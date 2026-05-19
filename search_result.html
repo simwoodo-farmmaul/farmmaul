@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 검색 결과</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        
+        :root { 
+            --primary-green: #87B32E; 
+            --primary-orange: #E69138; 
+            --primary-blue: #4B9AD2; 
+            --bg-color: #f8f9fa; 
+            --text-dark: #333;
+            --text-light: #666;
+        }
+        
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-dark); }
+        a { text-decoration: none; color: inherit; }
+
+        /* 1. 상단 헤더 & 검색바 */
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; gap: 15px; }
+        .back-btn { font-size: 1.5rem; color: #333; font-weight: 900; cursor: pointer; text-decoration: none; }
+        
+        .search-input-box { flex: 1; display: flex; background: #f1f3f5; border-radius: 25px; overflow: hidden; padding: 5px 15px; align-items: center; border: 1px solid #e9ecef; transition: 0.2s; }
+        .search-input-box:focus-within { border-color: var(--primary-green); background: #fff; box-shadow: 0 0 0 3px rgba(135,179,46,0.1); }
+        .search-input-box input { flex: 1; border: none; background: transparent; padding: 10px 5px; font-size: 1.05rem; outline: none; font-weight: 700; color: #222; }
+        .search-input-box button { background: none; border: none; font-size: 1.2rem; cursor: pointer; color: var(--primary-green); padding: 5px; }
+
+        /* 2. 연관 검색어 (태그) */
+        .related-tags { max-width: 800px; margin: 0 auto; padding: 12px 20px; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #fff; border-bottom: 1px solid #eee; }
+        .related-tags::-webkit-scrollbar { display: none; }
+        .tag-item { background: #fff8eb; color: var(--primary-orange); border: 1px solid #ffe0b2; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
+        .tag-item:hover { background: var(--primary-orange); color: #fff; }
+
+        /* 3. 필터 및 정렬 옵션 */
+        .filter-section { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .result-count { font-size: 0.95rem; font-weight: 800; color: #555; }
+        .result-count span { color: var(--primary-green); font-weight: 900; }
+        
+        .filter-buttons { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-filter { background: #fff; border: 1px solid #ddd; color: #666; padding: 8px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 4px; }
+        .btn-filter.active { background: #f4f9ea; border-color: var(--primary-green); color: var(--primary-green); }
+        
+        .sort-select { padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; font-weight: 700; font-size: 0.85rem; outline: none; background: #fff; cursor: pointer; }
+
+        /* 4. 검색 결과 리스트 */
+        .result-container { max-width: 800px; margin: 0 auto; padding: 0 20px 40px; display: flex; flex-direction: column; gap: 15px; }
+        
+        .product-card { background: #fff; border-radius: 15px; display: flex; padding: 15px; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); border: 1px solid #eaeaea; cursor: pointer; transition: 0.2s; }
+        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); }
+        
+        .prod-img { width: 110px; height: 110px; border-radius: 12px; object-fit: cover; background: #f0f0f0; flex-shrink: 0; }
+        .prod-info { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        
+        .prod-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px; }
+        .producer-name { font-size: 0.8rem; color: #888; font-weight: 800; }
+        .distance { font-size: 0.8rem; color: var(--primary-blue); font-weight: 900; background: #e1f5fe; padding: 3px 8px; border-radius: 6px; }
+        
+        .prod-title { font-size: 1.1rem; font-weight: 800; color: #222; margin-bottom: 6px; line-height: 1.3; }
+        .prod-price { font-size: 1.2rem; font-weight: 900; color: var(--primary-orange); margin-bottom: 8px; }
+        
+        /* 수령 방식 뱃지 */
+        .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+        .badge { font-size: 0.75rem; padding: 4px 8px; border-radius: 6px; font-weight: 800; }
+        .badge-visit { background: #fff8eb; color: #d97706; border: 1px solid #ffe0b2; }
+        .badge-hub { background: #f0f8ff; color: #0277bd; border: 1px solid #b3e5fc; }
+        .badge-parcel { background: #f5f5f5; color: #666; border: 1px solid #ddd; }
+
+        /* 더보기 버튼 */
+        .btn-load-more { display: block; width: 100%; padding: 15px; background: #fff; border: 1px solid #ddd; border-radius: 12px; text-align: center; font-weight: 800; color: #555; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-load-more:hover { background: #f8f9fa; border-color: #ccc; }
+
+        /* 모바일 반응형 */
+        @media (max-width: 480px) {
+            .prod-img { width: 90px; height: 90px; }
+            .prod-title { font-size: 1rem; }
+            .filter-section { flex-direction: column; align-items: flex-start; }
+            .sort-select { align-self: flex-end; margin-top: -35px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <a href="#" class="back-btn" onclick="history.back()">←</a>
+            <div class="search-input-box">
+                <input type="text" value="토마토" placeholder="검색어를 입력하세요">
+                <button onclick="alert('검색합니다!')">🔍</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="related-tags">
+        <div class="tag-item">#지산동토마토</div>
+        <div class="tag-item">#무농약토마토</div>
+        <div class="tag-item">#당일수확</div>
+        <div class="tag-item">#방울토마토</div>
+        <div class="tag-item">#흑토마토</div>
+    </div>
+
+    <div class="filter-section">
+        <div class="result-count">총 <span>4</span>건의 상품</div>
+        
+        <div class="filter-buttons">
+            <button class="btn-filter" onclick="toggleFilter(this)">📍 내 동네(5km)만</button>
+            <button class="btn-filter active" onclick="toggleFilter(this)">🏠 방문수거</button>
+            <button class="btn-filter" onclick="toggleFilter(this)">🏪 HUB수령</button>
+        </div>
+
+        <select class="sort-select">
+            <option>추천순</option>
+            <option selected>거리 가까운순</option>
+            <option>최신 등록순</option>
+            <option>낮은 가격순</option>
+        </select>
+    </div>
+
+    <div class="result-container">
+        
+        <div class="product-card" onclick="alert('상품 상세페이지로 이동합니다.')">
+            <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
+            <div class="prod-info">
+                <div class="prod-header">
+                    <span class="producer-name">🧑‍🌾 지산동 영진농원</span>
+                    <span class="distance">0.8 km</span>
+                </div>
+                <div class="prod-title">당일 수확 고당도 꿀토마토 2kg</div>
+                <div class="prod-price">14,000원</div>
+                <div class="badges">
+                    <span class="badge badge-visit">🏠 방문수거</span>
+                    <span class="badge badge-hub">🏪 HUB보관</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1561136594-7f68413baa99?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
+            <div class="prod-info">
+                <div class="prod-header">
+                    <span class="producer-name">🧑‍🌾 송북동 푸른농장</span>
+                    <span class="distance">2.1 km</span>
+                </div>
+                <div class="prod-title">유기농 찰토마토 특품 3kg (선물용)</div>
+                <div class="prod-price">22,000원</div>
+                <div class="badges">
+                    <span class="badge badge-visit">🏠 방문수거</span>
+                    <span class="badge badge-parcel">📦 택배배송</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1582284540020-8acbe03f4924?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
+            <div class="prod-info">
+                <div class="prod-header">
+                    <span class="producer-name">🧑‍🌾 고덕동 청년농부</span>
+                    <span class="distance">4.5 km</span>
+                </div>
+                <div class="prod-title">스테비아 대추 방울토마토 500g</div>
+                <div class="prod-price">8,500원</div>
+                <div class="badges">
+                    <span class="badge badge-hub">🏪 HUB보관</span>
+                    <span class="badge badge-parcel">📦 택배배송</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <img src="https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
+            <div class="prod-info">
+                <div class="prod-header">
+                    <span class="producer-name">🧑‍🌾 안성 일죽 농원</span>
+                    <span class="distance">15.2 km</span>
+                </div>
+                <div class="prod-title">무농약 흑토마토 (쿠마토) 1kg</div>
+                <div class="prod-price">11,000원</div>
+                <div class="badges">
+                    <span class="badge badge-parcel">📦 택배배송</span>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-load-more" onclick="alert('다음 상품을 불러옵니다.')">더보기 (4/12) ▼</button>
+
+    </div>
+
+    <script>
+        // 필터 버튼 클릭 시 색상 활성화/비활성화 스크립트
+        function toggleFilter(btn) {
+            btn.classList.toggle('active');
+            // 실제 구현 시 여기서 상품 리스트를 다시 정렬하거나 숨기는 로직이 들어갑니다.
+        }
+    </script>
+</body>
+</html>

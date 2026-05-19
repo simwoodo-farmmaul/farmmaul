@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 우리 동네 HUB 검색</title>
+
+    <link rel="icon" type="image/webp" href="farmmaul.webp">
+    <link rel="apple-touch-icon" href="farmmaul.webp">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
+        :root {
+            --primary-green: #87B32E;
+            --primary-orange: #E69138;
+            --primary-blue: #4B9AD2;
+            --bg-color: #f8f9fa;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
+        body { background-color: var(--bg-color); color: #333; padding-bottom: 80px; }
+        a { text-decoration: none; color: inherit; }
+        
+        /* 공통 헤더 */
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-icon { font-size: 1.2rem; cursor: pointer; font-weight: 900; }
+        .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); }
+        .location-picker { font-size: 0.95rem; font-weight: 800; cursor: pointer; padding: 6px 10px; border-radius: 8px; background: #f1f3f5; color: #555; }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 0; }
+
+        /* 검색창 바 */
+        .search-area { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; gap: 10px; }
+        .search-input { flex: 1; padding: 12px 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; outline: none; background: #f9f9f9; }
+        .search-input:focus { border-color: var(--primary-blue); background: #fff; }
+        .search-btn { background: var(--primary-blue); color: #fff; border: none; padding: 0 20px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; }
+
+        /* 지도 영역 */
+        .map-container { width: 100%; height: 250px; background: #e0e0e0; position: relative; border-bottom: 1px solid #ddd; }
+        .map-container iframe { width: 100%; height: 100%; border: none; }
+        
+        /* 지도 위 둥둥 떠있는 정보창 */
+        .map-overlay-info { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; color: var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); backdrop-filter: blur(4px); z-index: 10; white-space: nowrap; }
+
+        /* 허브 리스트 영역 */
+        .list-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
+        .list-count { font-weight: 800; font-size: 1.1rem; }
+        .list-count span { color: var(--primary-orange); }
+
+        .hub-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 15px; }
+        
+        /* 개별 허브 카드 */
+        .hub-card { background: #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eaeaea; transition: 0.2s; cursor: pointer; align-items: center; }
+        .hub-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: var(--primary-blue); }
+        
+        .hub-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; background: #eee; flex-shrink: 0; }
+        .hub-info { flex: 1; }
+        .hub-badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; margin-bottom: 5px; }
+        .badge-cafe { background: #e8f5e9; color: #2e7d32; }
+        .badge-store { background: #e3f2fd; color: #1565c0; }
+        
+        .hub-title { font-size: 1.1rem; font-weight: 900; color: #222; margin-bottom: 5px; }
+        .hub-addr { font-size: 0.85rem; color: #666; margin-bottom: 5px; }
+        .hub-time { font-size: 0.85rem; color: #888; font-weight: 700; }
+        
+        .btn-detail { background: #f1f3f5; color: #555; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 800; white-space: nowrap; border: 1px solid #ddd; }
+        .hub-card:hover .btn-detail { background: var(--primary-blue); color: #fff; border-color: var(--primary-blue); }
+
+        /* 모바일 하단바 */
+        .mobile-bottom-nav { display: none; }
+
+        @media (max-width: 768px) {
+            .map-container { height: 200px; }
+            .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; justify-content: space-around; align-items: center; border-top: 1px solid #eaeaea; }
+            .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.75rem; font-weight: 600; width: 25%; }
+            .nav-item .icon { font-size: 1.3rem; }
+            .nav-item.active { color: var(--primary-green); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <a href="index.html" class="btn-icon">←</a>
+            <div class="title">우리 동네 HUB 찾기</div>
+            <div class="location-picker" onclick="alert('동네 설정 팝업이 열립니다.')">📍 지산동 ▾</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="search-area">
+            <input type="text" class="search-input" placeholder="동 이름이나 허브 이름을 검색하세요">
+            <button class="search-btn" onclick="alert('검색되었습니다.')">검색</button>
+        </div>
+
+        <div class="map-container">
+            <div class="map-overlay-info">지산동 주변 반경 3km 내 HUB</div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3175.969894871408!2d127.054366!3d37.086884!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzfCsDA1JzEyLjgiTiAxMjfCsDAzJzE1LjciRQ!5e0!3m2!1sko!2skr!4v1620000000000!5m2!1sko!2skr" allowfullscreen="" loading="lazy"></iframe>
+        </div>
+
+        <div class="list-header">
+            <div class="list-count">검색된 HUB <span>3</span>곳</div>
+        </div>
+
+        <div class="hub-list">
+            <div class="hub-card" onclick="location.href='hub.html'">
+                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop" class="hub-img" alt="카페 허브">
+                <div class="hub-info">
+                    <span class="hub-badge badge-cafe">☕ 카페 거점</span>
+                    <div class="hub-title">지산동 1호 카페 [초록]</div>
+                    <div class="hub-addr">평택시 지산동 55-1 (송탄역 도보 3분)</div>
+                    <div class="hub-time">⏰ 09:00 ~ 21:00 (냉장보관 가능)</div>
+                </div>
+                <div class="btn-detail">상세보기</div>
+            </div>
+
+            <div class="hub-card" onclick="location.href='hub.html'">
+                <img src="https://images.unsplash.com/photo-1601599561096-f87c95fff1e9?q=80&w=200&auto=format&fit=crop" class="hub-img" alt="편의점 허브">
+                <div class="hub-info">
+                    <span class="hub-badge badge-store">🏪 편의점 거점</span>
+                    <div class="hub-title">송탄역 2호 제일편의점</div>
+                    <div class="hub-addr">평택시 신장동 120-3 (2번 출구 앞)</div>
+                    <div class="hub-time">⏰ 24시간 연중무휴</div>
+                </div>
+                <div class="btn-detail">상세보기</div>
+            </div>
+
+            <div class="hub-card" onclick="location.href='hub.html'">
+                <img src="https://images.unsplash.com/photo-1534723452862-4c874018d66d?q=80&w=200&auto=format&fit=crop" class="hub-img" alt="마트 허브">
+                <div class="hub-info">
+                    <span class="hub-badge badge-store">🛒 마트 거점</span>
+                    <div class="hub-title">고덕 삼성 3호 할인마트</div>
+                    <div class="hub-addr">평택시 고덕동 33-2 (상가 1층)</div>
+                    <div class="hub-time">⏰ 08:00 ~ 23:00 (대용량 보관 가능)</div>
+                </div>
+                <div class="btn-detail">상세보기</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="nav-item">
+            <span class="icon">🏠</span><span class="text">홈</span>
+        </a>
+        <a href="hub_search.html" class="nav-item active">
+            <span class="icon">🔍</span><span class="text">HUB검색</span>
+        </a>
+        <a href="chat.html" class="nav-item">
+            <span class="icon">💬</span><span class="text">채팅</span>
+        </a>
+        <a href="mypage.html" class="nav-item">
+            <span class="icon">👤</span><span class="text">내정보</span>
+        </a>
+    </div>
+
+</body>
+</html>

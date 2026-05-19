@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 주문 완료</title>
+    <link rel="icon" type="image/webp" href="farmmaul.webp">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        :root {
+            --primary-green: #87B32E;
+            --primary-orange: #E69138;
+            --primary-blue: #4B9AD2;
+            --bg-color: #f8f9fa;
+            --text-dark: #333;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
+        body { background-color: var(--bg-color); color: var(--text-dark); display: flex; flex-direction: column; min-height: 100vh; }
+        a { text-decoration: none; color: inherit; }
+
+        /* 헤더 */
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 600px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: center; }
+        .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); font-family: 'Jua', sans-serif; }
+
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; flex: 1; width: 100%; }
+
+        /* 완료 메시지 섹션 */
+        .success-header { text-align: center; margin-bottom: 40px; }
+        .success-icon { font-size: 4rem; margin-bottom: 20px; display: inline-block; animation: bounce 1s infinite alternate; }
+        @keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .success-header h2 { font-size: 1.8rem; font-weight: 900; color: #222; margin-bottom: 10px; }
+        .success-header p { font-size: 1rem; color: #666; font-weight: 600; line-height: 1.5; }
+
+        /* 영수증 카드 */
+        .receipt-card { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative; }
+        .receipt-card::after { content: ''; position: absolute; bottom: -10px; left: 5%; width: 90%; height: 20px; background: radial-gradient(circle, transparent 70%, #fff 70%); background-size: 20px 20px; display: none; } /* 절취선 효과는 생략 */
+
+        .receipt-title { font-size: 1.1rem; font-weight: 900; color: #333; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px dashed #f1f3f5; display: flex; justify-content: space-between; }
+        .order-no { font-size: 0.9rem; color: #999; font-weight: 700; }
+
+        .receipt-row { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 0.95rem; }
+        .r-label { color: #888; font-weight: 700; }
+        .r-value { color: #333; font-weight: 800; text-align: right; }
+        .r-value.highlight { color: var(--primary-orange); font-size: 1.2rem; }
+
+        .divider { border-top: 1px solid #f1f3f5; margin: 15px 0; }
+
+        /* 수령 방법 안내 박스 */
+        .delivery-info-box { background: #f0f7e6; border-radius: 12px; padding: 20px; margin-top: 20px; border: 1px solid #dcedc8; }
+        .info-title { font-weight: 900; font-size: 0.95rem; color: #2e7d32; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .info-desc { font-size: 0.9rem; color: #555; line-height: 1.6; font-weight: 600; }
+
+        /* 하단 버튼 */
+        .btn-group { display: flex; gap: 12px; margin-top: 40px; }
+        .btn { flex: 1; padding: 18px; border-radius: 15px; font-size: 1.1rem; font-weight: 900; cursor: pointer; border: none; text-align: center; transition: 0.2s; }
+        .btn-home { background: #f1f3f5; color: #555; }
+        .btn-home:hover { background: #e9ecef; }
+        .btn-history { background: var(--primary-green); color: #fff; box-shadow: 0 5px 15px rgba(135,179,46,0.3); }
+        .btn-history:hover { transform: translateY(-2px); }
+
+        @media (max-width: 768px) {
+            .container { padding: 30px 15px; }
+            .success-header h2 { font-size: 1.5rem; }
+            .receipt-card { padding: 25px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <div class="title">주문 완료</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 완료 메시지 -->
+        <div class="success-header">
+            <span class="success-icon">🎉</span>
+            <h2>주문이 완료되었습니다!</h2>
+            <p>이웃의 신선함을 정성껏 준비하겠습니다.<br>팜마을을 이용해주셔서 감사합니다.</p>
+        </div>
+
+        <!-- 영수증 영역 -->
+        <div class="receipt-card">
+            <div class="receipt-title">
+                <span>주문 요약 내역</span>
+                <span class="order-no">No. 20260515-0042</span>
+            </div>
+
+            <div class="receipt-row">
+                <span class="r-label">주문 상품</span>
+                <span class="r-value">지산동 꿀토마토 2kg 외 1건</span>
+            </div>
+            <div class="receipt-row">
+                <span class="r-label">주문 일시</span>
+                <span class="r-value">2026-05-15 13:20</span>
+            </div>
+            <div class="receipt-row">
+                <span class="r-label">수령 방법</span>
+                <span class="r-value" style="color:var(--primary-blue)">🏪 마을 HUB 보관 수령</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="receipt-row">
+                <span class="r-label">상품 금액</span>
+                <span class="r-value">30,000원</span>
+            </div>
+            <div class="receipt-row">
+                <span class="r-label">배송비</span>
+                <span class="r-value">0원 (HUB수령 무료)</span>
+            </div>
+            <div class="receipt-row">
+                <span class="r-label">최종 결제 금액</span>
+                <span class="r-value highlight">30,000원</span>
+            </div>
+
+            <!-- 수령 방법별 맞춤 안내 -->
+            <div class="delivery-info-box">
+                <div class="info-title">📍 HUB 수령 안내</div>
+                <div class="info-desc">
+                    선택하신 <b>[지산동 1호 카페 HUB]</b>에 상품이 도착하면 카카오톡 알림을 보내드립니다. 알림 수신 후 카페 사장님께 주문 번호를 보여주시고 상품을 수령하세요!
+                </div>
+            </div>
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div class="btn-group">
+            <a href="index.html" class="btn btn-home">홈으로 가기</a>
+            <a href="mypage.html" class="btn btn-history">주문 내역 확인</a>
+        </div>
+    </div>
+
+</body>
+</html>

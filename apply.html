@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 생산자 및 HUB 신청</title>
+    <style>
+        /* 구글 웹 폰트 'Jua' 및 기본 폰트 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        
+        :root { 
+            --primary-green: #87B32E; 
+            --primary-orange: #E69138; 
+            --primary-blue: #4B9AD2; 
+            --bg-color: #f4f7f6; 
+        }
+        
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; }
+
+        /* 헤더 */
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 600px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header .btn { font-size: 1.2rem; text-decoration: none; color: #333; font-weight: 900; cursor: pointer; }
+        .header .title { font-weight: 900; font-size: 1.2rem; color: #222; }
+
+        /* 컨테이너 */
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; padding-bottom: 100px; }
+
+        /* 상단 안내 박스 */
+        .welcome-box { background: #fff; border-radius: 15px; padding: 25px 20px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.03); margin-bottom: 25px; border-top: 4px solid var(--primary-green); }
+        .welcome-box h2 { font-size: 1.3rem; margin-bottom: 10px; font-weight: 900; color: #222; }
+        .welcome-box p { font-size: 0.95rem; color: #666; line-height: 1.5; margin: 0; word-break: keep-all; }
+
+        /* 탭 메뉴 */
+        .apply-tabs { display: flex; background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); border: 1px solid #eee; }
+        .apply-tab { flex: 1; padding: 15px 0; text-align: center; font-size: 1.05rem; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.2s; background: #fafafa; }
+        .apply-tab.active { background: #fff; color: var(--primary-green); border-bottom: 3px solid var(--primary-green); margin-bottom: -1px; }
+
+        /* 입력 폼 영역 */
+        .form-section { background: #fff; border-radius: 15px; padding: 25px 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); display: none; margin-bottom: 20px; }
+        .form-section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        .form-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 20px; color: #222; display: flex; align-items: center; gap: 8px; }
+
+        /* 폼 요소 디자인 */
+        .form-group { margin-bottom: 20px; }
+        .label { display: block; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; color: #555; }
+        .label .req { color: var(--primary-orange); margin-left: 4px; }
+        
+        input[type="text"], input[type="tel"], textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; box-sizing: border-box; font-family: inherit; transition: 0.2s; }
+        input:focus, textarea:focus { border-color: var(--primary-green); background: #fcfdfa; }
+        textarea { height: 100px; resize: none; }
+
+        /* 주소 입력 그룹 */
+        .address-group { display: flex; gap: 8px; margin-bottom: 8px; }
+        .address-group input { flex: 1; }
+        .btn-postcode { background: #f1f3f5; border: 1px solid #ddd; padding: 0 15px; border-radius: 10px; font-weight: 800; color: #555; cursor: pointer; white-space: nowrap; }
+
+        /* 사진 업로드 박스 */
+        .upload-box { display: block; box-sizing: border-box; width: 100%; border: 2px dashed #ccc; background: #f8f9fa; border-radius: 12px; padding: 25px 20px; text-align: center; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .upload-box:hover { border-color: var(--primary-green); background: #f4f9ea; }
+        .upload-icon { font-size: 2rem; margin-bottom: 10px; color: #aaa; }
+        .upload-text { font-size: 0.95rem; font-weight: 700; color: #666; }
+
+        /* 사진 미리보기 영역 */
+        .preview-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .preview-container img { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+
+        /* 체크박스 그룹 */
+        .check-group { display: flex; gap: 15px; flex-wrap: wrap; }
+        .check-item { display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 700; color: #444; cursor: pointer; }
+        .check-item input { width: 18px; height: 18px; accent-color: var(--primary-green); cursor: pointer; }
+
+        /* 약관 동의 및 하단 고정 버튼 */
+        .terms-box { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .terms-box label { display: flex; align-items: flex-start; gap: 10px; font-size: 0.9rem; color: #555; font-weight: 700; cursor: pointer; line-height: 1.4; }
+        .terms-box input { margin-top: 2px; width: 18px; height: 18px; accent-color: var(--primary-green); }
+
+        .btn-bottom-fixed { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; background: var(--primary-green); color: #fff; border: none; font-size: 1.3rem; font-weight: 900; cursor: pointer; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); }
+        .btn-bottom-fixed:hover { background: #76a025; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <a href="#" class="btn" onclick="history.back()">←</a>
+            <div class="title">생산자/HUB 신청</div>
+            <div style="width: 20px;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        
+        <div class="welcome-box">
+            <h2>팜마을의 이웃 상인이 되어주세요! 🌱</h2>
+            <p>직접 키운 농산물을 판매하는 <b>생산자</b>, 이웃들의 소중한 물건을 보관해 주는 <b>마을 HUB</b> 중 원하시는 역할을 선택하여 신청해 주세요.</p>
+        </div>
+
+        <div class="apply-tabs">
+            <div class="apply-tab active" id="tab-producer" onclick="switchTab('producer')">🧑‍🌾 생산자 신청</div>
+            <div class="apply-tab" id="tab-hub" onclick="switchTab('hub')">🏪 마을 HUB 신청</div>
+        </div>
+
+        <div class="form-section active" id="form-producer">
+            <div class="form-title">🧑‍🌾 생산자(농가) 기본 정보</div>
+            
+            <div class="form-group">
+                <span class="label">농장 또는 생산자이름(실명또는별명) <span class="req">*</span></span>
+                <div style="font-size:0.85rem; color:#666; font-weight:700; margin-bottom:8px;">
+                    *(실명또는별명)농장의 이름으로 호칭됩니다.
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <input type="text" placeholder="예: 지산동 영진" style="flex:1;">
+                    <span style="font-weight:900; font-size:1.15rem; color:#222; white-space:nowrap;">[농원]</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="label">농장 주소 (생산지) <span class="req">*</span></span>
+                <div class="address-group">
+                    <input type="text" placeholder="우편번호" readonly>
+                    <button class="btn-postcode">주소찾기</button>
+                </div>
+                <input type="text" placeholder="기본 주소" style="margin-bottom:8px;" readonly>
+                <input type="text" placeholder="상세 주소 (비닐하우스 위치 등)">
+            </div>
+
+            <div class="form-group">
+                <span class="label">주력 생산 품목 <span class="req">*</span></span>
+                <div class="check-group">
+                    <label class="check-item"><input type="checkbox"> 농산물</label>
+                    <label class="check-item"><input type="checkbox"> 축산물</label>
+                    <label class="check-item"><input type="checkbox"> 조류</label>
+                    <label class="check-item"><input type="checkbox"> 어류/수산</label>
+                    <label class="check-item"><input type="checkbox"> 가공식품</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="label">농장/작업장 사진 첨부 <span class="req">*</span></span>
+                <label class="upload-box">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">여기를 눌러 농장 사진을 업로드해주세요.<br><span style="font-size:0.8rem; color:#aaa;">(최대 3장 / 심사 시 참고됩니다)</span></div>
+                    <input type="file" id="file-producer" style="display:none;" multiple accept="image/*" onchange="handleFileUpload(this, 'preview-producer')">
+                </label>
+                <div id="preview-producer" class="preview-container"></div>
+            </div>
+
+            <div class="form-group">
+                <span class="label">생산자 한 줄 소개</span>
+                <textarea placeholder="이웃들에게 농장과 본인을 짧게 소개해 주세요."></textarea>
+            </div>
+
+            <div class="terms-box">
+                <label>
+                    <input type="checkbox" id="chk-producer">
+                    <span>(필수) 거짓 없이 직접 생산한 물품만을 판매하며, 팜마을 생산자 규정 및 품질 보증 정책에 동의합니다.</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="form-section" id="form-hub">
+            <div class="form-title">🏪 마을 HUB(거점) 기본 정보</div>
+            
+            <div class="form-group">
+                <span class="label">매장 상호명 <span class="req">*</span></span>
+                <input type="text" placeholder="예: 지산동 카페초록">
+            </div>
+
+            <div class="form-group">
+                <span class="label">매장 주소 <span class="req">*</span></span>
+                <div class="address-group">
+                    <input type="text" placeholder="우편번호" readonly>
+                    <button class="btn-postcode">주소찾기</button>
+                </div>
+                <input type="text" placeholder="기본 주소" style="margin-bottom:8px;" readonly>
+                <input type="text" placeholder="상세 주소">
+            </div>
+
+            <div class="form-group">
+                <span class="label">가까운 지하철역 또는 기차역 <span class="req">*</span></span>
+                <input type="text" placeholder="예: 평택역, 지제역">
+            </div>
+
+            <div class="form-group">
+                <span class="label">매장 영업 시간 <span class="req">*</span></span>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="time" style="flex:1;">
+                    <span style="font-weight:900;">~</span>
+                    <input type="time" style="flex:1;">
+                </div>
+                <div style="font-size:0.85rem; color:#888; margin-top:5px;">* 이웃들이 물건을 찾으러 올 수 있는 시간을 알려주세요.</div>
+            </div>
+
+            <div class="form-group">
+                <span class="label">매장 내/외부 사진 첨부 <span class="req">*</span></span>
+                <label class="upload-box">
+                    <div class="upload-icon">📸</div>
+                    <div class="upload-text">여기를 눌러 매장 간판 및 보관 장소 사진을 업로드해주세요.<br><span style="font-size:0.8rem; color:#aaa;">(심사 시 참고됩니다)</span></div>
+                    <input type="file" id="file-hub" style="display:none;" multiple accept="image/*" onchange="handleFileUpload(this, 'preview-hub')">
+                </label>
+                <div id="preview-hub" class="preview-container"></div>
+            </div>
+
+            <div class="terms-box">
+                <label>
+                    <input type="checkbox" id="chk-hub">
+                    <span>(필수) 이웃의 물건을 내 물건처럼 안전하게 보관하며, 팜마을 HUB 운영 규정 및 수수료 정책에 동의합니다.</span>
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+    <button class="btn-bottom-fixed" onclick="submitApplication()">신청서 제출하기</button>
+
+    <script>
+        let currentType = 'producer';
+
+        function switchTab(type) {
+            currentType = type;
+            document.getElementById('tab-producer').classList.remove('active');
+            document.getElementById('tab-hub').classList.remove('active');
+            document.getElementById('form-producer').classList.remove('active');
+            document.getElementById('form-hub').classList.remove('active');
+            document.getElementById('tab-' + type).classList.add('active');
+            document.getElementById('form-' + type).classList.add('active');
+        }
+
+        function handleFileUpload(inputElement, previewId) {
+            const previewContainer = document.getElementById(previewId);
+            previewContainer.innerHTML = ''; 
+            
+            if (inputElement.files && inputElement.files.length > 0) {
+                const fileCount = Math.min(inputElement.files.length, 3);
+                for (let i = 0; i < fileCount; i++) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        previewContainer.appendChild(img);
+                    }
+                    reader.readAsDataURL(inputElement.files[i]);
+                }
+                if (inputElement.files.length > 3) {
+                    alert('사진은 최대 3장까지만 등록 가능합니다.');
+                }
+            }
+        }
+
+        function submitApplication() {
+            const chk = document.getElementById('chk-' + currentType);
+            if (!chk.checked) {
+                alert('필수 약관 및 정책에 동의해 주세요.');
+                return;
+            }
+            if (currentType === 'producer') {
+                alert('🧑‍🌾 생산자 신청서가 접수되었습니다.');
+            } else {
+                alert('🏪 마을 HUB 신청서가 접수되었습니다.');
+            }
+        }
+    </script>
+
+</body>
+</html>

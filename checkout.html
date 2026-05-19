@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 주문서 작성</title>
+    <style>
+        :root { --primary-green: #87B32E; --primary-orange: #E69138; --primary-blue: #4B9AD2; --bg-color: #f1f3f5; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; }
+        
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; }
+        .header .title { font-weight: 900; font-size: 1.3rem; color: var(--primary-green); flex: 1; text-align: center; margin-right: 30px; }
+
+        /* 레이아웃 뼈대 */
+        .container { max-width: 1200px; margin: 0 auto; display: flex; gap: 30px; padding: 30px 20px; align-items: flex-start; }
+        .order-content { flex: 1.8; display: flex; flex-direction: column; gap: 20px; }
+        .side-summary { flex: 1; position: sticky; top: 90px; }
+
+        /* 섹션 공통 스타일 */
+        .order-section { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+        .sec-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 20px; color: #222; border-left: 5px solid var(--primary-green); padding-left: 12px; }
+        
+        /* 주문 상품 요약 */
+        .prod-summary { display: flex; gap: 15px; align-items: center; background: #f8f9fa; padding: 15px; border-radius: 12px; }
+        .prod-img { width: 80px; height: 80px; border-radius: 10px; object-fit: cover; }
+        .prod-info .title { font-weight: 800; font-size: 1.05rem; margin-bottom: 5px; }
+        .prod-info .opt { font-size: 0.9rem; color: #666; font-weight: 600; }
+
+        /* 입력 폼 스타일 */
+        .form-group { margin-bottom: 20px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .label { display: block; font-weight: 800; font-size: 0.95rem; margin-bottom: 8px; color: #555; }
+        input, select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; box-sizing: border-box; font-family: inherit; }
+        input:focus { border-color: var(--primary-green); }
+
+        /* 수령 방식별 가변 폼 영역 */
+        .dynamic-field { display: none; padding: 20px; background: #fff8eb; border-radius: 12px; margin-top: 10px; border: 1px solid #ffe0b2; }
+
+        /* 결제 수단 선택 */
+        .pay-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .pay-group input { display: none; }
+        .pay-group label { padding: 15px; border: 1px solid #ddd; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 800; background: #fff; transition: 0.2s; }
+        .pay-group input:checked + label { border-color: var(--primary-green); color: var(--primary-green); background: #f4f9ea; }
+
+        /* 최종 결제 박스 (사이드) */
+        .summary-card { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 2px solid var(--primary-green); }
+        .sum-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 1rem; color: #666; font-weight: 600; }
+        .sum-row.total { border-top: 1px dashed #eee; margin-top: 15px; padding-top: 15px; color: #222; }
+        .total .price { font-size: 1.8rem; font-weight: 900; color: var(--primary-orange); }
+
+        .btn-order { width: 100%; padding: 20px; background: var(--primary-green); color: #fff; border: none; border-radius: 15px; font-size: 1.3rem; font-weight: 900; cursor: pointer; margin-top: 20px; transition: 0.2s; }
+        .btn-order:hover { background: #76a025; transform: translateY(-2px); }
+
+        /* 모바일 반응형 */
+        @media (max-width: 900px) {
+            .container { flex-direction: column; padding: 15px; }
+            .side-summary { position: static; width: 100%; margin-top: 20px; }
+            .order-section { padding: 20px; }
+            .btn-order { position: fixed; bottom: 0; left: 0; border-radius: 0; z-index: 1001; }
+            body { padding-bottom: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <a href="#" style="text-decoration:none; color:#333; font-weight:900;" onclick="history.back()">←</a>
+            <div class="title">주문서 작성</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="order-content">
+            
+            <div class="order-section">
+                <div class="sec-title">🛍️ 주문 상품 정보</div>
+                <div class="prod-summary">
+                    <img src="https://via.placeholder.com/150/87B32E/ffffff?text=Product" class="prod-img">
+                    <div class="prod-info">
+                        <div class="title">당일 수확 고당도 지산동 꿀토마토 2kg</div>
+                        <div class="opt">수량: 1개 / 30% 할인가</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-section">
+                <div class="sec-title">👤 주문자 정보</div>
+                <div class="form-group">
+                    <span class="label">이름</span>
+                    <input type="text" placeholder="받으시는 분 성함">
+                </div>
+                <div class="form-group">
+                    <span class="label">휴대폰 번호</span>
+                    <input type="tel" placeholder="010-0000-0000">
+                </div>
+            </div>
+
+            <div class="order-section">
+                <div class="sec-title">📍 수령 정보 설정</div>
+                <div class="form-group">
+                    <span class="label">수령 방식 선택</span>
+                    <select id="delOption" onchange="toggleOrderForm()">
+                        <option value="p">🏠 농장 방문 수거</option>
+                        <option value="h">🏪 마을 HUB 보관 수령</option>
+                        <option value="d">📦 일반 택배 배송</option>
+                    </select>
+                </div>
+
+                <div id="field_p" class="dynamic-field" style="display: block;">
+                    <div class="form-group">
+                        <span class="label">방문 예정 시간</span>
+                        <input type="time" style="cursor: pointer;" onclick="try{this.showPicker();}catch(e){}" title="터치하여 시간을 선택하세요">
+                    </div>
+                    <div style="font-size:0.9rem; color:#666; margin-top:8px; font-weight: 700;">* 방문 장소: 경기도 평택시 지산동 123-4 영진농원 정문</div>
+                </div>
+
+                <div id="field_h" class="dynamic-field">
+                    <div class="form-group">
+                        <span class="label">수령하실 HUB</span>
+                        <input type="text" value="지산동 1호 카페 HUB" readonly style="background:#eee;">
+                    </div>
+                    <div class="form-group">
+                        <span class="label">보관 완료 알림 번호</span>
+                        <input type="tel" placeholder="알림톡을 받으실 번호 (기본: 주문자 번호)">
+                    </div>
+                </div>
+
+                <div id="field_d" class="dynamic-field">
+                    <div class="form-group">
+                        <span class="label">배송지 주소</span>
+                        <div style="display:flex; gap:5px; margin-bottom:8px;">
+                            <input type="text" placeholder="우편번호" style="flex:0.5;">
+                            <button style="flex:0.5; border-radius:10px; border:1px solid #ddd; background:#fff; font-weight:700; cursor:pointer;">주소찾기</button>
+                        </div>
+                        <input type="text" placeholder="기본 주소" style="margin-bottom:8px;">
+                        <input type="text" placeholder="상세 주소">
+                    </div>
+                    <div class="form-group">
+                        <span class="label">배송 요청사항</span>
+                        <input type="text" placeholder="문 앞에 놓아주세요 등">
+                    </div>
+                </div>
+            </div>
+
+            <div class="order-section">
+                <div class="sec-title">💳 결제 수단 선택</div>
+                <div class="pay-group">
+                    <input type="radio" name="pay" id="pay1" checked><label for="pay1">무통장 입금</label>
+                    <input type="radio" name="pay" id="pay2"><label for="pay2">신용/체크카드</label>
+                </div>
+                <div id="bankInfo" style="margin-top:20px; padding:20px; background:#f8f9fa; border-radius:12px; font-size:0.95rem;">
+                    <strong>농협 301-0000-0000-00</strong> (예금주: 팜마을)<br>
+                    <span style="color:#666; font-size:0.85rem;">* 주문자명과 입금자명이 다를 경우 메모 남겨주세요.</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="side-summary">
+            <div class="summary-card">
+                <div class="sec-title" style="border:none; padding:0; font-size:1.4rem;">최종 결제 금액</div>
+                <div class="sum-row"><span>상품 금액</span><span>20,000원</span></div>
+                <div class="sum-row"><span>상품 할인</span><span style="color:#ff5e62;">-6,000원</span></div>
+                <div id="delFeeRow" class="sum-row"><span>배송/HUB비용</span><span>0원</span></div>
+                
+                <div class="sum-row total">
+                    <span>총 결제금액</span>
+                    <span class="price">14,000원</span>
+                </div>
+
+                <div style="margin-top:20px; font-size:0.8rem; color:#888;">
+                    <label style="cursor:pointer;"><input type="checkbox" checked> 개인정보 수집 및 제3자 제공에 동의합니다. (필수)</label>
+                </div>
+
+                <button class="btn-order" onclick="alert('주문이 정상적으로 접수되었습니다. 생산자에게 알림톡을 발송합니다! 🚀')">14,000원 결제하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleOrderForm() {
+            const val = document.getElementById('delOption').value;
+            // 모든 가변 필드 숨기기
+            document.getElementById('field_p').style.display = 'none';
+            document.getElementById('field_h').style.display = 'none';
+            document.getElementById('field_d').style.display = 'none';
+
+            // 선택된 필드만 보이기
+            document.getElementById('field_' + val).style.display = 'block';
+
+            // 택배일 경우 배송비 표시 예시
+            const delFeeText = document.querySelector('#delFeeRow span:last-child');
+            if(val === 'd') {
+                delFeeText.innerText = '3,000원';
+                document.querySelector('.total .price').innerText = '17,000원';
+                document.querySelector('.btn-order').innerText = '17,000원 결제하기';
+            } else {
+                delFeeText.innerText = '0원';
+                document.querySelector('.total .price').innerText = '14,000원';
+                document.querySelector('.btn-order').innerText = '14,000원 결제하기';
+            }
+        }
+    </script>
+</body>
+</html>

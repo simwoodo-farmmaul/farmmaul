@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 구매자 상품 상세페이지</title>
+    <style>
+        :root { --primary-green: #87B32E; --primary-orange: #E69138; --primary-blue: #4B9AD2; --bg-color: #f8f9fa; }
+        body { font-family: 'Pretendard', sans-serif; background: #ffffff; margin: 0; padding: 0; color: #333; }
+        
+        /* 공통 헤더 */
+        .header { border-bottom: 1px solid #eee; position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); z-index: 100; }
+        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        .header .btn { font-size: 1.2rem; text-decoration: none; color: #333; font-weight: 900; cursor: pointer; }
+        .header .title { font-weight: 900; font-size: 1.3rem; color: var(--primary-green); }
+
+        /* 반응형 레이아웃 뼈대 */
+        .top-section { max-width: 1200px; margin: 0 auto; display: flex; gap: 50px; padding: 40px 20px; align-items: flex-start; }
+        .img-area { flex: 1; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+        .info-area { flex: 1; display: flex; flex-direction: column; width: 100%; }
+        .bottom-section { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; border-top: 1px solid #eee; padding-top: 40px; }
+
+        /* 사진 및 영상 */
+        .main-image { width: 100%; aspect-ratio: 1/1; background: #eee; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .main-image img { width: 100%; height: 100%; object-fit: cover; }
+        .youtube-box { width: 100%; aspect-ratio: 16/9; background: #000; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        /* 카테고리, 농장명, 제목, 인증 */
+        .cat-farm-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+        .category-badge { background: #e8f5e9; color: #2e7d32; border: 1px solid #2e7d32; padding: 4px 10px; border-radius: 6px; font-size: 0.85rem; font-weight: 900; }
+        .farm-name { font-size: 1.05rem; color: #666; font-weight: 800; }
+        
+        .certs { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
+        .cert-fixed { background: var(--primary-green); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; }
+        .cert-custom { background: var(--primary-blue); color: #fff; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; }
+        
+        .prod-title { font-size: 2rem; font-weight: 900; color: #222; line-height: 1.35; margin: 0 0 15px; word-break: keep-all; }
+        
+        /* 해시태그 */
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; }
+        .tags span { color: var(--primary-blue); background: #f0f8ff; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; }
+
+        /* 가격 정보 */
+        .price-wrap { display: flex; align-items: baseline; gap: 15px; margin-bottom: 25px; padding-bottom: 25px; border-bottom: 1px solid #eee; }
+        .discount { font-size: 2.2rem; font-weight: 900; color: #ff5e62; }
+        .sale-price { font-size: 2.4rem; font-weight: 900; color: #111; }
+        .unit-text { font-size: 1.2rem; font-weight: 700; color: #555; }
+        .org-price { font-size: 1.2rem; font-weight: 600; color: #bbb; text-decoration: line-through; }
+
+        /* 상품 기본 요약 박스 */
+        .summary-box { background: #f8f9fa; border-radius: 15px; padding: 25px; display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .summary-row { display: flex; font-size: 1.05rem; }
+        .s-label { width: 110px; font-weight: 800; color: #888; flex-shrink: 0; }
+        .s-value { flex: 1; font-weight: 700; color: #333; }
+
+        /* 수령 방식 선택 폼 및 동적 지도 */
+        .option-section { margin-bottom: 30px; }
+        .option-title { font-size: 1.2rem; font-weight: 900; margin-bottom: 15px; color: #222; }
+        .radio-group { display: flex; flex-direction: column; gap: 12px; }
+        .radio-label { position: relative; display: block; cursor: pointer; }
+        .radio-label input[type="radio"] { position: absolute; opacity: 0; }
+        .radio-box { border: 2px solid #ddd; border-radius: 12px; padding: 18px; background: #fff; transition: 0.2s; display: flex; gap: 15px; align-items: flex-start; }
+        
+        .radio-label input[type="radio"]:checked + .radio-box { border-color: var(--primary-orange); background: #fff8eb; }
+        .radio-icon { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #ccc; background: #fff; display: flex; justify-content: center; align-items: center; margin-top: 2px; flex-shrink: 0; }
+        .radio-label input[type="radio"]:checked + .radio-box .radio-icon { border-color: var(--primary-orange); }
+        .radio-label input[type="radio"]:checked + .radio-box .radio-icon::after { content: ''; width: 12px; height: 12px; background: var(--primary-orange); border-radius: 50%; }
+        
+        .radio-text { flex: 1; }
+        .radio-title { font-weight: 900; font-size: 1.1rem; color: #333; margin-bottom: 6px; }
+        .radio-desc { font-size: 0.95rem; color: #666; line-height: 1.5; word-break: keep-all; }
+        .hub-select { width: 100%; padding: 12px; margin-top: 10px; border: 1px solid #ddd; border-radius: 8px; font-weight: 700; color: #333; outline: none; }
+
+        /* 지도 안내 박스 */
+        .map-section { margin-top: 20px; padding: 20px; background: #f1f3f5; border-radius: 15px; border: 1px solid #e2e8f0; }
+        .map-info-title { font-weight: 800; font-size: 1rem; color: #2d3748; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+        .map-placeholder { width: 100%; height: 180px; background: #cbd5e0 url('https://img.icons8.com/color/96/map-marker.png') no-repeat center; background-size: 40px; border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 15px; color: #4a5568; font-weight: 700; font-size: 0.85rem; }
+
+        /* 하단 구매 버튼 */
+        .action-buttons { display: flex; gap: 15px; margin-top: auto; }
+        .btn-icon { width: 60px; height: 60px; border: 1px solid #ddd; border-radius: 15px; font-size: 1.8rem; background: #fff; cursor: pointer; color: #ff5e62; display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+        .btn-icon:hover { background: #fff0f1; border-color: #ff5e62; }
+        .btn-cart { flex: 1; height: 60px; background: #f1f3f5; color: #333; border: none; border-radius: 15px; font-size: 1.2rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .btn-cart:hover { background: #e9ecef; }
+        .btn-buy { flex: 1.5; height: 60px; background: var(--primary-green); color: #fff; border: none; border-radius: 15px; font-size: 1.2rem; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(135,179,46,0.4); }
+
+        /* 상세 설명 섹션 */
+        .sec-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; color: #222; border-bottom: 2px solid #222; padding-bottom: 10px; display: inline-block; }
+        .detail-block { margin-bottom: 50px; }
+        .detail-img { width: 100%; max-width: 800px; border-radius: 15px; margin-bottom: 20px; display: block; }
+        .detail-text { font-size: 1.1rem; line-height: 1.8; color: #444; font-weight: 500; max-width: 800px; white-space: pre-wrap; background: #f9f9f9; padding: 25px; border-radius: 15px; }
+
+        /* FAQ 섹션 */
+        .faq-item { background: #f8f9fa; border-radius: 12px; margin-bottom: 15px; padding: 20px; border: 1px solid #eee; }
+        .faq-q { font-weight: 900; font-size: 1.1rem; color: #222; margin-bottom: 10px; display: flex; gap: 8px; }
+        .faq-q::before { content: 'Q.'; color: var(--primary-orange); }
+        .faq-a { font-size: 1rem; color: #555; line-height: 1.6; display: flex; gap: 8px; padding-top: 10px; border-top: 1px dashed #ddd; }
+        .faq-a::before { content: 'A.'; color: var(--primary-blue); font-weight: 900; }
+
+        /* ★ AI 채팅창 팝업 디자인 ★ */
+        .ai-chat-window { position: fixed; bottom: 100px; right: 30px; width: 350px; height: 500px; background: #fff; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 2000; overflow: hidden; border: 1px solid #eee; }
+        .ai-chat-header { background: var(--primary-green); color: #fff; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .ai-chat-header h3 { margin: 0; font-size: 1.1rem; font-weight: 900; }
+        .ai-chat-body { flex: 1; padding: 20px; background: #f9f9f9; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .ai-msg { background: #fff; padding: 12px 15px; border-radius: 0 15px 15px 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-size: 0.95rem; line-height: 1.5; align-self: flex-start; max-width: 85%; border: 1px solid #eee; }
+        .ai-chat-footer { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; background: #fff; }
+        .ai-chat-input { flex: 1; border: 1px solid #ddd; padding: 10px 15px; border-radius: 20px; outline: none; font-size: 0.9rem; }
+        .ai-chat-send { background: var(--primary-green); color: #fff; border: none; padding: 8px 15px; border-radius: 15px; font-weight: 800; cursor: pointer; }
+
+        /* ★ 플로팅 AI 버튼 ★ */
+        .ai-fab { position: fixed; bottom: 30px; right: 30px; width: 65px; height: 65px; background: var(--primary-green); color: #fff; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 5px 20px rgba(135,179,46,0.4); cursor: pointer; z-index: 1999; transition: 0.3s; }
+        .ai-fab:hover { transform: scale(1.1); rotate: 10deg; }
+        .ai-fab .icon { font-size: 1.6rem; }
+        .ai-fab .text { font-size: 0.7rem; font-weight: 900; }
+
+        /* 모바일 반응형 */
+        @media (max-width: 768px) {
+            .top-section { flex-direction: column; gap: 20px; padding: 20px; }
+            .bottom-section { padding: 20px 20px 100px; }
+            .prod-title { font-size: 1.6rem; }
+            .price-wrap { flex-wrap: wrap; gap: 10px; }
+            .discount { font-size: 1.8rem; }
+            .sale-price { font-size: 2rem; }
+            .summary-box { padding: 20px; }
+            .s-label { width: 90px; font-size: 0.95rem; }
+            .sec-title { font-size: 1.3rem; }
+            .detail-text { font-size: 1rem; padding: 15px; }
+
+            .action-buttons { position: fixed; bottom: 0; left: 0; width: 100%; padding: 15px 20px; background: #fff; box-shadow: 0 -5px 20px rgba(0,0,0,0.08); z-index: 1000; box-sizing: border-box; margin: 0; border-top: 1px solid #eee; }
+            .btn-icon, .btn-cart, .btn-buy { height: 55px; border-radius: 12px; font-size: 1.1rem; }
+            
+            .ai-chat-window { width: calc(100% - 40px); right: 20px; bottom: 90px; height: 70vh; }
+            .ai-fab { bottom: 85px; right: 15px; width: 60px; height: 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <a href="#" class="btn" onclick="history.back()">←</a>
+            <div class="title">FarmMaul 상품안내</div>
+            <a href="#" class="btn" onclick="alert('상품이 공유되었습니다.')">🔗</a>
+        </div>
+    </div>
+
+    <div class="top-section">
+        <div class="img-area">
+            <div class="main-image">
+                <img src="https://via.placeholder.com/800x800/87B32E/ffffff?text=Main+Product+Image" alt="메인 사진">
+            </div>
+            <div class="youtube-box">
+                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <div class="info-area">
+            <div class="cat-farm-row">
+                <span class="category-badge">농산물</span>
+                <span class="farm-name">🧑‍🌾 지산동 영진농원</span>
+                </div>
+            
+            <div class="certs">
+                <span class="cert-fixed">GAP인증</span>
+                <span class="cert-fixed">무농약</span>
+                <span class="cert-custom">평택명인 (자체)</span>
+            </div>
+            
+            <h1 class="prod-title">당일 수확 고당도 지산동 꿀토마토 2kg (특품)</h1>
+            
+            <div class="tags">
+                <span>#당일수확</span><span>#산지직송</span><span>#무농약</span>
+            </div>
+
+            <div class="price-wrap">
+                <span class="discount">30%</span>
+                <div>
+                    <span class="sale-price">14,000</span><span class="unit-text">원 / 박스</span>
+                </div>
+                <span class="org-price">20,000원</span>
+            </div>
+
+            <div class="summary-box">
+                <div class="summary-row"><span class="s-label">상품 등급</span><span class="s-value">특급 (최고품질)</span></div>
+                <div class="summary-row"><span class="s-label">상품 크기</span><span class="s-value">대과 / 10cm 내외</span></div>
+                <div class="summary-row"><span class="s-label">수확/생산일</span><span class="s-value">2026-05-07</span></div>
+            </div>
+
+            <div class="option-section">
+                <div class="option-title">📍 수령 방법 선택 <span style="font-size:0.85rem; color:#ff5e62; font-weight:700;">(필수)</span></div>
+                
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="d_option" value="방문수거" checked onchange="updateMap()">
+                        <div class="radio-box">
+                            <div class="radio-icon"></div>
+                            <div class="radio-text">
+                                <div class="radio-title">🏠 농장 직접 방문수거</div>
+                                <div class="radio-desc">경기도 평택시 지산동 123-4 영진농원 정문</div>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="radio-label">
+                        <input type="radio" name="d_option" value="HUB보관" onchange="updateMap()">
+                        <div class="radio-box">
+                            <div class="radio-icon"></div>
+                            <div class="radio-text">
+                                <div class="radio-title">🏪 마을 HUB 보관 수령</div>
+                                <div class="radio-desc">원하시는 HUB를 선택해주세요.</div>
+                                <select class="hub-select" id="selectedHub" onchange="updateMap()">
+                                    <option value="지산동 1호 카페 HUB">지산동 1호 카페 HUB</option>
+                                    <option value="송탄역 2호 편의점 HUB">송탄역 2호 편의점 HUB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </label>
+
+                    <label class="radio-label">
+                        <input type="radio" name="d_option" value="택배배송" onchange="updateMap()">
+                        <div class="radio-box">
+                            <div class="radio-icon"></div>
+                            <div class="radio-text">
+                                <div class="radio-title">📦 일반 택배 배송</div>
+                                <div class="radio-desc">유료 배송 (배송비: 3,000원)</div>
+                            </div>
+                        </div>
+                    </label>
+                </div>
+
+                <div id="mapGuideArea" class="map-section">
+                    <div id="mapInfoTitle" class="map-info-title">📍 방문 장소 확인</div>
+                    <div id="mapAddress" style="font-size:0.9rem; color:#666; margin-bottom:12px;">경기도 평택시 지산동 123-4 영진농원</div>
+                    <div class="map-placeholder">선택된 위치의 실시간 지도가 표시됩니다</div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-icon" onclick="alert('찜 💖')">♥</button>
+                <button class="btn-cart" onclick="if(confirm('장바구니에 담았습니다! 장바구니로 이동하시겠습니까?')) location.href='cart.html';">장바구니 담기</button>
+                <button class="btn-buy" onclick="processBuy()">바로 구매하기</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-section">
+        
+        <h2 class="sec-title">📝 상품 상세 설명</h2>
+        
+        <div class="detail-block">
+            <img src="https://via.placeholder.com/800x600/f1f3f5/888888?text=Sub+Image+1" alt="추가 사진 1" class="detail-img">
+            <div class="detail-text">지산동의 맑은 공기와 따스한 햇살을 듬뿍 머금고 자란 꿀토마토입니다. 가장 맛있는 타이밍에 수확하여 당일 바로 보내드립니다.</div>
+        </div>
+
+        <div class="detail-block">
+            <img src="https://via.placeholder.com/800x600/f1f3f5/888888?text=Sub+Image+2" alt="추가 사진 2" class="detail-img">
+            <div class="detail-text">크고 단단한 특등급의 과수만 엄선하여 정성스럽게 포장합니다. 달콤한 맛과 풍부한 과즙을 자랑합니다.</div>
+        </div>
+
+        <h2 class="sec-title" style="margin-top: 40px;">❓ 자주 묻는 질문 (FAQ)</h2>
+        
+        <div class="faq-item">
+            <div class="faq-q">HUB 수령은 어떻게 진행되나요?</div>
+            <div class="faq-a">주문 완료 후 발급되는 '주문 확인서'를 선택하신 카페나 편의점 사장님께 보여주시면 즉시 상품을 건네드립니다.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-q">보관 방법과 유통기한이 궁금합니다.</div>
+            <div class="faq-a">수령 후 즉시 냉장 보관을 권장하며, 무방부제 상품이므로 가급적 일주일 이내에 드시는 것이 가장 맛있습니다.</div>
+        </div>
+
+    </div>
+
+    <div id="aiChatWindow" class="ai-chat-window">
+        <div class="ai-chat-header">
+            <h3>🤖 팜마을 AI 고객센터</h3>
+            <span onclick="toggleAIChat()" style="cursor:pointer; font-size: 1.5rem;">×</span>
+        </div>
+        <div class="ai-chat-body">
+            <div class="ai-msg">안녕하세요! 팜마을 AI 상담원입니다. 🌿<br>지산동 영진농원 꿀토마토에 대해 궁금하신 점이 있으신가요?</div>
+            <div class="ai-msg" style="background:#e3f2fd; border-color:#bbdefb;">지금 주문하시면 내일 아침에 수확하여 오후에 HUB로 배달될 예정입니다!</div>
+        </div>
+        <div class="ai-chat-footer">
+            <input type="text" class="ai-chat-input" placeholder="궁금한 점을 물어보세요...">
+            <button class="ai-chat-send" onclick="alert('준비 중인 기능입니다.')">전송</button>
+        </div>
+    </div>
+
+    <div class="ai-fab" onclick="toggleAIChat()">
+        <span class="icon">🤖</span>
+        <span class="text">AI상담</span>
+    </div>
+
+    <script>
+        // AI 채팅창 열고 닫기 스크립트
+        function toggleAIChat() {
+            const win = document.getElementById('aiChatWindow');
+            if(win.style.display === 'flex') {
+                win.style.display = 'none';
+            } else {
+                win.style.display = 'flex';
+            }
+        }
+
+        function updateMap() {
+            const option = document.querySelector('input[name="d_option"]:checked').value;
+            const mapArea = document.getElementById('mapGuideArea');
+            const mapTitle = document.getElementById('mapInfoTitle');
+            const mapAddr = document.getElementById('mapAddress');
+
+            if(option === '방문수거') {
+                mapArea.style.display = 'block';
+                mapTitle.innerHTML = '📍 방문 장소 확인';
+                mapAddr.innerText = '경기도 평택시 지산동 123-4 영진농원 정문';
+            } else if(option === 'HUB보관') {
+                mapArea.style.display = 'block';
+                const hub = document.getElementById('selectedHub').value;
+                mapTitle.innerHTML = `📍 ${hub} 위치 확인`;
+                if(hub.includes('1호 카페')) mapAddr.innerText = '평택시 지산동 55-1 카페초록 앞';
+                else mapAddr.innerText = '송탄역 2번 출구 앞 제일편의점';
+            } else {
+                mapArea.style.display = 'none';
+            }
+        }
+
+        function processBuy() {
+            const opt = document.querySelector('input[name="d_option"]:checked').value;
+            let msg = `[${opt}] 방식을 선택하셨습니다.\n`;
+            if(opt === 'HUB보관') {
+                msg += `선택 HUB: ${document.getElementById('selectedHub').value}\n`;
+            }
+            alert(msg + "\n주문서 작성 페이지로 이동합니다! 🚀");
+            
+            // 주문서 페이지(checkout.html)로 이동하는 핵심 코드!
+            location.href = 'checkout.html';
+        }
+
+        // 페이지 열릴 때 초기 지도 세팅
+        updateMap();
+    </script>
+</body>
+</html>

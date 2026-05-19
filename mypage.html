@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 마이페이지</title>
+    <link rel="icon" type="image/webp" href="farmmaul.webp">
+    <link rel="apple-touch-icon" href="farmmaul.webp">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        :root { --primary-green: #87B32E; --primary-orange: #E69138; --primary-blue: #4B9AD2; --bg-color: #f1f3f5; --text-dark: #333; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; word-break: keep-all; }
+        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
+        a { text-decoration: none; color: inherit; }
+
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; }
+        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-icon { font-size: 1.2rem; cursor: pointer; font-weight: 900; }
+        .title { font-weight: 900; font-size: 1.2rem; color: #222; }
+
+        .container { max-width: 800px; margin: 0 auto; }
+
+        /* 내 프로필 요약 */
+        .profile-section { background: #fff; padding: 30px 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #eee; }
+        .profile-img { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #e8f5e9; }
+        .profile-info h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 5px; }
+        .profile-info p { font-size: 0.95rem; color: #666; font-weight: 700; }
+        .btn-edit { font-size: 0.8rem; background: #f1f3f5; padding: 4px 10px; border-radius: 8px; font-weight: 800; color: #555; margin-top: 5px; display: inline-block; }
+
+        /* 통합 메뉴 박스 */
+        .menu-group { background: #fff; margin-top: 15px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; }
+        .menu-title { font-size: 1rem; font-weight: 900; color: var(--primary-green); padding: 20px 20px 10px; }
+        .menu-title.buyer { color: var(--primary-orange); }
+        .menu-title.hub { color: var(--primary-blue); }
+        
+        .menu-list { list-style: none; }
+        .menu-list li { border-bottom: 1px solid #f8f9fa; }
+        .menu-list li:last-child { border-bottom: none; }
+        .menu-list a { display: flex; justify-content: space-between; align-items: center; padding: 18px 20px; font-size: 1.05rem; font-weight: 700; color: #444; transition: background 0.2s; }
+        .menu-list a:hover { background: #f9fbf9; }
+        .menu-list a span.arrow { color: #ccc; font-weight: 900; }
+
+        /* 모바일 네비게이션 */
+        .mobile-bottom-nav { display: none; }
+        @media (max-width: 768px) {
+            .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; justify-content: space-around; align-items: center; border-top: 1px solid #eaeaea; }
+            .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: #666; font-size: 0.75rem; font-weight: 600; width: 25%; }
+            .nav-item.active { color: var(--primary-green); }
+            .nav-item .icon { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-inner">
+            <a href="index.html" class="btn-icon">←</a>
+            <div class="title">마이페이지</div>
+            <div style="width: 24px;"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="profile-section">
+            <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=200&auto=format&fit=crop" class="profile-img">
+            <div class="profile-info">
+                <h2>김영진 님</h2>
+                <p>📍 평택시 지산동</p>
+                <a href="#" class="btn-edit" onclick="alert('프로필 수정 화면으로 이동합니다.')">회원정보 수정</a>
+            </div>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-title buyer">🛒 나의 쇼핑 (구매 활동)</div>
+            <ul class="menu-list">
+                <li><a href="#">주문/수령 내역 <span class="arrow">›</span></a></li>
+                <li><a href="#">단골 농장 및 찜한 상품 <span class="arrow">›</span></a></li>
+                <li><a href="#">내가 쓴 구매 후기 <span class="arrow">›</span></a></li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-title">🧑‍🌾 나의 농장 (생산 활동)</div>
+            <ul class="menu-list">
+                <li><a href="register.html">상품 등록 / 관리하기 <span class="arrow">›</span></a></li>
+                <li><a href="producer_story.html">내 농장 블로그(이야기) 보기 <span class="arrow">›</span></a></li>
+                <li><a href="story_write.html">새로운 농장 일기 쓰기 ✏️ <span class="arrow">›</span></a></li>
+                <li><a href="#">주문 들어온 내역 확인 <span class="arrow">›</span></a></li>
+            </ul>
+        </div>
+
+        <div class="menu-group">
+            <div class="menu-title hub">🏪 나의 마을 HUB</div>
+            <ul class="menu-list">
+                <li><a href="hub_apply.html">새로운 마을 HUB 거점 신청 <span class="arrow">›</span></a></li>
+                <li><a href="hub.html">내 HUB 보관소 관리하기 <span class="arrow">›</span></a></li>
+            </ul>
+        </div>
+
+        <div class="menu-group" style="margin-bottom: 30px;">
+            <div class="menu-title" style="color:#555;">📞 고객센터</div>
+            <ul class="menu-list">
+                <li><a href="#">공지사항 <span class="arrow">›</span></a></li>
+                <li><a href="qna.html">자주 묻는 질문 (FAQ) <span class="arrow">›</span></a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mobile-bottom-nav">
+        <a href="index.html" class="nav-item"><span class="icon">🏠</span><span class="text">홈</span></a>
+        <a href="search_result.html" class="nav-item"><span class="icon">🔍</span><span class="text">동네검색</span></a>
+        <a href="chat.html" class="nav-item"><span class="icon">💬</span><span class="text">채팅</span></a>
+        <a href="mypage.html" class="nav-item active"><span class="icon">👤</span><span class="text">내정보</span></a>
+    </div>
+</body>
+</html>

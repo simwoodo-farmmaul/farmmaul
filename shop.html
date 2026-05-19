@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 생산용품관</title>
+    <style>
+        /* 구글 웹 폰트 'Jua' 및 기본 폰트 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        
+        :root { 
+            --primary-green: #87B32E; 
+            --primary-orange: #E69138; 
+            --primary-blue: #4B9AD2; 
+            --bg-color: #f8f9fa; 
+            --text-dark: #333;
+            --text-light: #666;
+        }
+        
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-dark); padding-bottom: 60px; }
+        a { text-decoration: none; color: inherit; }
+
+        /* 1. 상단 헤더 */
+        .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .header-inner { max-width: 1000px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .back-btn { font-size: 1.5rem; font-weight: 900; cursor: pointer; }
+        .logo-small { font-family: 'Jua', sans-serif; font-size: 1.5rem; color: var(--primary-green); }
+        .cart-icon { font-size: 1.4rem; position: relative; cursor: pointer; }
+        .cart-count { position: absolute; top: -5px; right: -8px; background: var(--primary-orange); color: #fff; font-size: 0.7rem; padding: 2px 6px; border-radius: 10px; font-weight: 800; }
+
+        /* 2. 메인 비주얼 및 카테고리 설명 */
+        .shop-hero { background: linear-gradient(135deg, #444 0%, #222 100%); color: #fff; padding: 40px 20px; text-align: center; }
+        .shop-hero h1 { font-family: 'Jua', sans-serif; font-size: 2rem; margin-bottom: 10px; color: var(--primary-green); }
+        .shop-hero p { font-size: 0.95rem; opacity: 0.8; line-height: 1.5; word-break: keep-all; }
+
+        /* 3. 카테고리 탭 */
+        .category-tabs { display: flex; background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 60px; z-index: 90; }
+        .tab-item { flex: 1; text-align: center; padding: 15px 0; font-size: 0.95rem; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.2s; }
+        .tab-item.active { color: var(--primary-green); border-bottom: 3px solid var(--primary-green); background: #fff; }
+
+        /* 4. 상품 리스트 영역 */
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+        .section-intro { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 25px; border-left: 5px solid var(--primary-green); box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+        .section-intro h2 { font-size: 1.2rem; font-weight: 900; margin-bottom: 8px; color: #222; }
+        .section-intro p { font-size: 0.9rem; color: #666; line-height: 1.5; margin: 0; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        
+        .product-card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eee; display: flex; flex-direction: column; }
+        .prod-img { width: 100%; aspect-ratio: 1/1; background: #f0f0f0; object-fit: cover; }
+        .prod-info { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        
+        /* 용도 설명 (설명과 판매의 조화) */
+        .prod-usage { font-size: 0.75rem; color: var(--primary-blue); font-weight: 800; margin-bottom: 6px; background: #f0f8ff; display: inline-block; padding: 2px 8px; border-radius: 4px; align-self: flex-start; }
+        
+        .prod-title { font-size: 1rem; font-weight: 800; color: #222; margin-bottom: 8px; line-height: 1.3; height: 2.6em; overflow: hidden; }
+        .prod-price { font-size: 1.15rem; font-weight: 900; color: var(--text-dark); margin-top: auto; }
+        .prod-price span { font-size: 0.85rem; font-weight: 600; color: #999; text-decoration: line-through; margin-left: 5px; }
+
+        .btn-buy { width: 100%; padding: 12px; background: var(--primary-green); color: #fff; border: none; border-top: 1px solid #eee; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: 0.2s; margin-top: 15px; border-radius: 8px; }
+        .btn-buy:hover { background: #76a025; }
+
+        /* 모바일 반응형 (1열 배치) */
+        @media (max-width: 480px) {
+            .product-grid { grid-template-columns: 1fr; }
+            .shop-hero { padding: 30px 15px; }
+            .shop-hero h1 { font-size: 1.7rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-inner">
+            <div class="back-btn" onclick="history.back()">←</div>
+            <div class="logo-small">🌱 팜마을 생산용품관</div>
+            <div class="cart-icon">🛒<span class="cart-count">0</span></div>
+        </div>
+    </div>
+
+    <div class="shop-hero">
+        <h1>본사 직영 통합 용품관</h1>
+        <p>농산물부터 어류까지, 대표님이 검증한<br>최고의 자재와 사료를 합리적인 가격에 공급합니다.</p>
+    </div>
+
+    <div class="category-tabs">
+        <div class="tab-item active" onclick="switchTab(this, 'agri')">🌱 농산</div>
+        <div class="tab-item" onclick="switchTab(this, 'livestock')">🥩 축산</div>
+        <div class="tab-item" onclick="switchTab(this, 'bird')">🦜 조류</div>
+        <div class="tab-item" onclick="switchTab(this, 'fish')">🐟 어류</div>
+    </div>
+
+    <div class="container">
+        
+        <div id="category-intro" class="section-intro">
+            <h2>🌱 농산물 생산 및 관리 용품</h2>
+            <p>텃밭 가꾸기부터 전문 농장 경영까지, 건강한 작물 재배를 위한 필수 영양제와 관리 도구 세트입니다.</p>
+        </div>
+
+        <div class="product-grid" id="product-list">
+            
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?q=80&w=400&auto=format&fit=crop" class="prod-img">
+                <div class="prod-info">
+                    <span class="prod-usage">토양 영양 보충</span>
+                    <div class="prod-title">프리미엄 유기농 액비 (500ml) - 고농축 영양제</div>
+                    <div class="prod-price">12,500원 <span>15,000원</span></div>
+                    <button class="btn-buy" onclick="alert('장바구니에 담겼습니다!')">구매하기</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=400&auto=format&fit=crop" class="prod-img">
+                <div class="prod-info">
+                    <span class="prod-usage">병해충 방지</span>
+                    <div class="prod-title">친환경 천연 살충 스프레이 (무독성/안전)</div>
+                    <div class="prod-price">9,800원</div>
+                    <button class="btn-buy" onclick="alert('장바구니에 담겼습니다!')">구매하기</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1416870262648-255f0bd5c676?q=80&w=400&auto=format&fit=crop" class="prod-img">
+                <div class="prod-info">
+                    <span class="prod-usage">수확 및 전지</span>
+                    <div class="prod-title">초경량 티타늄 전지 가위 (손목 보호 설계)</div>
+                    <div class="prod-price">24,000원 <span>31,000원</span></div>
+                    <button class="btn-buy" onclick="alert('장바구니에 담겼습니다!')">구매하기</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <img src="https://images.unsplash.com/photo-1599395276369-14a081822be7?q=80&w=400&auto=format&fit=crop" class="prod-img">
+                <div class="prod-info">
+                    <span class="prod-usage">스마트팜 구축</span>
+                    <div class="prod-title">가정용 자동 수경재배 LED 키트 (모종 포함)</div>
+                    <div class="prod-price">85,000원</div>
+                    <button class="btn-buy" onclick="alert('장바구니에 담겼습니다!')">구매하기</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        // 카테고리별 데이터 (설명 및 상품 예시)
+        const categoryData = {
+            agri: {
+                title: "🌱 농산물 생산 및 관리 용품",
+                desc: "텃밭 가꾸기부터 전문 농장 경영까지, 건강한 작물 재배를 위한 필수 영양제와 관리 도구 세트입니다.",
+                items: [
+                    { usage: "토양 영양", name: "프리미엄 유기농 액비 (500ml)", price: "12,500원", oldPrice: "15,000원", img: "https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?q=80&w=400" },
+                    { usage: "병해충 방지", name: "친환경 천연 살충 스프레이", price: "9,800원", oldPrice: "", img: "https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=400" }
+                ]
+            },
+            livestock: {
+                title: "🥩 축산물 사육 및 관리 용품",
+                desc: "가축의 면역력을 높여주는 특수 사료 첨가제와 청결한 축사 관리를 위한 전문 방역 소독 용품입니다.",
+                items: [
+                    { usage: "면역력 강화", name: "축산용 고농축 미네랄 블록", price: "18,000원", oldPrice: "22,000원", img: "https://images.unsplash.com/photo-1516467508483-a7212febe31a?q=80&w=400" },
+                    { usage: "축사 환경", name: "무독성 탈취 및 살균제 (4L)", price: "35,000원", oldPrice: "", img: "https://images.unsplash.com/photo-1500595046743-cd271d694d30?q=80&w=400" }
+                ]
+            },
+            bird: {
+                title: "🦜 조류 및 반려조 관리 용품",
+                desc: "관상조부터 양계까지, 깃털의 영양과 산란율을 높여주는 맞춤형 알곡 사료와 둥지 관리 용품입니다.",
+                items: [
+                    { usage: "영양 사료", name: "앵무새/조류 멀티비타민 알곡 1kg", price: "14,500원", oldPrice: "17,000원", img: "https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?q=80&w=400" },
+                    { usage: "부화 관리", name: "디지털 자동 온도조절 부화기", price: "120,000원", oldPrice: "", img: "https://images.unsplash.com/photo-1598965402089-897ce52e8355?q=80&w=400" }
+                ]
+            },
+            fish: {
+                title: "🐟 어류 및 수산 관리 용품",
+                desc: "맑은 수질 유지를 위한 여과 시스템과 관상어/양식 어류의 활동성을 높여주는 고단백 먹이입니다.",
+                items: [
+                    { usage: "수질 관리", name: "고성능 외부 여과기 필터 세트", price: "42,000원", oldPrice: "50,000원", img: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=400" },
+                    { usage: "성장 촉진", name: "고단백 프리미엄 침강성 사료", price: "19,000원", oldPrice: "", img: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?q=80&w=400" }
+                ]
+            }
+        };
+
+        // 탭 전환 스크립트
+        function switchTab(el, category) {
+            // 탭 활성화 변경
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+
+            // 설명문 변경
+            const data = categoryData[category];
+            document.getElementById('category-intro').innerHTML = `
+                <h2>${data.title}</h2>
+                <p>${data.desc}</p>
+            `;
+
+            // 상품 리스트 렌더링
+            const list = document.getElementById('product-list');
+            list.innerHTML = '';
+            data.items.forEach(item => {
+                list.innerHTML += `
+                    <div class="product-card">
+                        <img src="${item.img}" class="prod-img">
+                        <div class="prod-info">
+                            <span class="prod-usage">${item.usage}</span>
+                            <div class="prod-title">${item.name}</div>
+                            <div class="prod-price">${item.price} ${item.oldPrice ? `<span>${item.oldPrice}</span>` : ''}</div>
+                            <button class="btn-buy" onclick="alert('장바구니에 담겼습니다!')">구매하기</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+    </script>
+
+</body>
+</html>

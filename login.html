@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 로그인 및 회원가입</title>
+    <style>
+        /* 구글 웹 폰트 'Jua' 및 기본 폰트 설정 */
+        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+        
+        :root { 
+            --primary-green: #87B32E; 
+            --primary-orange: #E69138; 
+            --primary-blue: #4B9AD2; 
+            --bg-color: #f4f7f6; 
+            --kakao-yellow: #FEE500; 
+            --kakao-text: #3C1E1E; 
+        }
+        
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; box-sizing: border-box; }
+
+        /* 팜마을 텍스트 로고 디자인 */
+        .logo-container { text-align: center; margin-bottom: 30px; }
+        .logo-text {
+            font-family: 'Jua', sans-serif;
+            font-size: 2.8rem;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            letter-spacing: -1px;
+            filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2));
+        }
+        .logo-leaf { font-size: 2.2rem; -webkit-text-fill-color: initial; }
+        .logo-sub { font-size: 0.95rem; font-weight: 700; color: #666; margin-top: 5px; }
+
+        /* 로그인/가입 박스 뼈대 */
+        .auth-box { background: #fff; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; }
+        
+        /* 상단 탭 메뉴 */
+        .auth-tabs { display: flex; border-bottom: 2px solid #eee; }
+        .auth-tab { flex: 1; padding: 18px 0; text-align: center; font-size: 1.1rem; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.2s; background: #fafafa; }
+        .auth-tab.active { color: var(--primary-green); background: #fff; border-bottom: 3px solid var(--primary-green); margin-bottom: -2px; }
+
+        /* 폼 영역 공통 */
+        .form-container { padding: 35px 30px; display: none; }
+        .form-container.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 통합 회원가입 안내 박스 */
+        .unified-notice { background: #e8f5e9; color: #2e7d32; padding: 12px; border-radius: 10px; font-size: 0.85rem; font-weight: 800; text-align: center; margin-bottom: 20px; line-height: 1.5; border: 1px solid #c8e6c9; }
+
+        /* 입력창 디자인 */
+        .input-group { margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; outline: none; box-sizing: border-box; font-family: inherit; transition: border-color 0.2s; }
+        .input-group input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(135,179,46,0.1); }
+        .input-group input::placeholder { color: #bbb; }
+
+        /* 버튼 디자인 */
+        .btn-submit { width: 100%; padding: 15px; background: var(--primary-green); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-submit:hover { background: #76a025; }
+        
+        /* 카카오 간편 로그인 버튼 */
+        .divider { display: flex; align-items: center; text-align: center; color: #999; font-size: 0.85rem; font-weight: 700; margin: 25px 0; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
+        .divider::before { margin-right: 15px; }
+        .divider::after { margin-left: 15px; }
+
+        .btn-kakao { width: 100%; padding: 15px; background: var(--kakao-yellow); color: var(--kakao-text); border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-kakao:hover { background: #f4dc00; }
+        .kakao-icon { font-size: 1.3rem; }
+
+        /* 기타 링크 */
+        .extra-links { display: flex; justify-content: center; gap: 15px; margin-top: 20px; font-size: 0.85rem; font-weight: 700; color: #888; }
+        .extra-links a { color: #888; text-decoration: none; cursor: pointer; }
+        .extra-links a:hover { color: #333; text-decoration: underline; }
+        
+        /* 약관 동의 */
+        .terms-group { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: #666; font-weight: 700; margin: 20px 0; }
+        .terms-group input { width: 18px; height: 18px; accent-color: var(--primary-green); cursor: pointer; }
+        .terms-group a { color: var(--primary-blue); text-decoration: none; }
+
+        /* 모바일 최적화 */
+        @media (max-width: 480px) {
+            .auth-box { border-radius: 15px; }
+            .form-container { padding: 30px 20px; }
+            .logo-text { font-size: 2.4rem; }
+            .logo-leaf { font-size: 1.9rem; }
+            body { padding: 10px; align-items: flex-start; margin-top: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div style="width: 100%; max-width: 450px;">
+        
+        <div class="logo-container">
+            <a href="index.html" class="logo-text">
+                <span class="logo-leaf">🌱</span>팜마을
+            </a>
+            <div class="logo-sub">우리 동네 신선한 먹거리 직거래</div>
+        </div>
+
+        <div class="auth-box">
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" onclick="switchAuth('login')" id="tab-login">로그인</div>
+                <div class="auth-tab" onclick="switchAuth('signup')" id="tab-signup">회원가입</div>
+            </div>
+
+            <div class="form-container active" id="form-login">
+                
+                <button class="btn-kakao" onclick="alert('카카오 간편 로그인 화면으로 이동합니다.')">
+                    <span class="kakao-icon">💬</span> 카카오로 3초만에 시작하기
+                </button>
+                
+                <div class="divider">또는 이메일로 로그인</div>
+
+                <div class="input-group">
+                    <input type="email" placeholder="이메일 주소">
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="비밀번호">
+                </div>
+
+                <button class="btn-submit" onclick="alert('환영합니다! 팜마을 메인 페이지로 이동합니다.')">로그인</button>
+
+                <div class="extra-links">
+                    <a onclick="alert('비밀번호 찾기 화면이 열립니다.')">비밀번호 찾기</a>
+                    <span>|</span>
+                    <a onclick="switchAuth('signup')">이메일로 회원가입</a>
+                </div>
+            </div>
+
+            <div class="form-container" id="form-signup">
+                
+                <button class="btn-kakao" onclick="alert('카카오 간편 가입 화면으로 이동합니다. (정보 자동입력)')">
+                    <span class="kakao-icon">💬</span> 카카오로 간편 가입하기
+                </button>
+
+                <div class="divider">또는 이메일로 가입하기</div>
+
+                <div class="unified-notice">
+                    🌱 한 번의 가입으로 구매, 생산자 등록, HUB 신청까지<br>팜마을의 모든 서비스를 자유롭게 이용하실 수 있습니다.
+                </div>
+
+                <div class="input-group">
+                    <input type="text" placeholder="이름 (실명)">
+                </div>
+                <div class="input-group">
+                    <input type="email" placeholder="이메일 주소 (아이디로 사용)">
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="비밀번호 (영문, 숫자 포함 8자 이상)">
+                </div>
+                <div class="input-group">
+                    <input type="password" placeholder="비밀번호 확인">
+                </div>
+
+                <label class="terms-group">
+                    <input type="checkbox">
+                    <span>팜마을 <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>에 동의합니다. (필수)</span>
+                </label>
+
+                <button class="btn-submit" onclick="alert('가입이 완료되었습니다. 팜마을의 이웃이 되신 것을 환영합니다! 🎉')">회원가입 완료</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 탭 전환 스크립트
+        function switchAuth(type) {
+            // 탭 스타일 변경
+            document.getElementById('tab-login').classList.remove('active');
+            document.getElementById('tab-signup').classList.remove('active');
+            document.getElementById('tab-' + type).classList.add('active');
+
+            // 폼 내용 변경
+            document.getElementById('form-login').classList.remove('active');
+            document.getElementById('form-signup').classList.remove('active');
+            document.getElementById('form-' + type).classList.add('active');
+        }
+    </script>
+
+</body>
+</html>

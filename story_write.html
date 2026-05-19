@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 일기 쓰기</title>
+    <link rel="icon" type="image/webp" href="farmmaul.webp">
+    <style>
+        :root { --primary-green: #87B32E; --primary-blue: #4B9AD2; --bg-color: #f8f9fa; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { background-color: var(--bg-color); color: #333; }
+
+        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .btn-cancel { font-size: 1.1rem; font-weight: 800; cursor: pointer; background: none; border: none; color: #555; }
+        .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); }
+        .btn-submit { background: var(--primary-green); color: #fff; border: none; padding: 6px 15px; border-radius: 8px; font-weight: 800; font-size: 1rem; cursor: pointer; }
+
+        .container { max-width: 800px; margin: 20px auto; background: #fff; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-input { width: 100%; border: none; border-bottom: 1px solid #ddd; padding: 15px 5px; font-size: 1.2rem; font-weight: 800; outline: none; transition: 0.2s; }
+        .form-input:focus { border-color: var(--primary-green); }
+        
+        textarea.form-input { height: 250px; font-size: 1.05rem; font-weight: 400; line-height: 1.6; border: 1px solid #eee; border-radius: 10px; padding: 15px; resize: none; margin-top: 10px; }
+
+        .photo-upload-box { background: #f4f9ea; border: 2px dashed #a5d6a7; border-radius: 12px; padding: 30px; text-align: center; cursor: pointer; display: block; margin-bottom: 10px; }
+        .photo-upload-box .icon { font-size: 2rem; margin-bottom: 5px; display: block; }
+        .photo-upload-box .text { font-weight: 800; color: #2e7d32; }
+
+        .hashtag-input { background: #f8f9fa; border: none; padding: 12px 15px; border-radius: 20px; width: 100%; font-size: 0.95rem; outline: none; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <form onsubmit="event.preventDefault(); alert('농장 일기가 성공적으로 등록되었습니다!'); location.href='producer_story.html';">
+        <div class="header">
+            <button type="button" class="btn-cancel" onclick="history.back()">취소</button>
+            <div class="title">농장 일기 쓰기</div>
+            <button type="submit" class="btn-submit">등록</button>
+        </div>
+
+        <div class="container">
+            <div class="form-group">
+                <input type="text" class="form-input" placeholder="제목을 입력하세요 (예: 오늘 수확한 토마토!)" required>
+            </div>
+
+            <div class="form-group">
+                <label class="photo-upload-box" for="photo-upload">
+                    <span class="icon">📸</span>
+                    <span class="text">사진을 첨부하세요 (최대 5장)</span>
+                    <input type="file" id="photo-upload" style="display:none;" accept="image/*" multiple>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <textarea class="form-input" placeholder="이웃들에게 전하고 싶은 농장의 오늘 이야기를 자유롭게 적어주세요." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <div style="font-weight: 800; color: #555; font-size: 0.95rem;"># 해시태그</div>
+                <input type="text" class="hashtag-input" placeholder="예: #당일수확 #토마토 (띄어쓰기로 구분)">
+            </div>
+        </div>
+    </form>
+
+</body>
+</html>
