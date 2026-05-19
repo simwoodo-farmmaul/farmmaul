@@ -11,13 +11,13 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 현재 폴더에 있는 모든 HTML, 그림 파일들을 화면에 보여주라는 허가증
-app.use(express.static(__dirname));
+// 🌟 클라우드 환경에 맞춰 더 튼튼하게 보강된 마법의 열쇠! (모든 파일 접근 허가)
+app.use(express.static(path.join(__dirname)));
 
-// 클라우드타입 내부 연결 설정
+// 클라우드타입 내부 데이터베이스 연결 설정
 const db = mysql.createConnection({
-    host: 'farm-db3', // 우리가 새로 지은 든든한 창고 이름입니다.
-    port: 3306,       // 내부 연결 전용 기본 통로 번호입니다.
+    host: 'farm-db3', // 우리가 새로 지은 든든한 창고 이름
+    port: 3306,       
     user: 'root',
     password: 'Farmmaul1234!',
     database: 'farmmaul_db'
@@ -32,9 +32,19 @@ db.connect((err) => {
     console.log('✅ 데이터베이스 창고 연결 성공!');
 });
 
-// 인터넷 창에 주소를 치고 들어왔을 때 메인 화면을 보여주는 규칙
+// 📌 [1] 메인 화면 직통 통로
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// 📌 [2] 회원가입 화면 직통 통로 (확실하게 문 열어주기!)
+app.get('/register.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'register.html'));
+});
+
+// 📌 [3] 로그인 화면 직통 통로 (확실하게 문 열어주기!)
+app.get('/login.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'login.html'));
 });
 
 // 클라우드 서버가 지정해 주는 방 번호(포트) 또는 3000번 방에서 대기 시작!
