@@ -47,13 +47,13 @@ app.get('/login.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
 
-// 📌 [4] 마을 HUB 거점 신청 받는 곳 (사진과 설명글 서랍 추가!)
+// 📌 [4] 마을 HUB 거점 신청 받는 곳
 app.post('/api/hub-apply', (req, res) => {
     const { hub_name, hub_type, hub_address, hub_desc, hub_image } = req.body;
 
-    // 창고에 사진(LONGTEXT)과 설명글(TEXT) 컬럼을 새롭게 추가하여 만듭니다.
+    // 💡 이름이 _v2로 업그레이드된 새로운 서랍(테이블)을 만듭니다!
     const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS hub_applications (
+        CREATE TABLE IF NOT EXISTS hub_applications_v2 (
             id INT AUTO_INCREMENT PRIMARY KEY,
             hub_name VARCHAR(255) NOT NULL,
             hub_type VARCHAR(100) NOT NULL,
@@ -70,8 +70,8 @@ app.post('/api/hub-apply', (req, res) => {
             return res.status(500).json({ success: false, message: 'DB 준비 중 오류가 발생했습니다.' });
         }
 
-        // 사진과 설명글까지 한꺼번에 서랍에 쏙 넣습니다.
-        const insertQuery = `INSERT INTO hub_applications (hub_name, hub_type, hub_address, hub_desc, hub_image) VALUES (?, ?, ?, ?, ?)`;
+        // 업그레이드된 서랍(v2)에 사진과 글을 안전하게 쏙 넣습니다.
+        const insertQuery = `INSERT INTO hub_applications_v2 (hub_name, hub_type, hub_address, hub_desc, hub_image) VALUES (?, ?, ?, ?, ?)`;
         
         db.query(insertQuery, [hub_name, hub_type, hub_address, hub_desc, hub_image], (err, result) => {
             if (err) {
@@ -85,7 +85,8 @@ app.post('/api/hub-apply', (req, res) => {
 
 // 📌 [5] 관리자 페이지에 마을 HUB 목록 보내주기
 app.get('/api/hubs', (req, res) => {
-    const selectQuery = `SELECT * FROM hub_applications ORDER BY created_at DESC`;
+    // 관리자 페이지에 목록을 보낼 때도 새로운 서랍(v2)에서 꺼내옵니다!
+    const selectQuery = `SELECT * FROM hub_applications_v2 ORDER BY created_at DESC`;
     
     db.query(selectQuery, (err, results) => {
         if (err) {
