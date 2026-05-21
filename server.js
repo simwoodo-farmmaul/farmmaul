@@ -82,6 +82,20 @@ app.post('/api/hub-apply', (req, res) => {
         });
     });
 });
+// 📌 [5] 관리자 페이지에 마을 HUB 목록 보내주기 (데이터 조회)
+app.get('/api/hubs', (req, res) => {
+    // 창고(hub_applications 테이블)에서 신청 목록을 최신순으로 전부 꺼냅니다.
+    const selectQuery = `SELECT * FROM hub_applications ORDER BY created_at DESC`;
+    
+    db.query(selectQuery, (err, results) => {
+        if (err) {
+            console.error('목록 불러오기 에러:', err);
+            return res.status(500).json({ success: false, message: '데이터를 불러오는 중 오류가 발생했습니다.' });
+        }
+        // 꺼낸 데이터를 화면으로 예쁘게 포장해서 보냅니다!
+        res.json({ success: true, data: results });
+    });
+});
 // 클라우드 서버가 지정해 주는 방 번호(포트) 또는 3000번 방에서 대기 시작!
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

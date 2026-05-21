@@ -67,23 +67,6 @@
         .stat-label { font-size: 0.9rem; font-weight: 800; color: #888; margin-bottom: 10px; display: block; }
         .stat-value { font-size: 1.8rem; font-weight: 900; color: #222; }
 
-        /* ★ 모달 (팝업창) 스타일 ★ */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
-        .modal-content { background: #fff; width: 450px; max-height: 85vh; border-radius: 20px; padding: 30px; position: relative; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; cursor: pointer; border: none; background: none; color: #888; transition: 0.2s; }
-        .modal-close:hover { color: #333; transform: scale(1.1); }
-        
-        /* 모달 내부 프로필 디자인 */
-        .modal-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 15px; border: 4px solid #eee; display: block; }
-        .modal-img.hub { border-radius: 15px; width: 100%; height: 180px; margin-bottom: 20px; }
-        .modal-title { font-size: 1.4rem; font-weight: 900; text-align: center; margin-bottom: 5px; color: #222; }
-        .modal-subtitle { text-align: center; color: var(--master-orange); font-weight: 800; margin-bottom: 20px; font-size: 0.95rem; }
-        .modal-desc { background: #f8f9fa; padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 20px; border: 1px solid #eee; }
-        .modal-info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; }
-        .modal-info-row span:first-child { font-weight: 800; color: #888; }
-        .modal-info-row span:last-child { font-weight: 700; color: #333; text-align: right; }
-
     </style>
 </head>
 <body>
@@ -92,16 +75,9 @@
         <div class="sidebar-header">🌱 팜마을<span>통합 마스터 관리자</span></div>
         <ul class="menu-list">
             <li class="menu-item active" onclick="switchView('dash', this, '📊 전체 현황')">📊 전체 현황</li>
-            <li class="menu-item" onclick="switchView('farm', this, '🧑‍🌾 생산자(농가) 관리')">🧑‍🌾 생산자(농가) 관리</li>
             <li class="menu-item" onclick="switchView('hub', this, '🏪 마을 HUB 관리')">🏪 마을 HUB 관리</li>
+            <li class="menu-item" onclick="switchView('farm', this, '🧑‍🌾 생산자(농가) 관리')">🧑‍🌾 생산자(농가) 관리</li>
             <li class="menu-item" onclick="switchView('order', this, '🛒 주문/배송 통합관리')">🛒 주문/배송 통합관리</li>
-            <li class="menu-item" onclick="switchView('finance', this, '💰 정산 및 수익관리')">💰 정산 및 수익관리</li>
-            <li class="menu-item" onclick="switchView('content', this, '🖼️ 사이트 콘텐츠 관리')">🖼️ 사이트 콘텐츠 관리</li>
-            <li class="menu-item" onclick="switchView('shop', this, '🛠️ 생산용품관 관리')">🛠️ 생산용품관 관리</li>
-            <li class="menu-item" onclick="switchView('board', this, '📖 잘키우는법 관리')">📖 잘키우는법 관리</li>
-            <li class="menu-item" onclick="switchView('qna', this, '💬 질문있어요 관리')">💬 질문있어요 관리</li>
-            <li class="menu-item" onclick="switchView('approval', this, '👨‍🌾 가입/승인 관리')">👨‍🌾 가입/승인 관리</li>
-            <li class="menu-item" onclick="switchView('notice', this, '📢 공지 및 알림 발송')">📢 공지 및 알림 발송</li>
         </ul>
     </aside>
 
@@ -123,130 +99,31 @@
             </div>
         </div>
 
-        <div id="view-farm" class="view-section">
-            <div class="card">
-                <div class="card-header"><h2 class="card-title">등록된 생산자 목록</h2></div>
-                <table>
-                    <thead><tr><th>농장명</th><th>대표자</th><th>주소</th><th>주력품목</th><th>상태</th><th>관리</th></tr></thead>
-                    <tbody>
-                        <tr>
-                            <td>지산동 영진농원</td>
-                            <td>김영진</td>
-                            <td>평택시 지산동</td>
-                            <td>농산물(꿀토마토)</td>
-                            <td><span class="badge bg-green">정상영업</span></td>
-                            <td class="action-btns">
-                                <button class="btn-sm profile" onclick="openModal('producerModal')">프로필 보기</button>
-                                <button class="btn-sm warn">판매정지</button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>자연꼬꼬 농장</td>
-                            <td>이호선</td>
-                            <td>오산시</td>
-                            <td>축산물(유정란)</td>
-                            <td><span class="badge bg-green">정상영업</span></td>
-                            <td class="action-btns">
-                                <button class="btn-sm profile" onclick="alert('프로필 팝업 예시입니다.')">프로필 보기</button>
-                                <button class="btn-sm warn">판매정지</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
         <div id="view-hub" class="view-section">
             <div class="card">
                 <div class="card-header"><h2 class="card-title">등록된 마을 HUB(거점) 목록</h2></div>
                 <table>
-                    <thead><tr><th>HUB 상호명</th><th>점주명</th><th>주소</th><th>가까운 역</th><th>상태</th><th>관리</th></tr></thead>
-                    <tbody>
+                    <thead>
                         <tr>
-                            <td>지산동 1호 카페 [초록]</td>
-                            <td>박사장</td>
-                            <td>평택시 지산동 55-1</td>
-                            <td>송탄역</td>
-                            <td><span class="badge bg-green">운영중</span></td>
-                            <td class="action-btns">
-                                <button class="btn-sm profile" onclick="openModal('hubModal')">프로필 보기</button>
-                                <button class="btn-sm warn">자격정지</button>
-                            </td>
+                            <th>HUB 상호명</th>
+                            <th>공간 형태</th>
+                            <th>거점 주소</th>
+                            <th>신청 일시</th>
+                            <th>상태</th>
+                            <th>관리</th>
                         </tr>
-                        <tr>
-                            <td>송탄역 2호 편의점</td>
-                            <td>김점주</td>
-                            <td>평택시 송북동</td>
-                            <td>송탄역</td>
-                            <td><span class="badge bg-orange">임시휴업</span></td>
-                            <td class="action-btns">
-                                <button class="btn-sm profile" onclick="alert('프로필 팝업 예시입니다.')">프로필 보기</button>
-                                <button class="btn-sm warn">자격정지</button>
-                            </td>
-                        </tr>
+                    </thead>
+                    <tbody id="hubTableBody">
+                        <tr><td colspan="6" style="text-align:center; padding:30px;">데이터를 불러오는 중입니다...</td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
+        <div id="view-farm" class="view-section"><div class="card"><h2 class="card-title">생산자 관리 내역</h2></div></div>
         <div id="view-order" class="view-section"><div class="card"><h2 class="card-title">주문/배송 관리 내역</h2></div></div>
-        
-        <div id="view-finance" class="view-section"><div class="card"><h2 class="card-title">정산 및 수익 관리 내역</h2></div></div>
-        
-        <div id="view-content" class="view-section"><div class="card"><h2 class="card-title">콘텐츠 관리 내역</h2></div></div>
-        
-        <div id="view-shop" class="view-section"><div class="card"><h2 class="card-title">본사 직영 용품 리스트</h2></div></div>
-
-        <div id="view-board" class="view-section"><div class="card"><h2 class="card-title">게시물 통합 관리</h2></div></div>
-
-        <div id="view-qna" class="view-section"><div class="card"><h2 class="card-title">1:1 문의 및 FAQ 관리</h2></div></div>
-
-        <div id="view-approval" class="view-section"><div class="card"><h2 class="card-title">가입 및 승인 관리</h2></div></div>
-
-        <div id="view-notice" class="view-section"><div class="card"><h2 class="card-title">공지사항 및 푸시 발송</h2></div></div>
 
     </main>
-
-    <div class="modal-overlay" id="producerModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('producerModal')">×</button>
-            <div style="text-align: center; margin-bottom: 20px;">
-                <span class="badge bg-green" style="margin-bottom:10px; display:inline-block;">생산자 프로필</span>
-                <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=200&auto=format&fit=crop" class="modal-img">
-                <div class="modal-title">지산동 영진농원</div>
-                <div class="modal-subtitle">"지산동 햇살 아래서 키운 정직한 토마토"</div>
-            </div>
-            
-            <div class="modal-desc">
-                안녕하세요! 평택 지산동에서 30년째 텃밭을 일구고 있는 김영진입니다. 우리 가족이 먹는다는 마음으로 농약을 치지 않고 당일 수확을 원칙으로 합니다. 아침에 딴 싱싱한 토마토를 동네 이웃분들께 직접 전해드리는 기쁨으로 농사짓고 있습니다.
-            </div>
-
-            <div class="modal-info-row"><span>대표자 성명</span><span>김영진</span></div>
-            <div class="modal-info-row"><span>주력 품목</span><span>꿀토마토, 유기농 상추</span></div>
-            <div class="modal-info-row"><span>농장 주소</span><span>평택시 지산동 123-4</span></div>
-            <div class="modal-info-row" style="border:none;"><span>평점</span><span style="color:var(--master-orange);">⭐ 4.9 (단골 128명)</span></div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="hubModal">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closeModal('hubModal')">×</button>
-            <div style="text-align: center; margin-bottom: 20px;">
-                <span class="badge bg-blue" style="margin-bottom:10px; display:inline-block;">마을 HUB 프로필</span>
-                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop" class="modal-img hub">
-                <div class="modal-title">지산동 1호 카페 [초록]</div>
-            </div>
-            
-            <div class="modal-desc">
-                커피 향 가득한 공간에서 이웃의 신선한 농산물을 만나보세요. 대형 냉장 시설을 완비하여 생산자분들의 유정란과 채소도 신선하게 보관해 드립니다.
-            </div>
-
-            <div class="modal-info-row"><span>점주 성명</span><span>박사장</span></div>
-            <div class="modal-info-row"><span>운영 시간</span><span>09:00 ~ 21:00</span></div>
-            <div class="modal-info-row"><span>가까운 역</span><span>송탄역 (도보3분)</span></div>
-            <div class="modal-info-row" style="border:none;"><span>매장 주소</span><span>평택시 지산동 55-1 1층</span></div>
-        </div>
-    </div>
 
     <script>
         // 메뉴 전환 함수
@@ -260,22 +137,52 @@
             document.getElementById('header-title').innerText = titleText;
         }
 
-        // ★ 팝업(모달) 열기 함수
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
+        // 🚀 서버에서 진짜 허브 데이터를 가져와서 표에 그리는 함수
+        function loadHubList() {
+            fetch('/api/hubs')
+            .then(response => response.json())
+            .then(result => {
+                if(result.success) {
+                    const tbody = document.getElementById('hubTableBody');
+                    tbody.innerHTML = ''; // 임시 글자 싹 지우기
+
+                    // 저장된 데이터가 하나도 없을 때
+                    if(result.data.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">아직 접수된 마을 HUB 신청 내역이 없습니다.</td></tr>';
+                        return;
+                    }
+
+                    // 창고에서 가져온 데이터를 한 줄씩(tr) 만들어서 붙여넣기
+                    result.data.forEach(hub => {
+                        // 날짜 예쁘게 변환
+                        const date = new Date(hub.created_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+                        
+                        const row = `
+                            <tr>
+                                <td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td>
+                                <td>${hub.hub_type}</td>
+                                <td style="font-size:0.85rem; color:#555;">${hub.hub_address}</td>
+                                <td style="font-size:0.85rem;">${date}</td>
+                                <td><span class="badge bg-blue">신청완료</span></td>
+                                <td class="action-btns">
+                                    <button class="btn-sm profile" onclick="alert('상세보기 기능은 준비 중입니다.')">보기</button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('목록 불러오기 실패:', error);
+                document.getElementById('hubTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">서버와 연결할 수 없습니다.</td></tr>';
+            });
         }
 
-        // ★ 팝업(모달) 닫기 함수
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        // 팝업 바깥(어두운 배경) 클릭 시 닫기
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                event.target.classList.remove('active');
-            }
-        }
+        // 관리자 페이지가 열리면 자동으로 데이터 불러오기 명령!
+        document.addEventListener("DOMContentLoaded", function() {
+            loadHubList();
+        });
     </script>
 </body>
 </html>
