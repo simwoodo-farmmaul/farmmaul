@@ -46,7 +46,42 @@ app.get('/register.html', (req, res) => {
 app.get('/login.html', (req, res) => {
     res.sendFile(path.join(__dirname, 'login.html'));
 });
+// 📌 [4] 마을 HUB 거점 신청 받는 곳 (데이터베이스 저장)
+app.post('/api/hub-apply', (req, res) => {
+    // 화면에서 보낸 이름, 종류, 주소 데이터를 꺼냅니다.
+    const { hub_name, hub_type, hub_address } = req.body;
 
+    // 1. 혹시 창고에 서랍(테이블)이 없을까 봐, 튼튼한 서랍부터 만듭니다.
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS hub_applications (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            hub_name VARCHAR(255) NOT NULL,
+            hub_type VARCHAR(100) NOT NULL,
+            hub_address VARCHAR(500) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+
+    db.query(createTableQuery, (err) => {
+        if (err) {
+            console.error('테이블 생성 에러:', err);
+            return res.status(500).json({ success: false, message: 'DB 준비 중 오류가 발생했습니다.' });
+        }
+
+        // 2. 서랍이 준비되었으니, 입력받은 데이터를 안전하게 쏙 넣습니다!
+        const insertQuery = `INSERT INTO hub_applications (hub_name, hub_type, hub_address) VALUES (?, ?, ?)`;
+        
+        db.query(insertQuery, [hub_name, hub_type, hub_address], (err, result) => {
+            if (err) {
+                console.error('신청서 저장 에러:', err);
+                return res.status(500).json({ success: false, message: '저장 중 오류가 발생했습니다.' });
+            }
+            
+            // 3. 저장이 완료되면 화면에 성공했다고 기쁜 소식을 알려줍니다!
+            res.json({ success: true, message: '성공적으로 접수되었습니다! 팜마을 HUB가 되어주셔서 감사합니다.' });
+        });
+    });
+});
 // 클라우드 서버가 지정해 주는 방 번호(포트) 또는 3000번 방에서 대기 시작!
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
