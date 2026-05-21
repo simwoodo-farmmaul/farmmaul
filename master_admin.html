@@ -58,6 +58,8 @@
         .btn-sm:hover { background: #eee; }
         .btn-sm.profile { color: var(--master-blue); border-color: #bbdefb; }
         .btn-sm.profile:hover { background: #e3f2fd; }
+        .btn-sm.approve { color: #2e7d32; border-color: #c8e6c9; }
+        .btn-sm.approve:hover { background: #e8f5e9; }
         .btn-sm.warn { color: #c62828; border-color: #ffcdd2; }
         .btn-sm.warn:hover { background: #ffebee; }
         
@@ -67,6 +69,22 @@
         .stat-label { font-size: 0.9rem; font-weight: 800; color: #888; margin-bottom: 10px; display: block; }
         .stat-value { font-size: 1.8rem; font-weight: 900; color: #222; }
 
+        /* ★ 모달 (팝업창) 스타일 복구 ★ */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .modal-content { background: #fff; width: 450px; max-height: 85vh; border-radius: 20px; padding: 30px; position: relative; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; cursor: pointer; border: none; background: none; color: #888; transition: 0.2s; }
+        .modal-close:hover { color: #333; transform: scale(1.1); }
+        
+        .modal-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 15px; border: 4px solid #eee; display: block; }
+        .modal-img.hub { border-radius: 15px; width: 100%; height: 180px; margin-bottom: 20px; }
+        .modal-title { font-size: 1.4rem; font-weight: 900; text-align: center; margin-bottom: 5px; color: #222; }
+        .modal-subtitle { text-align: center; color: var(--master-orange); font-weight: 800; margin-bottom: 20px; font-size: 0.95rem; }
+        .modal-desc { background: #f8f9fa; padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 20px; border: 1px solid #eee; }
+        .modal-info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; }
+        .modal-info-row span:first-child { font-weight: 800; color: #888; }
+        .modal-info-row span:last-child { font-weight: 700; color: #333; text-align: right; }
+
     </style>
 </head>
 <body>
@@ -75,9 +93,16 @@
         <div class="sidebar-header">🌱 팜마을<span>통합 마스터 관리자</span></div>
         <ul class="menu-list">
             <li class="menu-item active" onclick="switchView('dash', this, '📊 전체 현황')">📊 전체 현황</li>
-            <li class="menu-item" onclick="switchView('hub', this, '🏪 마을 HUB 관리')">🏪 마을 HUB 관리</li>
             <li class="menu-item" onclick="switchView('farm', this, '🧑‍🌾 생산자(농가) 관리')">🧑‍🌾 생산자(농가) 관리</li>
+            <li class="menu-item" onclick="switchView('hub', this, '🏪 마을 HUB 관리')">🏪 마을 HUB 관리</li>
             <li class="menu-item" onclick="switchView('order', this, '🛒 주문/배송 통합관리')">🛒 주문/배송 통합관리</li>
+            <li class="menu-item" onclick="switchView('finance', this, '💰 정산 및 수익관리')">💰 정산 및 수익관리</li>
+            <li class="menu-item" onclick="switchView('content', this, '🖼️ 사이트 콘텐츠 관리')">🖼️ 사이트 콘텐츠 관리</li>
+            <li class="menu-item" onclick="switchView('shop', this, '🛠️ 생산용품관 관리')">🛠️ 생산용품관 관리</li>
+            <li class="menu-item" onclick="switchView('board', this, '📖 잘키우는법 관리')">📖 잘키우는법 관리</li>
+            <li class="menu-item" onclick="switchView('qna', this, '💬 질문있어요 관리')">💬 질문있어요 관리</li>
+            <li class="menu-item" onclick="switchView('approval', this, '👨‍🌾 가입/승인 관리')">👨‍🌾 가입/승인 관리</li>
+            <li class="menu-item" onclick="switchView('notice', this, '📢 공지 및 알림 발송')">📢 공지 및 알림 발송</li>
         </ul>
     </aside>
 
@@ -99,6 +124,8 @@
             </div>
         </div>
 
+        <div id="view-farm" class="view-section"><div class="card"><h2 class="card-title">생산자 관리 내역</h2></div></div>
+        
         <div id="view-hub" class="view-section">
             <div class="card">
                 <div class="card-header"><h2 class="card-title">등록된 마을 HUB(거점) 목록</h2></div>
@@ -110,7 +137,7 @@
                             <th>거점 주소</th>
                             <th>신청 일시</th>
                             <th>상태</th>
-                            <th>관리</th>
+                            <th>관리 (상세/승인)</th>
                         </tr>
                     </thead>
                     <tbody id="hubTableBody">
@@ -120,10 +147,34 @@
             </div>
         </div>
 
-        <div id="view-farm" class="view-section"><div class="card"><h2 class="card-title">생산자 관리 내역</h2></div></div>
         <div id="view-order" class="view-section"><div class="card"><h2 class="card-title">주문/배송 관리 내역</h2></div></div>
+        <div id="view-finance" class="view-section"><div class="card"><h2 class="card-title">정산 및 수익 관리 내역</h2></div></div>
+        <div id="view-content" class="view-section"><div class="card"><h2 class="card-title">콘텐츠 관리 내역</h2></div></div>
+        <div id="view-shop" class="view-section"><div class="card"><h2 class="card-title">본사 직영 용품 리스트</h2></div></div>
+        <div id="view-board" class="view-section"><div class="card"><h2 class="card-title">게시물 통합 관리</h2></div></div>
+        <div id="view-qna" class="view-section"><div class="card"><h2 class="card-title">1:1 문의 및 FAQ 관리</h2></div></div>
+        <div id="view-approval" class="view-section"><div class="card"><h2 class="card-title">가입 및 승인 관리</h2></div></div>
+        <div id="view-notice" class="view-section"><div class="card"><h2 class="card-title">공지사항 및 푸시 발송</h2></div></div>
 
     </main>
+
+    <div class="modal-overlay" id="dynamicHubModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('dynamicHubModal')">×</button>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <span class="badge bg-blue" style="margin-bottom:10px; display:inline-block;">마을 HUB 프로필</span>
+                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop" class="modal-img hub">
+                <div class="modal-title" id="modal-hub-name">허브 이름</div>
+            </div>
+            <div class="modal-desc">이곳은 마을 주민들을 잇는 팜마을의 소중한 HUB 거점입니다. 신청하신 내역을 확인해 주세요.</div>
+            <div class="modal-info-row"><span>공간 형태</span><span id="modal-hub-type">종류</span></div>
+            <div class="modal-info-row"><span>신청 일시</span><span id="modal-hub-date">날짜</span></div>
+            <div class="modal-info-row" style="border:none;"><span>매장 주소</span><span id="modal-hub-address" style="text-align: right;">주소</span></div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn-sm approve" style="padding: 10px 20px; font-size: 1rem;" onclick="alert('승인 처리 기능 작동!')">이 HUB 승인하기</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // 메뉴 전환 함수
@@ -137,7 +188,29 @@
             document.getElementById('header-title').innerText = titleText;
         }
 
-        // 🚀 서버에서 진짜 허브 데이터를 가져와서 표에 그리는 함수
+        // 팝업(모달) 닫기 함수
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // 팝업 바깥(어두운 배경) 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // 🌟 상세보기 팝업에 진짜 데이터 채워넣고 열기
+        function openHubDetail(name, type, address, date) {
+            document.getElementById('modal-hub-name').innerText = name;
+            document.getElementById('modal-hub-type').innerText = type;
+            document.getElementById('modal-hub-address').innerText = address;
+            document.getElementById('modal-hub-date').innerText = date;
+            
+            document.getElementById('dynamicHubModal').classList.add('active');
+        }
+
+        // 서버에서 진짜 허브 데이터를 가져와서 표에 그리는 함수
         function loadHubList() {
             fetch('/api/hubs')
             .then(response => response.json())
@@ -146,17 +219,15 @@
                     const tbody = document.getElementById('hubTableBody');
                     tbody.innerHTML = ''; // 임시 글자 싹 지우기
 
-                    // 저장된 데이터가 하나도 없을 때
                     if(result.data.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">아직 접수된 마을 HUB 신청 내역이 없습니다.</td></tr>';
                         return;
                     }
 
-                    // 창고에서 가져온 데이터를 한 줄씩(tr) 만들어서 붙여넣기
                     result.data.forEach(hub => {
-                        // 날짜 예쁘게 변환
                         const date = new Date(hub.created_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
                         
+                        // 🌟 보기 버튼과 승인 버튼이 추가된 모습!
                         const row = `
                             <tr>
                                 <td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td>
@@ -165,7 +236,8 @@
                                 <td style="font-size:0.85rem;">${date}</td>
                                 <td><span class="badge bg-blue">신청완료</span></td>
                                 <td class="action-btns">
-                                    <button class="btn-sm profile" onclick="alert('상세보기 기능은 준비 중입니다.')">보기</button>
+                                    <button class="btn-sm profile" onclick="openHubDetail('${hub.hub_name}', '${hub.hub_type}', '${hub.hub_address}', '${date}')">보기</button>
+                                    <button class="btn-sm approve" onclick="alert('${hub.hub_name} 거점을 최종 승인했습니다!')">승인</button>
                                 </td>
                             </tr>
                         `;
@@ -173,13 +245,9 @@
                     });
                 }
             })
-            .catch(error => {
-                console.error('목록 불러오기 실패:', error);
-                document.getElementById('hubTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:red;">서버와 연결할 수 없습니다.</td></tr>';
-            });
+            .catch(error => console.error('목록 불러오기 실패:', error));
         }
 
-        // 관리자 페이지가 열리면 자동으로 데이터 불러오기 명령!
         document.addEventListener("DOMContentLoaded", function() {
             loadHubList();
         });
