@@ -6,85 +6,47 @@
     <title>팜마을 - 총괄 마스터 관리자</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-        
-        :root { 
-            --master-dark: #1a1c23; --master-green: #87B32E; --master-blue: #4B9AD2; 
-            --master-orange: #E69138; --master-red: #ff5e62; --bg-light: #f4f7f6; 
-        }
-        
+        :root { --master-dark: #1a1c23; --master-green: #87B32E; --master-blue: #4B9AD2; --master-orange: #E69138; --master-red: #ff5e62; --bg-light: #f4f7f6; }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-light); margin: 0; padding: 0; color: #333; display: flex; height: 100vh; overflow: hidden; }
-
-        /* 좌측 사이드바 */
         .sidebar { width: 260px; background: var(--master-dark); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { padding: 25px 20px; font-family: 'Jua', sans-serif; font-size: 1.8rem; color: var(--master-green); border-bottom: 1px solid #333; text-align: center; }
         .sidebar-header span { color: #fff; font-size: 1rem; font-family: 'Pretendard', sans-serif; font-weight: 800; display: block; margin-top: 5px; }
-        
         .menu-list { list-style: none; padding: 10px 0; margin: 0; overflow-y: auto; flex: 1; }
         .menu-item { padding: 12px 25px; cursor: pointer; font-weight: 700; transition: 0.2s; color: #adb5bd; display: flex; align-items: center; gap: 10px; border-left: 4px solid transparent; font-size: 0.95rem; }
         .menu-item:hover, .menu-item.active { background: #2d2f39; color: #fff; border-left-color: var(--master-green); }
-
-        /* 우측 메인 콘텐츠 */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; min-width: 0; }
         .top-bar { background: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: sticky; top: 0; z-index: 10; }
         .page-title-text { font-size: 1.3rem; font-weight: 900; color: #111; margin: 0; }
         .admin-profile { display: flex; align-items: center; gap: 10px; font-weight: 800; }
         .logout-btn { border: 1px solid #ddd; background: #fff; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: 0.2s; }
-        .logout-btn:hover { background: #f1f3f5; }
-
-        /* 뷰 컨트롤 */
         .view-section { padding: 30px; display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 공통 카드 및 테이블 */
         .card { background: #fff; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eee; margin-bottom: 25px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 1.15rem; font-weight: 900; color: #333; margin: 0; }
-        
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 12px 15px; font-size: 0.9rem; color: #888; border-bottom: 2px solid #f1f3f5; background: #fcfcfc; }
         td { padding: 15px; border-bottom: 1px solid #f1f3f5; font-size: 0.95rem; font-weight: 600; vertical-align: middle; }
-        tr:hover td { background: #fdfdfd; }
-        
         .badge { padding: 5px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; }
-        .bg-green { background: #e8f5e9; color: #2e7d32; }
-        .bg-orange { background: #fff3e0; color: #ef6c00; }
-        .bg-red { background: #ffebee; color: #c62828; }
         .bg-blue { background: #e3f2fd; color: #1565c0; }
-        .bg-gray { background: #f1f3f5; color: #666; }
-
         .action-btns { display: flex; gap: 5px; }
         .btn-sm { padding: 6px 12px; border: 1px solid #ddd; background: #fff; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .btn-sm:hover { background: #eee; }
         .btn-sm.profile { color: var(--master-blue); border-color: #bbdefb; }
-        .btn-sm.profile:hover { background: #e3f2fd; }
         .btn-sm.approve { color: #2e7d32; border-color: #c8e6c9; }
-        .btn-sm.approve:hover { background: #e8f5e9; }
-        .btn-sm.warn { color: #c62828; border-color: #ffcdd2; }
-        .btn-sm.warn:hover { background: #ffebee; }
-        
-        /* 요약 카드 */
         .master-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-box { background: #fff; padding: 25px; border-radius: 15px; border: 1px solid #eee; }
         .stat-label { font-size: 0.9rem; font-weight: 800; color: #888; margin-bottom: 10px; display: block; }
         .stat-value { font-size: 1.8rem; font-weight: 900; color: #222; }
-
-        /* ★ 모달 (팝업창) 스타일 복구 ★ */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
-        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .modal-overlay.active { display: flex; }
         .modal-content { background: #fff; width: 450px; max-height: 85vh; border-radius: 20px; padding: 30px; position: relative; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; cursor: pointer; border: none; background: none; color: #888; transition: 0.2s; }
-        .modal-close:hover { color: #333; transform: scale(1.1); }
-        
-        .modal-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 0 auto 15px; border: 4px solid #eee; display: block; }
-        .modal-img.hub { border-radius: 15px; width: 100%; height: 180px; margin-bottom: 20px; }
+        .modal-close { position: absolute; top: 20px; right: 20px; font-size: 1.5rem; cursor: pointer; border: none; background: none; color: #888; }
+        .modal-img.hub { border-radius: 15px; width: 100%; height: 200px; object-fit: cover; margin-bottom: 20px; }
         .modal-title { font-size: 1.4rem; font-weight: 900; text-align: center; margin-bottom: 5px; color: #222; }
-        .modal-subtitle { text-align: center; color: var(--master-orange); font-weight: 800; margin-bottom: 20px; font-size: 0.95rem; }
         .modal-desc { background: #f8f9fa; padding: 15px; border-radius: 10px; font-size: 0.95rem; color: #555; line-height: 1.6; margin-bottom: 20px; border: 1px solid #eee; }
         .modal-info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px dashed #eee; font-size: 0.95rem; }
         .modal-info-row span:first-child { font-weight: 800; color: #888; }
         .modal-info-row span:last-child { font-weight: 700; color: #333; text-align: right; }
-
     </style>
 </head>
 <body>
@@ -155,7 +117,6 @@
         <div id="view-qna" class="view-section"><div class="card"><h2 class="card-title">1:1 문의 및 FAQ 관리</h2></div></div>
         <div id="view-approval" class="view-section"><div class="card"><h2 class="card-title">가입 및 승인 관리</h2></div></div>
         <div id="view-notice" class="view-section"><div class="card"><h2 class="card-title">공지사항 및 푸시 발송</h2></div></div>
-
     </main>
 
     <div class="modal-overlay" id="dynamicHubModal">
@@ -163,71 +124,84 @@
             <button class="modal-close" onclick="closeModal('dynamicHubModal')">×</button>
             <div style="text-align: center; margin-bottom: 20px;">
                 <span class="badge bg-blue" style="margin-bottom:10px; display:inline-block;">마을 HUB 프로필</span>
-                <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop" class="modal-img hub">
+                <img id="modal-hub-img" src="" class="modal-img hub" onerror="this.src='https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop'">
                 <div class="modal-title" id="modal-hub-name">허브 이름</div>
             </div>
-            <div class="modal-desc">이곳은 마을 주민들을 잇는 팜마을의 소중한 HUB 거점입니다. 신청하신 내역을 확인해 주세요.</div>
+            <div class="modal-desc" id="modal-hub-desc">설명글 내용</div>
             <div class="modal-info-row"><span>공간 형태</span><span id="modal-hub-type">종류</span></div>
             <div class="modal-info-row"><span>신청 일시</span><span id="modal-hub-date">날짜</span></div>
             <div class="modal-info-row" style="border:none;"><span>매장 주소</span><span id="modal-hub-address" style="text-align: right;">주소</span></div>
             <div style="text-align: center; margin-top: 20px;">
-                <button class="btn-sm approve" style="padding: 10px 20px; font-size: 1rem;" onclick="alert('승인 처리 기능 작동!')">이 HUB 승인하기</button>
+                <button class="btn-sm approve" style="padding: 10px 20px; font-size: 1rem;" id="modal-approve-btn">이 HUB 최종 승인하기</button>
             </div>
         </div>
     </div>
 
     <script>
-        // 메뉴 전환 함수
+        let globalHubList = []; // 데이터를 안전하게 보관할 전역 배열
+
         function switchView(viewId, element, titleText) {
             document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
-            
             document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
-            
             document.getElementById('header-title').innerText = titleText;
         }
 
-        // 팝업(모달) 닫기 함수
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
 
-        // 팝업 바깥(어두운 배경) 클릭 시 닫기
         window.onclick = function(event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                event.target.classList.remove('active');
-            }
+            if (event.target.classList.contains('modal-overlay')) { event.target.classList.remove('active'); }
         }
 
-        // 🌟 상세보기 팝업에 진짜 데이터 채워넣고 열기
-        function openHubDetail(name, type, address, date) {
-            document.getElementById('modal-hub-name').innerText = name;
-            document.getElementById('modal-hub-type').innerText = type;
-            document.getElementById('modal-hub-address').innerText = address;
+        // 🌟 상세보기 클릭 시 배열에서 매칭되는 데이터를 뽑아 팝업에 연결
+        function openHubDetail(index) {
+            const hub = globalHubList[index];
+            if(!hub) return;
+
+            const date = new Date(hub.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+
+            document.getElementById('modal-hub-name').innerText = hub.hub_name;
+            document.getElementById('modal-hub-type').innerText = hub.hub_type;
+            document.getElementById('modal-hub-address').innerText = hub.hub_address;
             document.getElementById('modal-hub-date').innerText = date;
             
+            // 진짜 설명글과 사진 주입 (사진이 없으면 기본 샘플 대체)
+            document.getElementById('modal-hub-desc').innerText = hub.hub_desc || "등록된 매장 소개 설명글이 없습니다.";
+            document.getElementById('modal-hub-img').src = hub.hub_image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop";
+            
+            document.getElementById('modal-approve-btn').onclick = function() {
+                alert(`[${hub.hub_name}] 거점을 최종 승인 완료했습니다.`);
+            };
+
             document.getElementById('dynamicHubModal').classList.add('active');
         }
 
-        // 서버에서 진짜 허브 데이터를 가져와서 표에 그리는 함수
         function loadHubList() {
             fetch('/api/hubs')
             .then(response => response.json())
             .then(result => {
                 if(result.success) {
                     const tbody = document.getElementById('hubTableBody');
-                    tbody.innerHTML = ''; // 임시 글자 싹 지우기
+                    tbody.innerHTML = ''; 
+                    globalHubList = result.data; // 서버 데이터를 전역 저장소에 세팅
 
-                    if(result.data.length === 0) {
+                    if(globalHubList.length === 0) {
                         tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">아직 접수된 마을 HUB 신청 내역이 없습니다.</td></tr>';
                         return;
                     }
 
-                    result.data.forEach(hub => {
-                        const date = new Date(hub.created_at).toLocaleString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+                    globalHubList.forEach((hub, index) => {
+                        // 💡 대한민국 표준시(Asia/Seoul) 타임존을 명시하여 9시간 차이 강제 해결!
+                        const date = new Date(hub.created_at).toLocaleString('ko-KR', { 
+                            timeZone: 'Asia/Seoul',
+                            year: 'numeric', 
+                            month: '2-digit', 
+                            day: '2-digit', 
+                            hour: '2-digit', 
+                            minute: '2-digit' 
+                        });
                         
-                        // 🌟 보기 버튼과 승인 버튼이 추가된 모습!
                         const row = `
                             <tr>
                                 <td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td>
@@ -236,7 +210,7 @@
                                 <td style="font-size:0.85rem;">${date}</td>
                                 <td><span class="badge bg-blue">신청완료</span></td>
                                 <td class="action-btns">
-                                    <button class="btn-sm profile" onclick="openHubDetail('${hub.hub_name}', '${hub.hub_type}', '${hub.hub_address}', '${date}')">보기</button>
+                                    <button class="btn-sm profile" onclick="openHubDetail(${index})">보기</button>
                                     <button class="btn-sm approve" onclick="alert('${hub.hub_name} 거점을 최종 승인했습니다!')">승인</button>
                                 </td>
                             </tr>
@@ -248,9 +222,7 @@
             .catch(error => console.error('목록 불러오기 실패:', error));
         }
 
-        document.addEventListener("DOMContentLoaded", function() {
-            loadHubList();
-        });
+        document.addEventListener("DOMContentLoaded", loadHubList);
     </script>
 </body>
 </html>
