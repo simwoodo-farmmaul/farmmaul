@@ -51,7 +51,6 @@ app.get('/login.html', (req, res) => {
 app.post('/api/hub-apply', (req, res) => {
     const { hub_name, hub_type, hub_address, hub_desc, hub_image } = req.body;
 
-    // 💡 이름이 _v2로 업그레이드된 새로운 서랍(테이블)을 만듭니다!
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS hub_applications_v2 (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -70,7 +69,6 @@ app.post('/api/hub-apply', (req, res) => {
             return res.status(500).json({ success: false, message: 'DB 준비 중 오류가 발생했습니다.' });
         }
 
-        // 업그레이드된 서랍(v2)에 사진과 글을 안전하게 쏙 넣습니다.
         const insertQuery = `INSERT INTO hub_applications_v2 (hub_name, hub_type, hub_address, hub_desc, hub_image) VALUES (?, ?, ?, ?, ?)`;
         
         db.query(insertQuery, [hub_name, hub_type, hub_address, hub_desc, hub_image], (err, result) => {
@@ -83,17 +81,33 @@ app.post('/api/hub-apply', (req, res) => {
     });
 });
 
-// 📌 [5] 관리자 페이지에 마을 HUB 목록 보내주기
+// 📌 [5] 전체 마을 HUB 목록 보내주기
 app.get('/api/hubs', (req, res) => {
-    // 관리자 페이지에 목록을 보낼 때도 새로운 서랍(v2)에서 꺼내옵니다!
     const selectQuery = `SELECT * FROM hub_applications_v2 ORDER BY created_at DESC`;
-    
     db.query(selectQuery, (err, results) => {
         if (err) {
             console.error('목록 불러오기 에러:', err);
             return res.status(500).json({ success: false, message: '데이터를 불러오는 중 오류가 발생했습니다.' });
         }
         res.json({ success: true, data: results });
+    });
+});
+
+// 📌 [6] ★ 개별 마을 HUB 상세 정보 꺼내주기 (추가된 핵심 파이프라인!) ★
+app.get('/api/hubs/:id', (req, res) => {
+    const hubId = req.params.id;
+    const selectOneQuery = `SELECT * FROM hub_applications_v2 WHERE id = ?`;
+    
+    db.query(selectOneQuery, [hubId], (err, result) => {
+        if (err) {
+            console.error('상세페이지 조회 에러:', err);
+            return res.status(500).json({ success: false, message: '데이터를 불러오는 중 오류가 발생했습니다.' });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ success: false, message: '해당 HUB 거점을 찾을 수 없습니다.' });
+        }
+        // 딱 일치하는 한 개의 데이터만 전송합니다.
+        res.json({ success: true, data: result[0] });
     });
 });
 
