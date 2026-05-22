@@ -101,17 +101,17 @@
         .section-title { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 5px; border-left: 4px solid var(--primary-orange); padding-left: 10px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; }
         .section-subtitle { font-size: 1.05rem; color: var(--text-light); margin-bottom: 25px; padding-left: 14px; }
 
-        /* 순서 1. 상품 리스트 */
+        /* 상품 리스트 */
         .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
         .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eaeaea; transition: transform 0.2s; cursor: pointer; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        .product-image { width: 100%; height: 200px; background-color: #f0f0f0; object-fit: cover; }
+        .product-image { width: 100%; height: 200px; background-color: #f0f0f0; background-size: cover; background-position: center; }
         .product-info { padding: 15px; }
         .product-info h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .product-info .price { font-size: 1.2rem; font-weight: bold; color: var(--primary-orange); }
         .product-info .producer { font-size: 0.9rem; color: var(--text-light); margin-top: 5px; }
 
-        /* 순서 2. 생산자 이야기 리스트 */
+        /* 생산자 이야기 리스트 */
         .producer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .producer-card { background: #fff; border-radius: 15px; padding: 25px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; }
         .producer-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: var(--primary-green); }
@@ -121,7 +121,7 @@
         .btn-follow { background: #e8f5e9; color: var(--primary-green); border: none; padding: 8px 24px; border-radius: 20px; font-weight: 800; cursor: pointer; transition: background 0.2s; }
         .producer-card:hover .btn-follow { background: var(--primary-green); color: white; }
 
-        /* 순서 3. HUB 위치 (새로운 레이아웃 적용) */
+        /* HUB 위치 UI */
         .hub-search-ui { background: #fff; border-radius: 15px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .region-selects { display: flex; gap: 10px; padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; }
         .region-selects select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.95rem; font-weight: 700; outline: none; }
@@ -132,7 +132,7 @@
         .btn-hub-apply { background: var(--primary-green); color: #fff; }
         .btn-hub-apply:hover { background: #719626; }
         
-        /* [수정됨] 지도 및 리스트 분할 레이아웃 */
+        /* 지도 및 리스트 레이아웃 */
         .hub-display-area { display: flex; gap: 20px; padding: 25px; background: #fff; }
         .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; min-height: 320px; }
         .hub-map-img-box img { width: 100%; height: 100%; object-fit: cover; }
@@ -145,7 +145,7 @@
         .hub-item-info { font-size: 0.95rem; color: #555; font-weight: 600; display: flex; align-items: flex-start; gap: 5px; }
         .hub-item-info span { color: #ff5e62; font-size: 0.9rem; margin-top: 1px; }
 
-        /* 순서 4. 약초/비료/사료 3단 박스 메뉴 */
+        /* 약초/비료/사료 3단 박스 메뉴 */
         .extra-menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .extra-menu-box { border-radius: 15px; padding: 25px 20px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .extra-menu-box:nth-child(1) { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
@@ -155,14 +155,14 @@
         .extra-menu-box .icon { font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1)); }
         .extra-menu-box .title { font-size: 1.2rem; font-weight: 800; color: var(--text-dark); }
 
-        /* 순서 5. 디미가 배너 (2단) */
+        /* 디미가 배너 (2단) */
         .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; }
         .dimiga-box { cursor: pointer; flex: 1; background: linear-gradient(to right, #6b9122, #87B32E); border-radius: 15px; padding: 25px 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; gap: 10px; transition: transform 0.2s; }
         .dimiga-box:hover { transform: translateY(-3px); }
         .dimiga-box .d-title { color: #ffffff; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.5px; word-break: keep-all; }
         .dimiga-box .d-sub { color: #ffffff; font-size: 1rem; font-weight: 700; letter-spacing: -0.5px; opacity: 0.9; word-break: keep-all; }
 
-        /* 순서 6. 서브 메뉴 3단 배너 (생산용품/가이드/QA) */
+        /* 서브 메뉴 3단 배너 */
         .sub-menus { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; }
         .sub-menu-banner:hover { transform: translateY(-3px); }
@@ -171,7 +171,7 @@
         .banner-guide { background: var(--primary-green); }
         .banner-qa { background: var(--primary-orange); }
 
-        /* 순서 7. 팜마을 통합 안내 센터 */
+        /* 팜마을 통합 안내 센터 */
         .integrated-guide-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .guide-box { background: #fff; border-radius: 15px; padding: 30px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
         .guide-box:hover { transform: translateY(-5px); border-color: var(--primary-green); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
@@ -179,7 +179,7 @@
         .guide-box .title { font-size: 1.15rem; font-weight: 900; color: #222; margin-bottom: 12px; }
         .guide-box .desc { font-size: 0.9rem; color: #666; line-height: 1.5; word-break: keep-all; }
 
-        /* 순서 8. CTA 섹션 */
+        /* CTA 섹션 */
         .cta-section { background: linear-gradient(135deg, var(--primary-green), #6bc75a); color: white; text-align: center; padding: 60px 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .cta-section h2 { font-size: 2.2rem; margin-bottom: 15px; font-weight: 800; }
         .cta-section p { font-size: 1.15rem; margin-bottom: 30px; opacity: 0.95; }
@@ -188,7 +188,7 @@
         .cta-btn-free { background: white; color: var(--primary-green); }
         .cta-btn-prod { background: var(--primary-orange); color: white; }
 
-        /* 순서 9. 푸터 */
+        /* 푸터 정보 */
         footer.company-info { background-color: #f1f3f5; padding: 50px 20px 80px; color: #666; font-size: 0.9rem; border-top: 1px solid #e9ecef; line-height: 1.6; }
         .footer-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
         .footer-details span { display: inline-block; margin-right: 25px; }
@@ -208,7 +208,6 @@
         .float-up .icon { font-size: 1.2rem; }
         .float-up .text { font-size: 0.7rem; font-weight: 700; }
 
-        /* 모바일 네비게이션 */
         .mobile-bottom-nav { display: none; }
 
         /* 📱 모바일 반응형 처리 */
@@ -241,7 +240,6 @@
             .hub-btn-group { display: flex; width: 100%; gap: 8px; margin-top: 5px; }
             .hub-btn-group button { flex: 1; padding: 12px; font-size: 0.95rem; }
             
-            /* 모바일 환경 지도/리스트 레이아웃 */
             .hub-display-area { flex-direction: column; padding: 15px; }
             .hub-map-img-box { min-height: 200px; }
 
@@ -326,7 +324,7 @@
         <h2 class="section-title">우리 동네 방금 올라온 상품</h2>
         <div class="product-grid">
             <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop');"></div>
                 <div class="product-info">
                     <h3>무농약 찰토마토 2kg</h3>
                     <div class="price">15,000원</div>
@@ -334,7 +332,7 @@
                 </div>
             </div>
             <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=400&auto=format&fit=crop');"></div>
                 <div class="product-info">
                     <h3>반려동물용 친환경 수제 방석</h3>
                     <div class="price">25,000원</div>
@@ -342,7 +340,7 @@
                 </div>
             </div>
             <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format&fit=crop');"></div>
                 <div class="product-info">
                     <h3>오늘 낳은 신선 유정란 10구</h3>
                     <div class="price">6,500원</div>
@@ -350,7 +348,7 @@
                 </div>
             </div>
             <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=400&auto=format&fit=crop');"></div>
                 <div class="product-info">
                     <h3>수제 관상어 사료 세트</h3>
                     <div class="price">12,000원</div>
@@ -395,7 +393,6 @@
         <h2 class="section-title">우리 동네 마을 HUB 위치</h2>
         <p class="section-subtitle">내가 사는 곳을 기준으로, 내 주변의 가까운 HUB 위치를 확인하세요.</p>
         <div class="hub-search-ui">
-            
             <div class="region-selects">
                 <select><option>시/도 선택</option><option selected>경기도</option><option>서울특별시</option></select>
                 <select><option>시/군/구 선택</option><option selected>평택시</option><option>오산시</option></select>
@@ -411,36 +408,18 @@
                     <img src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?q=80&w=800&auto=format&fit=crop" alt="지도 배경">
                     <div class="hub-map-label">지산동 HUB 지도</div>
                 </div>
-                <div class="hub-list">
-                    <div class="hub-list-item" onclick="alert('제일편의점 상세 위치를 띄웁니다.')">
-                        <div class="hub-item-name">송탄역 2번 출구 앞 제일편의점 HUB</div>
-                        <div class="hub-item-info"><span>📍</span> 평택시 신장동 245-12 (연중무휴 24시)</div>
-                    </div>
-                    <div class="hub-list-item" onclick="alert('카페초록 상세 위치를 띄웁니다.')">
-                        <div class="hub-item-name">지산동 1호 카페초록 앞 HUB</div>
-                        <div class="hub-item-info"><span>📍</span> 평택시 지산동 55-1 (09:00 ~ 21:00)</div>
-                    </div>
-                    <div class="hub-list-item" onclick="alert('2호점 예정지 위치를 띄웁니다.')">
-                        <div class="hub-item-name">송탄 지산동 2호 HUB 예정지</div>
-                        <div class="hub-item-info"><span>📍</span> 지산동 비전빌딩 1층 (오픈 준비 중)</div>
-                    </div>
+                <div class="hub-list" id="mainHubListContainer">
+                    <div style="text-align:center; color:#888; padding:20px;">마을 HUB 거점을 불러오는 중입니다...</div>
                 </div>
             </div>
-
         </div>
     </section>
 
     <section class="common-section">
         <div class="extra-menu-grid">
-            <div class="extra-menu-box" onclick="location.href='herb.html'">
-                <span class="icon">🌿</span><span class="title">약초</span>
-            </div>
-            <div class="extra-menu-box" onclick="location.href='fertilizer.html'">
-                <span class="icon">🍂</span><span class="title">비료</span>
-            </div>
-            <div class="extra-menu-box" onclick="location.href='feed.html'">
-                <span class="icon">🌾</span><span class="title">사료</span>
-            </div>
+            <div class="extra-menu-box" onclick="location.href='herb.html'"><span class="icon">🌿</span><span class="title">약초</span></div>
+            <div class="extra-menu-box" onclick="location.href='fertilizer.html'"><span class="icon">🍂</span><span class="title">비료</span></div>
+            <div class="extra-menu-box" onclick="location.href='feed.html'"><span class="icon">🌾</span><span class="title">사료</span></div>
         </div>
     </section>
 
@@ -570,13 +549,43 @@
             <span class="icon">👤</span><span class="text">내정보</span>
         </a>
     </div>
-<script>
-    // PWA 서비스 워커 등록 코드
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js')
-        .then(() => console.log("팜마을 앱 등록 성공!"))
-        .catch((err) => console.log("앱 등록 실패:", err));
-    }
-</script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 서버의 최신형 서랍(v2) 주소로부터 승인된 허브 목록을 가져옵니다.
+            fetch('/api/hubs')
+            .then(response => response.json())
+            .then(result => {
+                if(result.success) {
+                    const container = document.getElementById('mainHubListContainer');
+                    container.innerHTML = ''; // 로딩 메시지 비우기
+
+                    if(result.data.length === 0) {
+                        container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">아직 승인된 우리동네 HUB 거점이 없습니다.</div>';
+                        return;
+                    }
+
+                    // 최신순 상위 3개만 메인 화면에 고급스럽게 노출시킵니다.
+                    result.data.slice(0, 3).forEach(hub => {
+                        const itemHtml = `
+                            <div class="hub-list-item" onclick="location.href='hub.html?id=${hub.id}'">
+                                <div class="hub-item-name">${hub.hub_name}</div>
+                                <div class="hub-item-info"><span>📍</span> ${hub.hub_address}</div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', itemHtml);
+                    });
+                }
+            })
+            .catch(error => console.error('메인 허브 리스트 바인딩 실패:', error));
+        });
+
+        // PWA 모바일 앱 구동을 위한 서비스 워커 등록 코드 복구
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("팜마을 앱 등록 성공!"))
+            .catch((err) => console.log("앱 등록 실패:", err));
+        }
+    </script>
 </body>
 </html>
