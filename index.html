@@ -135,8 +135,8 @@
         /* 지도 및 리스트 레이아웃 */
         .hub-display-area { display: flex; gap: 20px; padding: 25px; background: #fff; }
         .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; min-height: 320px; }
-        .hub-map-img-box img { width: 100%; height: 100%; object-fit: cover; }
-        .hub-map-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(255,255,255,0.95); padding: 12px 30px; border-radius: 30px; font-size: 1.1rem; font-weight: 900; color: var(--primary-blue); box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 2px solid #e3f2fd; }
+        /* 💡 추가된 실시간 지도 프레임 전용 스타일 */
+        .hub-map-img-box iframe { width: 100%; height: 100%; border: none; }
         
         .hub-list { flex: 1; display: flex; flex-direction: column; gap: 15px; justify-content: center; }
         .hub-list-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; }
@@ -204,9 +204,9 @@
         .float-chat { background: var(--primary-orange); }
         .float-chat .icon { font-size: 1.4rem; margin-bottom: 2px; }
         .float-chat .text { font-size: 0.75rem; font-weight: 800; }
-        .float-up { background: #444; }
-        .float-up .icon { font-size: 1.2rem; }
-        .float-up .text { font-size: 0.7rem; font-weight: 700; }
+        .floating-menu .float-up { background: #444; }
+        .floating-menu .float-up .icon { font-size: 1.2rem; }
+        .floating-menu .float-up .text { font-size: 0.7rem; font-weight: 700; }
 
         .mobile-bottom-nav { display: none; }
 
@@ -283,7 +283,7 @@
         <div class="header-container">
             <div class="header-left">
                 <a href="index.html" class="logo-text"><span class="logo-leaf">🌱</span>팜마을</a>
-                <div class="location-picker" onclick="alert('동네 설정 팝업이 열립니다.')">📍 평택시 지산동 ▾</div>
+                <div class="location-picker" onclick="alert('동네 설정 팝업이 일립니다.')">📍 평택시 지산동 ▾</div>
             </div>
             
             <div class="user-menu">
@@ -403,14 +403,12 @@
                 </div>
             </div>
 
-<div class="hub-display-area">
-                <div class="hub-map-img-box" style="background: linear-gradient(135deg, #e3f2fd, #b3e5fc); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 20px; text-align: center;">
-                    <div style="font-size: 3.5rem; margin-bottom: 10px;">📍</div>
-                    <div style="font-weight: 900; color: #0d47a1; font-size: 1.2rem; margin-bottom: 5px;">평택 지산동 실시간 HUB 거점</div>
-                    <div style="font-size: 0.85rem; color: #1565c0; font-weight: 700; line-height: 1.4;">등록 승인된 우리동네 거점 목록입니다.<br>원하시는 거점을 누르면 실시간 지도로 자동 연결됩니다.</div>
+            <div class="hub-display-area">
+                <div class="hub-map-img-box">
+                    <iframe id="mainMapIframe" src="about:blank" allowfullscreen="" loading="lazy"></iframe>
                 </div>
                 <div class="hub-list" id="mainHubListContainer">
-                    <div style="text-align:center; color:#888;">마을 HUB 거점을 불러오는 중입니다...</div>
+                    <div style="text-align:center; color:#888; padding:20px;">마을 HUB 거점을 불러오는 중입니다...</div>
                 </div>
             </div>
         </div>
@@ -553,23 +551,34 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // 서버의 최신형 서랍(v2) 주소로부터 승인된 허브 목록을 가져옵니다.
             fetch('/api/hubs')
             .then(response => response.json())
             .then(result => {
                 if(result.success) {
                     const container = document.getElementById('mainHubListContainer');
-                    container.innerHTML = ''; // 로딩 메시지 비우기
+                    container.innerHTML = ''; 
 
                     if(result.data.length === 0) {
                         container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">아직 승인된 우리동네 HUB 거점이 없습니다.</div>';
+                        // 데이터가 없으면 평택시청을 임시 기준으로 표출
+                        document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent('경기 평택시 지산동')}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
                         return;
                     }
 
-                    // 최신순 상위 3개만 메인 화면에 고급스럽게 노출시킵니다.
+                    // 💡 [처음 로드 시] 가장 최신 거점(첫 번째 내역)의 주소를 추출해 지도를 먼저 띄워줍니다.
+                    const firstHubAddr = result.data[0].hub_address.replace(/\[\d+\]\s*/, '');
+                    document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
+
+                    // 최신순 상위 3개 노출
                     result.data.slice(0, 3).forEach(hub => {
+                        // 우편번호 기호를 떼어내어 깔끔한 주소 텍스트만 추출
+                        const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
+                        
+                        // 💡 마우스를 올리거나(onmouseover) 클릭하면 지도가 해당 허브의 위치로 마법처럼 바뀌는 획기적 기능 장착!
                         const itemHtml = `
-                            <div class="hub-list-item" onclick="location.href='hub.html?id=${hub.id}'">
+                            <div class="hub-list-item" 
+                                 onclick="location.href='hub.html?id=${hub.id}'"
+                                 onmouseover="updateMainMap('${cleanAddr}')">
                                 <div class="hub-item-name">${hub.hub_name}</div>
                                 <div class="hub-item-info"><span>📍</span> ${hub.hub_address}</div>
                             </div>
@@ -581,7 +590,17 @@
             .catch(error => console.error('메인 허브 리스트 바인딩 실패:', error));
         });
 
-        // PWA 모바일 앱 구동을 위한 서비스 워커 등록 코드 복구
+        // 🌟 마우스 오버 시 지도를 해당 주소 위치로 새로 빌드해주는 연동 함수
+        function updateMainMap(address) {
+            const iframe = document.getElementById('mainMapIframe');
+            const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
+            
+            // 중복 로딩 현상을 방지하기 위해 주소가 다를 때만 갱신
+            if(iframe.src !== newSrc) {
+                iframe.src = newSrc;
+            }
+        }
+
         if ('serviceWorker' in navigator) {
           navigator.serviceWorker.register('sw.js')
             .then(() => console.log("팜마을 앱 등록 성공!"))
