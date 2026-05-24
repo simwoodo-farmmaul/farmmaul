@@ -1,3 +1,4 @@
+const session = require('express-session');
 require('./setup.js'); // 👈 서버가 켜질 때 도면(setup.js)을 자동으로 실행하는 마법의 주문!
 const express = require('express');
 const mysql = require('mysql2');
@@ -5,6 +6,15 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
+
+// 📌 [세션 장착] 주민을 기억하기 위한 임시 명찰 발급 장치!
+app.use(session({
+    secret: 'farmmaul_secret_key_0424',
+    resave: false,                      
+    saveUninitialized: true,           
+    cookie: { secure: false }   
+}));
+
 app.use(cors());
 
 // 💡 사진 파일이 포함되므로 대용량(10메가) 데이터도 통과할 수 있도록 허가증 보강!
@@ -110,12 +120,10 @@ app.get('/api/hubs/:id', (req, res) => {
     });
 });
 
-// 📌 [7] ★ 카카오 로그인 회원 처리 수신함 (새로 추가된 부분!) ★
+// 📌 [7] ★ 카카오 로그인 회원 처리 수신함 (세션 기억장치 보강!) ★
 app.get('/auth/kakao/callback', async (req, res) => {
     const authCode = req.query.code; 
-    
-    // 🚨 아래 작은따옴표 안의 글자를 지우고, 이사장님의 카카오 REST API 키를 넣어주세요!
-    const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; 
+    const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; // 
     const REDIRECT_URI = 'https://farmmaul.com/auth/kakao/callback'; 
 
     if (!authCode) return res.send("<script>alert('인증 코드가 없습니다.'); location.href='/';</script>");
@@ -154,6 +162,9 @@ app.get('/auth/kakao/callback', async (req, res) => {
             db.query(insertMember, [kakaoId, nickname, email, nickname], (err) => {
                 if (err) throw err;
                 
+                // ⭐ [핵심 보강] 로그인이 성공하면 서버 세션 비밀장부에 사용자 정보를 기억시킵니다!
+                req.session.user = { kakaoId: kakaoId, nickname: nickname };
+                
                 res.send(`<script>alert('${nickname}님, 반갑습니다! 팜마을 로그인에 성공했습니다 🎉'); location.href='/';</script>`);
             });
         });
@@ -162,6 +173,25 @@ app.get('/auth/kakao/callback', async (req, res) => {
         console.error('카카오 인증 실패:', error);
         res.send("<script>alert('카카오 로그인 중 오류가 발생했습니다.'); location.href='/';</script>");
     }
+});
+
+// 📌 [8] ★ 로그인 상태 확인 창구 API ★
+// index.html 화면이 로드되자마자 이 창구를 호출해 "지금 로그인한 사람이 누구냐"고 서버에 묻습니다.
+app.get('/api/user', (req, res) => {
+    if (req.session && req.session.user) {
+        res.json({ loggedIn: true, user: req.session.user });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
+
+// 📌 [9] ★ 로그아웃 처리 창구 API ★
+// 화면에서 [로그아웃] 버튼을 누르면 서버 비밀장부(세션)를 깨끗이 지우고 첫 화면으로 보냅니다.
+app.get('/auth/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) console.error('로그아웃 세션 삭제 에러:', err);
+        res.send("<script>alert('로그아웃되었습니다. 또 방문해 주세요!'); location.href='/';</script>");
+    });
 });
 
 const PORT = process.env.PORT || 3000;

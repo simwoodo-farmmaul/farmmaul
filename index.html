@@ -256,9 +256,10 @@
             <div class="user-menu">
                 <a href="cart.html" style="font-size: 1.3rem; background: transparent; padding: 5px 10px; border: none; box-shadow: none;" title="장바구니">🛒</a>
                 <a href="register.html" class="btn-producer">상품등록</a>
-                <a href="login.html" class="btn-login">로그인</a>               
+                <a href="login.html" class="btn-login">로그인</a>  
+                <div id="auth-zone">
                 <a href="https://kauth.kakao.com/oauth/authorize?client_id=e2676a110b5565e56d2863dd7a9581c8&redirect_uri=https://farmmaul.com/auth/kakao/callback&response_type=code" class="btn-kakao">카카오 회원가입</a>
-            </div>
+             </div>
         </div>
     </header>
 
@@ -569,5 +570,26 @@
             .catch((err) => console.log("앱 등록 실패:", err));
         }
     </script>
+<script>
+    // 페이지가 열리면 즉시 서버에게 로그인한 사람이 있는지 물어봅니다.
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/user')
+            .then(response => response.json())
+            .then(data => {
+                const authZone = document.getElementById('auth-zone');
+                
+                if (data.loggedIn) {
+                    // 🎉 로그인 상태라면: 회원가입 버튼을 숨기고 [환영 문구]와 [로그아웃] 버튼을 보여줍니다!
+                    authZone.innerHTML = `
+                        <span style="color: #333; font-weight: bold; margin-right: 15px;">
+                            👤 ${data.user.nickname}님 환영합니다
+                        </span>
+                        <a href="/auth/logout" style="padding: 6px 12px; background-color: #ff4d4d; color: white; border-radius: 5px; text-decoration: none; font-size: 14px;">로그아웃</a>
+                    `;
+                }
+            })
+            .catch(err => console.error('사용자 정보 조회 실패:', err));
+    });
+</script>
 </body>
 </html>
