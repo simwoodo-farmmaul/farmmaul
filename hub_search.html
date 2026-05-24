@@ -21,17 +21,14 @@
         body { background-color: var(--bg-color); color: #333; padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
         
-        /* 100% 복구된 공통 헤더 */
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         .btn-icon { font-size: 1.2rem; cursor: pointer; font-weight: 900; }
         .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); }
-        /* 복구된 헤더 동네 선택 피커 */
         .location-picker { font-size: 0.95rem; font-weight: 800; cursor: pointer; padding: 6px 10px; border-radius: 8px; background: #f1f3f5; color: #555; }
 
         .container { max-width: 800px; margin: 0 auto; padding: 0; }
         
-        /* 🌟 메인페이지 스타일로 업그레이드된 3단 콤보박스 검색창 구역 */
         .search-area { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; }
         .region-selects { display: flex; gap: 10px; width: 100%; }
         .region-selects select { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; font-size: 0.95rem; font-weight: 700; outline: none; background: #f9f9f9; }
@@ -39,17 +36,14 @@
         .search-btn { background: var(--primary-blue); color: #fff; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 1rem; width: 100%; transition: 0.2s; }
         .search-btn:hover { background: #3a82b8; }
 
-        /* 지도 영역 */
         .map-container { width: 100%; height: 250px; background: #e0e0e0; position: relative; border-bottom: 1px solid #ddd; }
         .map-container iframe { width: 100%; height: 100%; border: none; }
         .map-overlay-info { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; color: var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); backdrop-filter: blur(4px); z-index: 10; white-space: nowrap; }
 
-        /* 리스트 헤더 */
         .list-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
         .list-count { font-weight: 800; font-size: 1.1rem; }
         .list-count span { color: var(--primary-orange); }
 
-        /* 허브 리스트 및 카드 디자인 복구 */
         .hub-list { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 15px; }
         .hub-card { background: #fff; border-radius: 15px; padding: 15px; display: flex; gap: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eaeaea; transition: 0.2s; cursor: pointer; align-items: center; }
         .hub-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: var(--primary-blue); }
@@ -57,7 +51,6 @@
         .hub-img { width: 90px; height: 90px; border-radius: 12px; object-fit: cover; background: #eee; flex-shrink: 0; }
         .hub-info { flex: 1; }
         
-        /* 예전 버전 배지 디자인 복구 */
         .hub-badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; margin-bottom: 5px; }
         .badge-cafe { background: #e8f5e9; color: #2e7d32; }
         .badge-store { background: #e3f2fd; color: #1565c0; }
@@ -69,7 +62,6 @@
         .btn-detail { background: #f1f3f5; color: #555; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 800; white-space: nowrap; border: 1px solid #ddd; }
         .hub-card:hover .btn-detail { background: var(--primary-blue); color: #fff; border-color: var(--primary-blue); }
 
-        /* 100% 완벽 복구된 4버튼 모바일 하단바 */
         .mobile-bottom-nav { display: none; }
 
         @media (max-width: 768px) {
@@ -116,8 +108,8 @@
         </div>
 
         <div class="map-container">
-            <div class="map-overlay-info">평택 지산동 주변 등록된 실시간 HUB</div>
-            <iframe src="https://maps.google.com/maps?q=지산동&t=&z=14&ie=UTF-8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe>
+            <div class="map-overlay-info">선택된 동네 주변 실시간 HUB 지도</div>
+            <iframe id="searchMapIframe" src="about:blank" allowfullscreen="" loading="lazy"></iframe>
         </div>
 
         <div class="list-header">
@@ -145,7 +137,7 @@
     </div>
 
     <script>
-        let allHubs = []; // 서버에서 긁어온 원본 데이터를 보관할 배열 창고
+        let allHubs = []; 
 
         function renderHubs(dataList) {
             const container = document.getElementById('searchHubListContainer');
@@ -154,20 +146,29 @@
 
             if(dataList.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">선택하신 동네와 일치하는 마을 HUB 거점이 없습니다.</div>';
+                document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent('경기 평택시 지산동')}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
                 return;
             }
+
+            // 검색된 첫 번째 허브의 주소로 지도 자동 이동!
+            const firstHubAddr = dataList[0].hub_address.replace(/\[\d+\]\s*/, '');
+            document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
 
             dataList.forEach(hub => {
                 const imgUrl = hub.hub_image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop";
                 
-                // 💡 공간 형태에 따라 예전 버전의 배지 클래스(badge-cafe / badge-store)를 자동 매칭합니다!
                 let badgeClass = "badge-store"; 
                 if(hub.hub_type.includes("카페") || hub.hub_type.includes("식당")) {
                     badgeClass = "badge-cafe";
                 }
 
+                // 💡 마우스 오버 시 지도가 자동으로 전환되도록 설계
+                const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
+
                 const cardHtml = `
-                    <div class="hub-card" onclick="location.href='hub.html?id=${hub.id}'">
+                    <div class="hub-card" 
+                         onclick="location.href='hub.html?id=${hub.id}'"
+                         onmouseover="updateSearchMap('${cleanAddr}')">
                         <img src="${imgUrl}" class="hub-img" alt="허브 전경">
                         <div class="hub-info">
                             <span class="hub-badge ${badgeClass}">${hub.hub_type}</span>
@@ -182,19 +183,16 @@
             });
         }
 
-        // 🌟 3단 콤보박스 기반 실시간 필터링 함수 구현!
         function filterHubsByRegion() {
             const sido = document.getElementById('sidoSelect').value;
             const sigungu = document.getElementById('sigunguSelect').value;
             const eupmyeondong = document.getElementById('eupmyeondongSelect').value;
 
-            // 아무것도 선택 안 했으면 전체 목록 노출
             if(!sido && !sigungu && !eupmyeondong) {
                 renderHubs(allHubs);
                 return;
             }
 
-            // 주소 문자열 내에 선택한 글자들이 포함되어 있는지 꼼꼼하게 검사합니다.
             const filtered = allHubs.filter(hub => {
                 let match = true;
                 if(sido && !hub.hub_address.includes(sido)) match = false;
@@ -206,14 +204,21 @@
             renderHubs(filtered);
         }
 
-        // 페이지 로드 시 데이터베이스에서 허브 내역 최초 파싱
+        // 마우스 오버 시 지도를 갱신하는 함수
+        function updateSearchMap(address) {
+            const iframe = document.getElementById('searchMapIframe');
+            const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
+            if(iframe.src !== newSrc) {
+                iframe.src = newSrc;
+            }
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/hubs')
             .then(response => response.json())
             .then(result => {
                 if(result.success) {
                     allHubs = result.data;
-                    // 처음 열릴 때 기본 선택값인 '경기도 평택시 지산동' 기준으로 자동 한 번 걸러서 쾌적하게 보여줍니다.
                     filterHubsByRegion();
                 }
             })
