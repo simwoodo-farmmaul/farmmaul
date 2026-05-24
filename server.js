@@ -93,7 +93,7 @@ app.get('/api/hubs', (req, res) => {
     });
 });
 
-// 📌 [6] ★ 개별 마을 HUB 상세 정보 꺼내주기 (추가된 핵심 파이프라인!) ★
+// 📌 [6] 개별 마을 HUB 상세 정보 꺼내주기
 app.get('/api/hubs/:id', (req, res) => {
     const hubId = req.params.id;
     const selectOneQuery = `SELECT * FROM hub_applications_v2 WHERE id = ?`;
@@ -106,9 +106,62 @@ app.get('/api/hubs/:id', (req, res) => {
         if (result.length === 0) {
             return res.status(404).json({ success: false, message: '해당 HUB 거점을 찾을 수 없습니다.' });
         }
-        // 딱 일치하는 한 개의 데이터만 전송합니다.
         res.json({ success: true, data: result[0] });
     });
+});
+
+// 📌 [7] ★ 카카오 로그인 회원 처리 수신함 (새로 추가된 부분!) ★
+app.get('/auth/kakao/callback', async (req, res) => {
+    const authCode = req.query.code; 
+    
+    // 🚨 아래 작은따옴표 안의 글자를 지우고, 이사장님의 카카오 REST API 키를 넣어주세요!
+    const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; 
+    const REDIRECT_URI = 'https://farmmaul.com/auth/kakao/callback'; 
+
+    if (!authCode) return res.send("<script>alert('인증 코드가 없습니다.'); location.href='/';</script>");
+
+    try {
+        const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
+            body: `grant_type=authorization_code&client_id=${KAKAO_REST_API_KEY}&redirect_uri=${REDIRECT_URI}&code=${authCode}`
+        });
+        const tokenData = await tokenResponse.json();
+
+        const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
+            headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
+        });
+        const userData = await userResponse.json();
+
+        const kakaoId = userData.id;
+        const nickname = userData.kakao_account?.profile?.nickname || '팜마을 회원';
+        const email = userData.kakao_account?.email || '';
+
+        const createMemberTable = `
+            CREATE TABLE IF NOT EXISTS farm_members (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                kakao_id BIGINT UNIQUE NOT NULL,
+                nickname VARCHAR(100) NOT NULL,
+                email VARCHAR(100),
+                joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `;
+        
+        db.query(createMemberTable, (err) => {
+            if (err) throw err;
+
+            const insertMember = `INSERT INTO farm_members (kakao_id, nickname, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=?`;
+            db.query(insertMember, [kakaoId, nickname, email, nickname], (err) => {
+                if (err) throw err;
+                
+                res.send(`<script>alert('${nickname}님, 반갑습니다! 팜마을 로그인에 성공했습니다 🎉'); location.href='/';</script>`);
+            });
+        });
+
+    } catch (error) {
+        console.error('카카오 인증 실패:', error);
+        res.send("<script>alert('카카오 로그인 중 오류가 발생했습니다.'); location.href='/';</script>");
+    }
 });
 
 const PORT = process.env.PORT || 3000;
