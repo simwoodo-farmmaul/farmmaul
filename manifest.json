@@ -8,9 +8,9 @@
   "theme_color": "#87B32E",
   "icons": [
     {
-      "src": "farmmaul.jpg",
+      "src": "farmmaul.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }
