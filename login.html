@@ -17,9 +17,12 @@
         }
         
         * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
-        body { background: var(--bg-color); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
+        
+        /* 🌟 전체 여백 축소 */
+        body { background: var(--bg-color); margin: 0; padding: 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
 
-        .logo-container { text-align: center; margin-bottom: 30px; }
+        /* 🌟 로고 하단 간격 축소 (30px -> 20px) */
+        .logo-container { text-align: center; margin-bottom: 20px; }
         .logo-text {
             font-family: 'Jua', sans-serif;
             font-size: 2.8rem;
@@ -40,36 +43,51 @@
 
         .auth-box { background: #fff; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; }
         
+        /* 🌟 탭 위아래 여백 축소 (18px -> 14px) */
         .auth-tabs { display: flex; border-bottom: 2px solid #eee; }
-        .auth-tab { flex: 1; padding: 18px 0; text-align: center; font-size: 1.1rem; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.2s; background: #fafafa; }
+        .auth-tab { flex: 1; padding: 14px 0; text-align: center; font-size: 1.1rem; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.2s; background: #fafafa; }
         .auth-tab.active { color: var(--primary-green); background: #fff; border-bottom: 3px solid var(--primary-green); margin-bottom: -2px; }
 
-        .form-container { padding: 35px 30px; display: none; }
+        /* 🌟 내부 폼 패딩 축소 (35px -> 25px) */
+        .form-container { padding: 25px 20px; display: none; }
         .form-container.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        .input-group { margin-bottom: 15px; width: 100%; position: relative; }
-        .input-group input { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+        /* 🌟 입력창 간격 및 내부 여백 축소 (15px -> 10px, 12px) */
+        .input-group { margin-bottom: 10px; width: 100%; position: relative; }
+        .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
         .input-group input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(135,179,46,0.1); }
         .input-group input::placeholder { color: #bbb; }
 
         .password-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: #999; cursor: pointer; user-select: none; }
 
-        .btn-submit { width: 100%; padding: 15px; background: var(--primary-green); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.2s; margin-top: 10px; display: block; }
+        /* 🌟 버튼 여백 축소 (15px -> 13px) */
+        .btn-submit { width: 100%; padding: 13px; background: var(--primary-green); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.2s; margin-top: 8px; display: block; }
         .btn-submit:hover { background: #76a025; }
         
-        .btn-kakao { display: flex; width: 100%; padding: 15px; background: var(--kakao-yellow); color: var(--kakao-text); border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; text-decoration: none; }
+        .btn-kakao { display: flex; width: 100%; padding: 13px; background: var(--kakao-yellow); color: var(--kakao-text); border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; text-decoration: none; }
         .btn-kakao:hover { background: #f4dc00; }
         .kakao-icon { font-size: 1.3rem; }
 
-        .divider { display: flex; align-items: center; text-align: center; color: #999; font-size: 0.85rem; font-weight: 700; margin: 25px 0; }
+        /* 🌟 구분선 상하 여백 축소 (25px -> 18px) */
+        .divider { display: flex; align-items: center; text-align: center; color: #999; font-size: 0.85rem; font-weight: 700; margin: 18px 0; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
         .divider::before { margin-right: 15px; }
         .divider::after { margin-left: 15px; }
 
-        .extra-links { display: flex; justify-content: center; gap: 15px; margin-top: 20px; font-size: 0.85rem; font-weight: 700; color: #888; }
+        /* 🌟 하단 링크 간격 축소 (20px -> 15px) */
+        .extra-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; font-size: 0.85rem; font-weight: 700; color: #888; }
         .extra-links a { color: #888; text-decoration: none; cursor: pointer; }
         .extra-links a:hover { color: #333; text-decoration: underline; }
+
+        /* 🌟 모바일 전용 초밀착 셋팅 (폭 480px 이하일 때 더 좁힘) */
+        @media (max-width: 480px) {
+            .auth-box { border-radius: 15px; }
+            .form-container { padding: 20px 15px; }
+            .logo-text { font-size: 2.2rem; }
+            .logo-leaf { font-size: 1.8rem; }
+            body { padding: 10px; align-items: flex-start; margin-top: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -125,7 +143,7 @@
             }
         }
 
-        // 🌟 이메일 로그인 요청 연동
+        // 이메일 로그인 요청 연동
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
