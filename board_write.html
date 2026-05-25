@@ -6,207 +6,180 @@
     <title>팜마을 - 잔디밭 글쓰기</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
-        body { background-color: #f9fbf9; color: #333; padding-bottom: 5px; }
+        body { background-color: #f9fbf9; color: #333; padding-bottom: 30px; }
         header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1.5rem; font-weight: bold; color: #a066c0; text-decoration: none; }
-        
-        .form-container { max-width: 700px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; border: 1px solid #eaeaea; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .form-container { max-width: 700px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; border: 1px solid #eaeaea; }
         h2 { margin-bottom: 20px; font-size: 1.5rem; color: #222; }
-        
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #444; }
-        .form-group input[type="text"], .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
-        .form-group input:focus, .form-group textarea:focus { border-color: #a066c0; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
         .form-group textarea { height: 200px; resize: none; }
-        
-        .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; border: 1px dashed #2e7d32; }
-        .preview-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
-        .preview-box { width: 90px; height: 90px; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #ddd; position: relative; }
-        
-        .btn-delete-img {
-            position: absolute; top: -8px; right: -8px; background: #ff4d4d; color: white;
-            border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center;
-            justify-content: center; font-size: 12px; cursor: pointer; font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        .btn-submit { width: 100%; background: #a066c0; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-submit:hover { background: #8a4fa7; }
-        
-        #loadingMsg { display: none; color: #e65100; font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; }
+        .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; border: 1px dashed #2e7d32; }
+        .preview-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px; }
+        .preview-box { width: 80px; height: 80px; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #ddd; position: relative; }
+        .btn-delete-img { position: absolute; top: -5px; right: -5px; background: #ff4d4d; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 10px; cursor: pointer; }
+        .btn-submit { width: 100%; background: #a066c0; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <header>
         <a href="board.html" class="logo">🌱 잔디밭 글쓰기</a>
         <a href="board.html" style="text-decoration: none; font-weight: bold; color: #666;">취소</a>
     </header>
-
     <div class="form-container">
         <h2>이야기 나누기</h2>
         <form id="boardForm">
             <div class="form-group">
                 <label for="title">제목</label>
-                <input type="text" id="title" placeholder="주민들과 나눌 이야기의 제목을 적어주세요" required>
+                <input type="text" id="title" placeholder="제목을 입력하세요" required>
             </div>
-            
             <div class="form-group">
-                <label>📸 사진 등록 (여러 장 가능)</label>
+                <label for="content">내용</label>
+                <textarea id="content" placeholder="이웃들과 나눌 내용을 적어주세요" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>📸 사진 등록 (최대 5장)</label>
                 <label for="imageFiles" class="file-label">➕ 사진 선택하기</label>
-                <div id="loadingMsg">안전하게 사진 용량을 줄이는 중입니다... 잠시만 기다려주세요 ⏳</div>
                 <input type="file" id="imageFiles" multiple accept="image/*" style="display: none;">
                 <div class="preview-container" id="previewContainer"></div>
             </div>
-
-            <div class="form-group">
-                <label for="content">내용</label>
-                <textarea id="content" placeholder="우리 동네 이웃들에게 들려주고 싶은 소소한 일상이나 유익한 정보를 자유롭게 적어보세요." required></textarea>
-            </div>
-
             <div class="form-group">
                 <label for="youtube_url">🎬 유튜브 동영상 주소 (선택)</label>
                 <input type="text" id="youtube_url" placeholder="https://www.youtube.com/watch?v=...">
             </div>
-
             <button type="submit" class="btn-submit" id="submitBtn">작성 완료하기 ✨</button>
         </form>
     </div>
 
     <script>
         let base64Images = [];
-
-        // 🌟 멈춤 방지용 안전 압축 장치
-        function compressImage(file) {
-            return new Promise((resolve) => {
-                // 사진 파일이 아니면 그냥 넘깁니다.
-                if (!file.type.match(/image.*/)) {
-                    resolve(null);
-                    return;
-                }
-
+        document.getElementById('imageFiles').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const container = document.getElementById('previewContainer');
+            // 🌟 핵심: 5장 제한 로직
+            if (base64Images.length + files.length > 5) {
+                alert('사진은 최대 5장까지만 등록할 수 있습니다.');
+                return;
+            }
+            for(let i=0; i<files.length; i++) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    const img = new Image();
-                    img.onload = function() {
-                        const maxWidth = 1200;
-                        const maxHeight = 1200;
-                        let width = img.width;
-                        let height = img.height;
-
-                        if (width > height) {
-                            if (width > maxWidth) {
-                                height = Math.round((height *= maxWidth / width));
-                                width = maxWidth;
-                            }
-                        } else {
-                            if (height > maxHeight) {
-                                width = Math.round((width *= maxHeight / height));
-                                height = maxHeight;
-                            }
-                        }
-
-                        const canvas = document.createElement('canvas');
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-
-                        resolve(canvas.toDataURL('image/jpeg', 0.7));
-                    };
-                    // 사진이 깨졌을 경우 멈추지 않고 넘어가도록 처리
-                    img.onerror = function() { resolve(null); };
-                    img.src = event.target.result;
-                };
-                reader.onerror = function() { resolve(null); };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        // 사진 파일 다중 선택, 순차적 압축(멈춤 방지), 미리보기 및 삭제 기능
-        document.getElementById('imageFiles').addEventListener('change', async function(e) {
-            const files = e.target.files;
-            if (files.length === 0) return;
-
-            const container = document.getElementById('previewContainer');
-            const loadingMsg = document.getElementById('loadingMsg');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            loadingMsg.style.display = 'block';
-            submitBtn.disabled = true;
-            submitBtn.style.background = '#ccc';
-
-            // 💡 여러 장을 '한 번에' 하지 않고 '한 장씩 차례대로' 안전하게 처리합니다.
-            for(let i=0; i<files.length; i++) {
-                const compressedData = await compressImage(files[i]);
-                
-                if (compressedData) {
-                    base64Images.push(compressedData);
-                    
+                    const imgData = event.target.result;
+                    base64Images.push(imgData);
                     const box = document.createElement('div');
                     box.className = 'preview-box';
-                    box.style.backgroundImage = `url('${compressedData}')`;
-                    
+                    box.style.backgroundImage = `url('${imgData}')`;
                     const delBtn = document.createElement('div');
-                    delBtn.className = 'btn-delete-img';
-                    delBtn.innerHTML = '✖';
+                    delBtn.className = 'btn-delete-img'; delBtn.innerHTML = '✖';
                     delBtn.onclick = function() {
-                        const idx = base64Images.indexOf(compressedData);
-                        if (idx > -1) {
-                            base64Images.splice(idx, 1);
-                        }
+                        base64Images.splice(base64Images.indexOf(imgData), 1);
                         container.removeChild(box);
                     };
-                    
                     box.appendChild(delBtn);
                     container.appendChild(box);
-                }
+                };
+                reader.readAsDataURL(files[i]);
             }
-
-            // 모든 처리가 끝나면 버튼 원상복구
-            loadingMsg.style.display = 'none';
-            submitBtn.disabled = false;
-            submitBtn.style.background = '#a066c0';
-            e.target.value = '';
         });
 
-        // 폼 전송 이벤트
         document.getElementById('boardForm').addEventListener('submit', function(e) {
             e.preventDefault();
-            
             const submitData = {
                 title: document.getElementById('title').value,
                 youtube_url: document.getElementById('youtube_url').value,
                 content: document.getElementById('content').value,
                 images: base64Images
             };
-
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerText = '저장하는 중입니다...';
-            submitBtn.disabled = true;
-
             fetch('/api/board', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(submitData)
             })
-            .then(res => {
-                if(!res.ok) throw new Error('서버 전송 용량 초과 또는 오류');
-                return res.json();
-            })
+            .then(res => res.json())
             .then(result => {
                 alert(result.message);
-                if(result.success) {
-                    location.href = 'board.html';
-                }
-            })
-            .catch(err => {
-                console.error('글 작성 에러:', err);
-                alert('글을 올리지 못했습니다. 인터넷 연결을 확인해주세요.');
-                submitBtn.innerText = '작성 완료하기 ✨';
-                submitBtn.disabled = false;
+                if(result.success) location.href = 'board.html';
             });
         });
     </script>
 </body>
 </html>
+
+### 📄 2. `board.html` 수정 (줄글형 리스트 UI)
+
+박스형태에서 한 줄씩 제목이 보이는 리스트 형태로 디자인을 완전히 바꿨습니다.
+
+```html
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 잔디밭 목록</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f9fbf9; color: #333; }
+        header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #87B32E; text-decoration: none; }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-write { background-color: #a066c0; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; }
+        
+        /* 🌟 줄글 리스트 스타일 */
+        .post-list { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; }
+        .post-item { padding: 18px 25px; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .post-item:hover { background-color: #f8fafc; }
+        .post-item:last-child { border-bottom: none; }
+        .post-info { flex: 1; margin-right: 20px; }
+        .post-title { font-size: 1.1rem; font-weight: bold; color: #222; margin-bottom: 5px; }
+        .post-meta { font-size: 0.85rem; color: #888; }
+        .post-icon { color: #87B32E; font-size: 1.2rem; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">🌱 팜마을 잔디밭</a>
+        <a href="index.html" style="text-decoration: none; font-weight: bold; color: #666;">🏠 홈</a>
+    </header>
+    <div class="container">
+        <div class="board-header">
+            <h1>전체 이야기</h1>
+            <a href="board_write.html" class="btn-write">✏️ 글쓰기</a>
+        </div>
+        <div class="post-list" id="postListContainer">
+            </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/board')
+                .then(response => response.json())
+                .then(result => {
+                    const container = document.getElementById('postListContainer');
+                    if (result.data.length === 0) {
+                        container.innerHTML = '<div style="padding:40px; text-align:center; color:#999;">등록된 글이 없습니다.</div>';
+                        return;
+                    }
+                    result.data.forEach(post => {
+                        const date = new Date(post.created_at).toLocaleDateString();
+                        const itemHtml = `
+                            <div class="post-item" onclick="location.href='board_detail.html?id=${post.id}'">
+                                <div class="post-info">
+                                    <div class="post-title">${post.title}</div>
+                                    <div class="post-meta">🧑‍🌾 ${post.nickname} | 📅 ${date}</div>
+                                </div>
+                                <div class="post-icon">❯</div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', itemHtml);
+                    });
+                });
+        });
+    </script>
+</body>
+</html>
+
+개편된 잔디밭 게시판의 새로운 모습입니다! 파일을 덮어쓰시고 **깃허브 업로드 및 재배포**를 진행해 보십시오. 훨씬 깔끔하고 듬직한 게시판이 될 것입니다.
+
+개편된 게시판에 대해 더 수정하고 싶은 부분이 있다면 언제든 말씀해 주세요!
