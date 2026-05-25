@@ -14,12 +14,12 @@
         h2 { margin-bottom: 20px; font-size: 1.5rem; color: #222; }
         
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #444; }
-        .form-group input[type="text"], .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
+        .form-group label { font-weight: bold; color: #444; }
+        .form-group input[type="text"], .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; margin-top: 8px; }
         .form-group input:focus, .form-group textarea:focus { border-color: #a066c0; }
         .form-group textarea { height: 200px; resize: none; }
         
-        .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; border: 1px dashed #2e7d32; }
+        .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; border: 1px dashed #2e7d32; margin-top: 8px; }
         .preview-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 90px; height: 90px; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #ddd; position: relative; }
         
@@ -34,6 +34,17 @@
         .btn-submit:hover { background: #8a4fa7; }
         
         #loadingMsg { display: none; color: #e65100; font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; }
+
+        /* 🎤 마이크 버튼 스타일 */
+        .btn-mic { background: #87B32E; color: white; border: none; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-mic:hover { background: #6b9122; }
+        .btn-mic.recording { background: #ff4d4d; animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -52,8 +63,11 @@
             </div>
             
             <div class="form-group">
-                <label for="content">내용</label>
-                <textarea id="content" placeholder="우리 동네 이웃들에게 들려주고 싶은 소소한 일상이나 유익한 정보를 자유롭게 적어보세요." required></textarea>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="content">내용</label>
+                    <button type="button" class="btn-mic" id="btnMic">🎤 음성으로 쓰기</button>
+                </div>
+                <textarea id="content" placeholder="버튼을 누르고 스마트폰에 말씀하시면 글자로 바뀝니다. (직접 타이핑하셔도 됩니다)" required></textarea>
             </div>
 
             <div class="form-group">
@@ -74,6 +88,67 @@
     </div>
 
     <script>
+        // ==========================================
+        // 🎤 1. 음성 인식 (STT) 기능
+        // ==========================================
+        const btnMic = document.getElementById('btnMic');
+        const contentArea = document.getElementById('content');
+        
+        // 브라우저가 음성 인식을 지원하는지 확인
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ko-KR'; // 한국어 설정
+            recognition.interimResults = false; // 중간 결과 말고 최종 결과만 송출
+            let isRecording = false;
+
+            btnMic.addEventListener('click', () => {
+                if (isRecording) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
+
+            // 녹음 시작 시
+            recognition.onstart = function() {
+                isRecording = true;
+                btnMic.classList.add('recording');
+                btnMic.innerHTML = '🛑 듣는 중... (말씀하세요)';
+            };
+
+            // 음성을 글자로 변환 성공 시
+            recognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                // 기존 내용 뒤에 띄어쓰기하고 붙여넣기
+                contentArea.value += (contentArea.value ? ' ' : '') + transcript;
+            };
+
+            // 에러 발생 시
+            recognition.onerror = function(event) {
+                console.error('음성 인식 에러:', event.error);
+                if (event.error === 'not-allowed') {
+                    alert('마이크 사용 권한이 필요합니다. 브라우저 설정에서 마이크를 허용해주세요.');
+                } else {
+                    alert('음성 인식에 실패했습니다. 다시 시도해주세요.');
+                }
+            };
+
+            // 녹음 종료 시
+            recognition.onend = function() {
+                isRecording = false;
+                btnMic.classList.remove('recording');
+                btnMic.innerHTML = '🎤 음성으로 쓰기';
+            };
+        } else {
+            // 지원하지 않는 브라우저(구형 기기 등)에서는 버튼 숨김
+            btnMic.style.display = 'none';
+        }
+
+        // ==========================================
+        // 📸 2. 사진 압축 및 등록 로직 (기존과 동일)
+        // ==========================================
         let base64Images = [];
 
         function compressImage(file) {
@@ -149,6 +224,9 @@
             e.target.value = '';
         });
 
+        // ==========================================
+        // 🚀 3. 최종 작성 서버 전송 로직
+        // ==========================================
         document.getElementById('boardForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const submitData = {
