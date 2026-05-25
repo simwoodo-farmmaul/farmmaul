@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 잔디밭 커뮤니티</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f9fbf9; color: #333; padding-bottom: 40px; }
+        header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #87B32E; text-decoration: none; }
+        
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        .board-title h1 { font-size: 1.8rem; color: #222; }
+        .board-title p { font-size: 0.95rem; color: #666; margin-top: 5px; }
+        
+        .btn-write { background-color: #a066c0; color: white; padding: 12px 24px; border-radius: 25px; text-decoration: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s; }
+        .btn-write:hover { transform: translateY(-2px); background-color: #8a4fa7; }
+
+        .board-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .post-card { background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; cursor: pointer; transition: 0.2s; display: flex; flex-direction: column; }
+        .post-card:hover { transform: translateY(-4px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        
+        .post-thumbnail { width: 100%; height: 180px; background-color: #e8f5e9; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+        .post-body { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .post-title { font-size: 1.1rem; font-weight: bold; color: #222; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .post-meta { font-size: 0.85rem; color: #777; display: flex; justify-content: space-between; align-items: center; }
+        
+        @media (max-width: 768px) {
+            .board-grid { grid-template-columns: repeat(1, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="logo">🌱 팜마을 잔디밭</a>
+        <a href="index.html" style="text-decoration: none; font-weight: bold; color: #666;">🏠 홈으로</a>
+    </header>
+
+    <div class="container">
+        <div class="board-header">
+            <div class="board-title">
+                <h1>🌱 동네 잔디밭</h1>
+                <p>우리 동네 주민들의 생생한 영상과 사진이 가득한 소통 공간입니다.</p>
+            </div>
+            <a href="board_write.html" class="btn-write">✏️ 글쓰기</a>
+        </div>
+
+        <div class="board-grid" id="postGridContainer">
+            </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/board')
+                .then(response => response.json())
+                .then(result => {
+                    const container = document.getElementById('postGridContainer');
+                    if (!result.data || result.data.length === 0) {
+                        container.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#999; padding:50px 0;">아직 잔디밭에 올라온 이야기가 없습니다. 첫 번째 주인공이 되어보세요!</div>';
+                        return;
+                    }
+
+                    result.data.forEach(post => {
+                        // 저장된 이미지 배열 분석
+                        let images = [];
+                        try { images = JSON.parse(post.images); } catch(e) { images = []; }
+                        
+                        // 대표 이미지 설정 (사진이 없으면 기본 새싹 이모티콘)
+                        let thumbnailStyle = ``;
+                        let thumbnailContent = `🌱`;
+                        if (images.length > 0) {
+                            thumbnailStyle = `style="background-image: url('${images[0]}')"`;
+                            thumbnailContent = '';
+                        }
+
+                        const date = new Date(post.created_at).toLocaleDateString();
+
+                        const cardHtml = `
+                            <div class="post-card" onclick="location.href='board_detail.html?id=${post.id}'">
+                                <div class="post-thumbnail" ${thumbnailStyle}>${thumbnailContent}</div>
+                                <div class="post-body">
+                                    <div class="post-title">${post.title}</div>
+                                    <div class="post-meta">
+                                        <span>🧑‍🌾 ${post.nickname}</span>
+                                        <span>📅 ${date}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', cardHtml);
+                    });
+                })
+                .catch(err => console.error('게시판 목록 조회 실패:', err));
+        });
+    </script>
+</body>
+</html>

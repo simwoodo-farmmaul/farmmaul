@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 잔디밭 글쓰기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f9fbf9; color: #333; padding-bottom: 5px; }
+        header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #a066c0; text-decoration: none; }
+        
+        .form-container { max-width: 700px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; border: 1px solid #eaeaea; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        h2 { margin-bottom: 20px; font-size: 1.5rem; color: #222; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #444; }
+        .form-group input[type="text"], .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #a066c0; }
+        .form-group textarea { height: 200px; resize: none; }
+        
+        .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; border: 1px dashed #2e7d32; }
+        .preview-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-box { width: 90px; height: 90px; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #ddd; position: relative; }
+        
+        .btn-submit { width: 100%; background: #a066c0; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .btn-submit:hover { background: #8a4fa7; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="board.html" class="logo">🌱 잔디밭 글쓰기</a>
+        <a href="board.html" style="text-decoration: none; font-weight: bold; color: #666;">취소</a>
+    </header>
+
+    <div class="form-container">
+        <h2>이야기 나누기</h2>
+        <form id="boardForm">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" placeholder="주민들과 나눌 이야기의 제목을 적어주세요" required>
+            </div>
+            
+            <div class="form-group">
+                <label>📸 사진 등록 (여러 장 가능)</label>
+                <label for="imageFiles" class="file-label">➕ 사진 선택하기</label>
+                <input type="file" id="imageFiles" multiple accept="image/*" style="display: none;">
+                <div class="preview-container" id="previewContainer"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="content">내용</label>
+                <textarea id="content" placeholder="우리 동네 이웃들에게 들려주고 싶은 소소한 일상이나 유익한 정보를 자유롭게 적어보세요." required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="youtube_url">🎬 유튜브 동영상 주소 (선택)</label>
+                <input type="text" id="youtube_url" placeholder="https://www.youtube.com/watch?v=...">
+            </div>
+
+            <button type="submit" class="btn-submit">작성 완료하기 ✨</button>
+        </form>
+    </div>
+
+    <script>
+        let base64Images = [];
+
+        // 사진 파일 다중 선택 및 이미지 압축 변환 장치
+        document.getElementById('imageFiles').addEventListener('change', function(e) {
+            const files = e.target.files;
+            const container = document.getElementById('previewContainer');
+            
+            for(let i=0; i<files.length; i++) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    base64Images.push(event.target.result);
+                    
+                    const box = document.createElement('div');
+                    box.className = 'preview-box';
+                    box.style.backgroundImage = `url('${event.target.result}')`;
+                    container.appendChild(box);
+                };
+                reader.readAsDataURL(files[i]);
+            }
+        });
+
+        // 폼 전송 이벤트
+        document.getElementById('boardForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitData = {
+                title: document.getElementById('title').value,
+                youtube_url: document.getElementById('youtube_url').value,
+                content: document.getElementById('content').value,
+                images: base64Images
+            };
+
+            fetch('/api/board', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submitData)
+            })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                if(result.success) {
+                    location.href = 'board.html';
+                }
+            })
+            .catch(err => console.error('글 작성 에러:', err));
+        });
+    </script>
+</body>
+</html>

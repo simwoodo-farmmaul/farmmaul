@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 잔디밭 이야기</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f9fbf9; color: #333; padding-bottom: 60px; }
+        header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #a066c0; text-decoration: none; }
+        
+        .main-container { max-width: 800px; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .detail-header { padding: 25px 30px; border-bottom: 1px solid #f0f0f0; }
+        .post-title { font-size: 1.6rem; font-weight: 800; color: #222; margin-bottom: 12px; line-height: 1.4; }
+        .post-info { font-size: 0.9rem; color: #666; display: flex; gap: 20px; }
+        
+        .detail-body { padding: 30px; line-height: 1.7; font-size: 1.05rem; color: #444; }
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin-bottom: 25px; border-radius: 8px; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        
+        .image-gallery { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        .gallery-img { width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; background: #fafafa; }
+        .post-text-content { white-space: pre-wrap; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="board.html" class="logo">🌱 잔디밭 이야기</a>
+        <a href="board.html" style="text-decoration: none; font-weight: bold; color: #666;">목록으로</a>
+    </header>
+
+    <div class="main-container">
+        <div class="detail-header">
+            <div class="post-title" id="postTitle">로딩 중입니다...</div>
+            <div class="post-info">
+                <span id="postAuthor">🧑‍🌾 </span>
+                <span id="postDate">📅 </span>
+            </div>
+        </div>
+        
+        <div class="detail-body">
+            <div id="videoArea"></div>
+
+            <div class="image-gallery" id="imageGallery"></div>
+
+            <div class="post-text-content" id="postContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // 유튜브 일반 링크를 재생 가능한 임베드 링크로 변환해주는 마법 함수
+        function getYoutubeEmbedUrl(url) {
+            if(!url) return null;
+            let videoId = null;
+            if(url.includes('v=')) {
+                videoId = url.split('v=')[1].split('&')[0];
+            } else if(url.includes('youtu.be/')) {
+                videoId = url.split('youtu.be/')[1].split('?')[0];
+            }
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+
+            fetch(`/api/board/${id}`)
+                .then(res => res.json())
+                .then(result => {
+                    if(!result.success) {
+                        alert('글을 가져올 수 없습니다.');
+                        location.href = 'board.html';
+                        return;
+                    }
+
+                    const post = result.data;
+                    document.getElementById('postTitle').innerText = post.title;
+                    document.getElementById('postAuthor').innerText = `🧑‍🌾 생산자: ${post.nickname}`;
+                    document.getElementById('postDate').innerText = `📅 등록일: ${new Date(post.created_at).toLocaleDateString()}`;
+                    document.getElementById('postContent').innerText = post.content;
+
+                    // 1. 유튜브 연동 제어
+                    const embedUrl = getYoutubeEmbedUrl(post.youtube_url);
+                    if(embedUrl) {
+                        document.getElementById('videoArea').innerHTML = `
+                            <div class="video-container">
+                                <iframe src="${embedUrl}" allowfullscreen></iframe>
+                            </div>
+                        `;
+                    }
+
+                    // 2. 여러 장의 이미지 연동 제어
+                    let images = [];
+                    try { images = JSON.parse(post.images); } catch(e) { images = []; }
+                    
+                    const gallery = document.getElementById('imageGallery');
+                    images.forEach(imgBase64 => {
+                        const imgTag = document.createElement('img');
+                        imgTag.className = 'gallery-img';
+                        imgTag.src = imgBase64;
+                        gallery.appendChild(imgTag);
+                    });
+                })
+                .catch(err => console.error('상세 내용 조회 에러:', err));
+        });
+    </script>
+</body>
+</html>

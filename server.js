@@ -194,6 +194,73 @@ app.get('/auth/logout', (req, res) => {
     });
 });
 
+// 📌 [10] ★ 잔디밭 자유게시판 - 게시글 저장하기 (사진 여러 장 + 유튜브) ★
+app.post('/api/board', (req, res) => {
+    const { title, content, youtube_url, images } = req.body;
+    // 로그인된 사용자의 닉네임을 사용합니다. (로그인 전이면 익명)
+    const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
+
+    // 게시판 테이블이 없으면 자동으로 생성 (이미지 장고는 LONGTEXT로 생성)
+    const createBoardTable = `
+        CREATE TABLE IF NOT EXISTS farm_board (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nickname VARCHAR(100) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            youtube_url VARCHAR(500),
+            images LONGTEXT, 
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+
+    db.query(createBoardTable, (err) => {
+        if (err) {
+            console.error('게시판 테이블 생성 에러:', err);
+            return res.status(500).json({ success: false, message: 'DB 준비 중 오류가 발생했습니다.' });
+        }
+
+        const insertQuery = `INSERT INTO farm_board (nickname, title, content, youtube_url, images) VALUES (?, ?, ?, ?, ?)`;
+        // 여러 장의 사진 배열을 텍스트(JSON) 형태로 변환하여 저장합니다.
+        const imagesJson = JSON.stringify(images || []);
+
+        db.query(insertQuery, [nickname, title, content, youtube_url, imagesJson], (err, result) => {
+            if (err) {
+                console.error('글 저장 에러:', err);
+                return res.status(500).json({ success: false, message: '글을 저장하는 중 오류가 발생했습니다.' });
+            }
+            res.json({ success: true, message: '잔디밭에 글이 성공적으로 등록되었습니다! 🌱' });
+        });
+    });
+});
+
+// 📌 [11] ★ 잔디밭 자유게시판 - 전체 글 목록 불러오기 ★
+app.get('/api/board', (req, res) => {
+    const selectQuery = `SELECT id, nickname, title, youtube_url, images, created_at FROM farm_board ORDER BY created_at DESC`;
+    db.query(selectQuery, (err, results) => {
+        if (err) {
+            // 테이블이 아직 없을 때는 빈 배열을 반환하여 에러를 방지합니다.
+            return res.json({ success: true, data: [] });
+        }
+        res.json({ success: true, data: results });
+    });
+});
+
+// 📌 [12] ★ 잔디밭 자유게시판 - 개별 글 상세 보기 ★
+app.get('/api/board/:id', (req, res) => {
+    const postId = req.params.id;
+    const selectOneQuery = `SELECT * FROM farm_board WHERE id = ?`;
+    
+    db.query(selectOneQuery, [postId], (err, result) => {
+        if (err) {
+            console.error('글 조회 에러:', err);
+            return res.status(500).json({ success: false, message: '글을 불러오는 중 오류가 발생했습니다.' });
+        }
+        if (result.length === 0) {
+            return res.status(404).json({ success: false, message: '해당 게시글을 찾을 수 없습니다.' });
+        }
+        res.json({ success: true, data: result[0] });
+    });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 힘차게 달리고 있습니다!`);
