@@ -54,9 +54,7 @@
         .btn-register-trigger { border: 1px solid var(--primary-orange); color: white !important; background-color: var(--primary-orange); padding: 4px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.2s; text-decoration: none; }
         .btn-register-trigger:hover { background-color: #d84315; }
 
-        /* 🌟 수정 포인트 1: 녹색 배경의 아래쪽 여백(Padding)을 넓혀 글자와 검색창을 상대적으로 위로 올렸습니다 */
         .hero { background: linear-gradient(135deg, #4B9AD2 0%, #6bc75a 50%, #87B32E 100%); color: white; text-align: center; padding: 40px 20px 80px; }
-        
         .hero-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; text-shadow: 0px 2px 4px rgba(0,0,0,0.2); }
         .hero-subtitle { font-size: 1.1rem; font-weight: bold; line-height: 1.4; text-shadow: 0px 1px 3px rgba(0,0,0,0.15); margin-bottom: 15px; opacity: 0.95; }
         
@@ -65,9 +63,7 @@
         .search-bar button { width: 50px; border: none; background: var(--primary-orange); color: #fff; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
         .search-bar button:hover { background: #d84315; }
 
-        /* 🌟 수정 포인트 2: 마진을 음수(-60px)로 설정하여 4개의 박스가 녹색 배경 위로 겹쳐 올라타게 만들었습니다 */
         .main-categories { max-width: 1200px; margin: -60px auto 40px; display: flex; justify-content: center; gap: 20px; padding: 0 20px; position: relative; z-index: 10; }
-        
         .category-box { border-radius: 18px; width: 120px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border: none; }
         .category-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
         .category-box span.icon { font-size: 2.8rem; margin-bottom: 8px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
@@ -196,7 +192,6 @@
             .auth-zone-flex { gap: 6px; flex: 1; justify-content: flex-end; }
             .btn-login, .btn-register-trigger { padding: 5px 10px; font-size: 0.85rem; }
 
-            /* 🌟 모바일에서도 겹침 효과를 위해 음수 마진(-40px) 적용 */
             .main-categories { flex-wrap: wrap; gap: 10px; margin: -40px auto 30px; }
             .category-box { width: calc(50% - 5px); height: 100px; }
             .category-box span.icon { font-size: 2.2rem; }
@@ -440,14 +435,14 @@
         </div>
     </section>
 
-<section class="common-section">
+    <section class="common-section">
         <div class="cta-section">
             <h2>지금 팜마을을 시작해보세요</h2>
             <p>우리 동네 신선한 먹거리, 지금 바로 만나보세요</p>
             <div class="cta-buttons">
                 <a href="join.html" class="cta-btn cta-btn-free">무료 회원가입</a>
                 <a href="register.html" class="cta-btn cta-btn-prod">상품등록하기</a>
-                <button id="pwaInstallBtn" class="cta-btn" style="background-color: #4B9AD2; color: white; border: none; cursor: pointer; display: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">📲 바탕화면에 앱 추가</button>
+                <button id="pwaInstallBtn" class="cta-btn" style="background-color: #4B9AD2; color: white; border: none; cursor: pointer; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">📲 바탕화면에 앱 추가</button>
             </div>
         </div>
     </section>
@@ -579,19 +574,16 @@
                 .catch(err => console.error('사용자 정보 조회 실패:', err));
         });
     </script>
-
-<script>
+    
+    <script>
         let deferredPrompt;
         const installBtn = document.getElementById('pwaInstallBtn');
 
-        // 스마트폰이 앱 설치를 지원하면 파란색 버튼을 짜잔! 하고 보여줍니다.
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            installBtn.style.display = 'inline-block';
         });
 
-        // 파란색 버튼을 클릭했을 때의 동작
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -600,17 +592,14 @@
                     alert('팜마을 어플 설치를 시작합니다. 바탕화면을 확인해 주세요! 🌱');
                 }
                 deferredPrompt = null;
-                installBtn.style.display = 'none'; // 설치 후엔 버튼 숨김
             } else {
-                // 아이폰(사파리) 사용자는 자동 설치가 안 되므로 안내창을 띄워줍니다.
-                alert('아이폰(사파리) 사용자는 화면 하단의 [공유 버튼 ⬆️]을 누르신 후 [홈 화면에 추가 ➕]를 선택해 주시면 앱처럼 사용하실 수 있습니다! 🌱');
+                // 이미 설치되어 있거나 브라우저 자동창이 안 되는 모든 PC/모바일 환경 통합 안내
+                alert('안드로이드(갤럭시) 기기는 브라우저 기능에 따라 설치 창이 열리며, 아이폰(사파리) 사용자는 화면 하단의 [공유 버튼 ⬆️]을 누르신 후 [홈 화면에 추가 ➕]를 선택해 주시면 앱처럼 사용하실 수 있습니다! 🌱');
             }
         });
 
-        // 설치가 완료되면 확인 알림을 띄웁니다.
         window.addEventListener('appinstalled', () => {
             alert('팜마을 앱 설치가 성공적으로 완료되었습니다! 🎉');
-            installBtn.style.display = 'none';
         });
     </script>
 </body>
