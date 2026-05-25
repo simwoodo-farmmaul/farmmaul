@@ -20,11 +20,33 @@
         .form-group textarea { height: 200px; resize: none; }
         
         .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; border: 1px dashed #2e7d32; }
-        .preview-container { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
         .preview-box { width: 90px; height: 90px; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #ddd; position: relative; }
+        
+        /* 사진 취소(삭제) 버튼 스타일 */
+        .btn-delete-img {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff4d4d;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
         
         .btn-submit { width: 100%; background: #a066c0; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-submit:hover { background: #8a4fa7; }
+        
+        /* 로딩 중 안내 메시지 스타일 */
+        #loadingMsg { display: none; color: #e65100; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -45,6 +67,7 @@
             <div class="form-group">
                 <label>📸 사진 등록 (여러 장 가능)</label>
                 <label for="imageFiles" class="file-label">➕ 사진 선택하기</label>
+                <span id="loadingMsg">사진 용량을 줄이는 중입니다. 잠시만 기다려주세요...⏳</span>
                 <input type="file" id="imageFiles" multiple accept="image/*" style="display: none;">
                 <div class="preview-container" id="previewContainer"></div>
             </div>
@@ -59,30 +82,104 @@
                 <input type="text" id="youtube_url" placeholder="https://www.youtube.com/watch?v=...">
             </div>
 
-            <button type="submit" class="btn-submit">작성 완료하기 ✨</button>
+            <button type="submit" class="btn-submit" id="submitBtn">작성 완료하기 ✨</button>
         </form>
     </div>
 
     <script>
         let base64Images = [];
 
-        // 사진 파일 다중 선택 및 이미지 압축 변환 장치
+        // 🌟 마법의 사진 압축 장치 (최대 가로/세로 1200px, 품질 70%로 다이어트)
+        function compressImage(file, callback) {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = function() {
+                    const maxWidth = 1200;
+                    const maxHeight = 1200;
+                    let width = img.width;
+                    let height = img.height;
+
+                    // 비율을 유지하면서 크기 줄이기
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height *= maxWidth / width));
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width *= maxHeight / height));
+                            height = maxHeight;
+                        }
+                    }
+
+                    // 투명한 도화지(캔버스)에 줄어든 크기로 다시 그리기
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // 용량이 쫙 줄어든 새로운 사진 데이터 생성 (JPEG 포맷, 70% 화질)
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                    callback(compressedDataUrl);
+                };
+            };
+        }
+
+        // 사진 파일 다중 선택, 압축, 미리보기 및 삭제 기능
         document.getElementById('imageFiles').addEventListener('change', function(e) {
             const files = e.target.files;
+            if (files.length === 0) return;
+
             const container = document.getElementById('previewContainer');
+            const loadingMsg = document.getElementById('loadingMsg');
+            const submitBtn = document.getElementById('submitBtn');
             
+            // 압축하는 동안 버튼과 안내 메시지 제어
+            loadingMsg.style.display = 'inline-block';
+            submitBtn.disabled = true;
+            submitBtn.style.background = '#ccc';
+
+            let processedCount = 0;
+
             for(let i=0; i<files.length; i++) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    base64Images.push(event.target.result);
+                // 선택된 사진을 하나씩 압축 장치에 넣습니다.
+                compressImage(files[i], function(compressedData) {
+                    base64Images.push(compressedData);
                     
                     const box = document.createElement('div');
                     box.className = 'preview-box';
-                    box.style.backgroundImage = `url('${event.target.result}')`;
+                    box.style.backgroundImage = `url('${compressedData}')`;
+                    
+                    // ❌ 개별 사진 삭제 버튼
+                    const delBtn = document.createElement('div');
+                    delBtn.className = 'btn-delete-img';
+                    delBtn.innerHTML = '✖';
+                    delBtn.onclick = function() {
+                        const idx = base64Images.indexOf(compressedData);
+                        if (idx > -1) {
+                            base64Images.splice(idx, 1);
+                        }
+                        container.removeChild(box);
+                    };
+                    
+                    box.appendChild(delBtn);
                     container.appendChild(box);
-                };
-                reader.readAsDataURL(files[i]);
+
+                    processedCount++;
+                    // 모든 사진 압축이 끝나면 글쓰기 버튼을 다시 활성화합니다.
+                    if (processedCount === files.length) {
+                        loadingMsg.style.display = 'none';
+                        submitBtn.disabled = false;
+                        submitBtn.style.background = '#a066c0';
+                    }
+                });
             }
+            // 같은 사진을 또 고를 수 있도록 파일 선택창 비우기
+            e.target.value = '';
         });
 
         // 폼 전송 이벤트
@@ -96,19 +193,31 @@
                 images: base64Images
             };
 
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = '저장하는 중입니다...';
+            submitBtn.disabled = true;
+
             fetch('/api/board', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(submitData)
             })
-            .then(res => res.json())
+            .then(res => {
+                if(!res.ok) throw new Error('서버 전송 용량 초과 또는 오류');
+                return res.json();
+            })
             .then(result => {
                 alert(result.message);
                 if(result.success) {
                     location.href = 'board.html';
                 }
             })
-            .catch(err => console.error('글 작성 에러:', err));
+            .catch(err => {
+                console.error('글 작성 에러:', err);
+                alert('글을 올리지 못했습니다. 인터넷 연결을 확인하거나 사진을 줄여주세요.');
+                submitBtn.innerText = '작성 완료하기 ✨';
+                submitBtn.disabled = false;
+            });
         });
     </script>
 </body>
