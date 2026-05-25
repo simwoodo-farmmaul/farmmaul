@@ -8,7 +8,7 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#87B32E">
     
-    <link rel="apple-touch-icon" href="farmmaul.png">
+    <link rel="apple-touch-icon" href="farmmaul-192.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="팜마을">
@@ -602,5 +602,14 @@
             alert('팜마을 앱 설치가 성공적으로 완료되었습니다! 🎉');
         });
     </script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('서비스 워커 등록 성공! 이제 앱 설치가 가능합니다.', reg))
+                .catch(err => console.log('서비스 워커 등록 실패:', err));
+        });
+    }
+</script>
 </body>
 </html>
