@@ -1,0 +1,21 @@
+{
+  "name": "팜마을 - 스마트 농업 직거래 플랫폼",
+  "short_name": "팜마을",
+  "description": "우리 동네 신선한 먹거리 직거래 플랫폼",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#87B32E",
+  "icons": [
+    {
+      "src": "farmmaul-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "farmmaul-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
