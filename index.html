@@ -6,16 +6,13 @@
     <title>팜마을 - 스마트 농업 직거래 플랫폼</title>
 
     <script>
-        const manifestLink = document.createElement('link');
-        manifestLink.rel = 'manifest';
-        
-        // 접속한 기기가 스마트폰(Android, iPhone 등)인지 확인합니다.
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            manifestLink.href = 'manifest-mobile.json'; // 모바일이면 주소창 없는 꽉 찬 화면!
+            // 모바일 기기 접속 시: 주소창 없는 꽉 찬 화면용 설정
+            document.write('<link rel="manifest" href="manifest-mobile.json">');
         } else {
-            manifestLink.href = 'manifest-pc.json'; // PC면 주소창이 살아있는 인터넷 화면!
+            // PC 접속 시: 주소창이 살아있는 인터넷 화면용 설정
+            document.write('<link rel="manifest" href="manifest-pc.json">');
         }
-        document.head.appendChild(manifestLink);
     </script>
     <meta name="theme-color" content="#87B32E">
     
