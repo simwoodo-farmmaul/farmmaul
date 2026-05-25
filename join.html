@@ -8,35 +8,30 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; }
         body { background-color: #f9fbf9; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
         
-        /* 캡처본과 똑같은 하얀색 상자 디자인 */
         .register-container { background: white; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 450px; }
         
-        /* 카카오 가입 노란색 버튼 */
         .btn-kakao-login { display: block; width: 100%; background: #FEE500; color: #3C1E1E; text-align: center; padding: 15px; border-radius: 8px; font-weight: 800; font-size: 1.1rem; text-decoration: none; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .btn-kakao-login:hover { background: #e5cd00; }
         
-        /* 가운데 '또는 이메일로 가입하기' 선 */
         .divider { display: flex; align-items: center; text-align: center; color: #999; font-size: 0.95rem; font-weight: 800; margin-bottom: 25px; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eaeaea; }
         .divider:not(:empty)::before { margin-right: 15px; }
         .divider:not(:empty)::after { margin-left: 15px; }
 
-        /* 연한 초록색 안내 상자 */
         .info-box { background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 8px; padding: 18px 15px; text-align: center; color: #2e7d32; font-weight: 800; font-size: 0.95rem; margin-bottom: 25px; line-height: 1.5; }
 
-        /* 입력칸 디자인 */
-        .input-group { margin-bottom: 15px; }
-        .input-group input { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; color: #333; }
+        .input-group { margin-bottom: 15px; position: relative; }
+        .input-group input { width: 100%; padding: 15px; padding-right: 45px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; color: #333; }
         .input-group input::placeholder { color: #aaa; font-weight: 600; }
         .input-group input:focus { border-color: #87B32E; }
 
-        /* 하단 체크박스 구역 */
+        /* 👁️ 비밀번호 눈동자 토글 버튼 스타일 */
+        .password-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: #999; cursor: pointer; user-select: none; }
+
         .terms-group { display: flex; align-items: center; gap: 8px; margin-bottom: 25px; font-size: 0.9rem; color: #555; font-weight: 800; }
         .terms-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: #87B32E; cursor: pointer; }
         .terms-group a { color: #4B9AD2; text-decoration: none; }
-        .terms-group a:hover { text-decoration: underline; }
         
-        /* 최종 회원가입 버튼 */
         .btn-submit { width: 100%; background: #87B32E; color: white; border: none; padding: 16px; border-radius: 8px; font-size: 1.15rem; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-submit:hover { background: #719626; }
     </style>
@@ -54,16 +49,18 @@
 
         <form id="registerForm">
             <div class="input-group">
-                <input type="text" placeholder="이름 (실명)" required>
+                <input type="text" id="regName" placeholder="이름 (실명)" required>
             </div>
             <div class="input-group">
-                <input type="email" placeholder="이메일 주소 (아이디로 사용)" required>
+                <input type="email" id="regEmail" placeholder="이메일 주소 (아이디로 사용)" required>
             </div>
             <div class="input-group">
-                <input type="password" placeholder="비밀번호 (영문, 숫자 포함 8자 이상)" required>
+                <input type="password" id="regPassword" placeholder="비밀번호 (영문, 숫자 포함 8자 이상)" required>
+                <span class="password-toggle" onclick="togglePass('regPassword', this)">👁️</span>
             </div>
             <div class="input-group">
-                <input type="password" placeholder="비밀번호 확인" required>
+                <input type="password" id="regPasswordConfirm" placeholder="비밀번호 확인" required>
+                <span class="password-toggle" onclick="togglePass('regPasswordConfirm', this)">👁️</span>
             </div>
             
             <div class="terms-group">
@@ -76,11 +73,45 @@
     </div>
 
     <script>
-        // 이메일로 회원가입 폼을 제출했을 때 자동으로 메인화면으로 넘겨줍니다!
+        // 👁️ 비밀번호 보이기/숨기기 토글 스크립트
+        function togglePass(inputId, toggleIcon) {
+            const input = document.getElementById(inputId);
+            if (input.type === "password") {
+                input.type = "text";
+                toggleIcon.style.color = "#87B32E"; // 보일 때는 녹색으로 강조
+            } else {
+                input.type = "password";
+                toggleIcon.style.color = "#999";
+            }
+        }
+
+        // 🌟 진짜 서버 데이터베이스에 이메일 가입 요청을 전송합니다.
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
-            alert('팜마을 회원가입이 성공적으로 완료되었습니다! 환영합니다 🌱');
-            location.href = 'index.html'; // 완료 후 메인 홈페이지로 이동
+            
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+            if (password !== passwordConfirm) {
+                alert('비밀번호와 비밀번호 확인이 서로 일치하지 않습니다.');
+                return;
+            }
+
+            fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if (data.success) {
+                    location.href = 'login.html'; // 가입 완료 시 로그인 창으로 안전 이동
+                }
+            })
+            .catch(err => alert('서버 통신 오류가 발생했습니다.'));
         });
     </script>
 </body>

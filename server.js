@@ -27,15 +27,61 @@ db.connect((err) => {
     if (err) { console.error('❌ DB 연결 실패:', err); return; }
     console.log('✅ 데이터베이스 창고 연결 성공!');
     db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
+    
+    // 🌟 [중요] 일반 이메일 회원들을 저장할 전용 테이블을 자동으로 개설합니다.
+    const createEmailMembersTable = `
+        CREATE TABLE IF NOT EXISTS farm_email_users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            name VARCHAR(100) NOT NULL,
+            email VARCHAR(100) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    db.query(createEmailMembersTable, () => {});
 });
 
-// 🌟 [핵심] 관리자로 임명할 이사장님의 카카오톡 닉네임(이름)을 적어줍니다.
-// 현재 카카오톡 프로필 이름과 똑같이 적어주셔야 컴퓨터가 알아봅니다!
 const adminNames = ['김영진', '김영진(지산)', '지산']; 
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
+app.get('/join.html', (req, res) => res.sendFile(path.join(__dirname, 'join.html')));
+
+// 🌟 [신규] 진짜 이메일 회원가입 처리 창구
+app.post('/api/register', (req, res) => {
+    const { name, email, password } = req.body;
+    
+    // 이미 존재하는 이메일인지 먼저 확인
+    db.query('SELECT * FROM farm_email_users WHERE email = ?', [email], (err, results) => {
+        if (results && results.length > 0) {
+            return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
+        }
+        
+        // 데이터베이스 창고에 안전하게 저장
+        db.query('INSERT INTO farm_email_users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: '가입 처리 중 데이터베이스 오류가 발생했습니다.' });
+            res.json({ success: true, message: '팜마을 회원가입이 성공적으로 완료되었습니다! 🎉' });
+        });
+    });
+});
+
+// 🌟 [신규] 진짜 이메일 로그인 처리 창구
+app.post('/api/login', (req, res) => {
+    const { email, password } = req.body;
+    
+    db.query('SELECT * FROM farm_email_users WHERE email = ? AND password = ?', [email, password], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: '로그인 처리 중 오류 발생' });
+        
+        if (results && results.length > 0) {
+            // 로그인 성공 시 세션 열쇠 전달 (이름을 닉네임으로 사용)
+            req.session.user = { kakaoId: null, nickname: results[0].name, email: results[0].email };
+            res.json({ success: true, message: `${results[0].name}님, 반갑습니다!` });
+        } else {
+            res.status(412).json({ success: false, message: '이메일 주소 또는 비밀번호가 일치하지 않습니다.' });
+        }
+    });
+});
 
 app.post('/api/hub-apply', (req, res) => {
     const { hub_name, hub_type, hub_address, hub_desc, hub_image } = req.body;
@@ -94,13 +140,10 @@ app.get('/auth/logout', (req, res) => {
     req.session.destroy(() => res.send("<script>alert('로그아웃되었습니다.'); location.href='/';</script>"));
 });
 
-// 📌 잔디밭 글 저장 (비회원 원천 차단)
 app.post('/api/board', (req, res) => {
-    // 🌟 로그인을 안 했으면 아예 서버에서 글쓰기를 튕겨냅니다.
     if (!req.session || !req.session.user) {
         return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
     }
-
     const { title, content, youtube_url, images } = req.body;
     const nickname = req.session.user.nickname;
     
@@ -118,17 +161,13 @@ app.get('/api/board', (req, res) => {
     });
 });
 
-// 📌 상세보기 (관리자 여부를 화면에 알려주기)
 app.get('/api/board/:id', (req, res) => {
     const postId = req.params.id;
     db.query(`UPDATE farm_board SET views = views + 1 WHERE id = ?`, [postId], () => {
         db.query(`SELECT * FROM farm_board WHERE id = ?`, [postId], (err, result) => {
             if (result.length === 0) return res.status(404).json({ success: false });
-            
             const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
-            // 🌟 이 글을 보는 사람이 관리자 명단에 있는지 확인합니다.
             const isAdmin = adminNames.includes(currentUser); 
-            
             res.json({ success: true, data: result[0], currentUser: currentUser, isAdmin: isAdmin });
         });
     });
@@ -147,21 +186,17 @@ app.put('/api/board/:id', (req, res) => {
     });
 });
 
-// 📌 삭제하기 (관리자는 모든 글 삭제 가능)
 app.delete('/api/board/:id', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.'});
-    
     const postId = req.params.id;
     const nickname = req.session.user.nickname;
-    const isAdmin = adminNames.includes(nickname); // 이 사람이 관리자인가?
+    const isAdmin = adminNames.includes(nickname);
 
-    // 🌟 관리자라면 작성자 이름(nickname)을 따지지 않고 무조건 삭제합니다!
     if (isAdmin) {
         db.query(`DELETE FROM farm_board WHERE id=?`, [postId], (err, result) => {
             res.json({ success: true, message: '관리자 권한으로 글을 삭제했습니다.' });
         });
     } else {
-        // 일반 회원은 자기가 쓴 글만 삭제 가능
         db.query(`DELETE FROM farm_board WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
              if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
              res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
