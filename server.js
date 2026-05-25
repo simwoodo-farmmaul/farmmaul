@@ -1,5 +1,5 @@
 const session = require('express-session');
-require('./setup.js'); // 👈 서버가 켜질 때 도면(setup.js)을 자동으로 실행하는 마법의 주문!
+require('./setup.js'); 
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
@@ -7,7 +7,6 @@ const path = require('path');
 
 const app = express();
 
-// 📌 [세션 장착] 주민을 기억하기 위한 임시 명찰 발급 장치!
 app.use(session({
     secret: 'farmmaul_secret_key_0424',
     resave: false,                      
@@ -16,252 +15,139 @@ app.use(session({
 }));
 
 app.use(cors());
-
-// 💡 사진 파일이 포함되므로 대용량(10메가) 데이터도 통과할 수 있도록 허가증 보강!
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ limit: '10mb', extended: true }));
-
-// 🌟 클라우드 환경에 맞춰 더 튼튼하게 보강된 마법의 열쇠! (모든 파일 접근 허가)
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// 클라우드타입 내부 데이터베이스 연결 설정
 const db = mysql.createConnection({
-    host: 'farm-db3', 
-    port: 3306,       
-    user: 'root',
-    password: 'Farmmaul1234!',
-    database: 'farmmaul_db'
+    host: 'farm-db3', port: 3306, user: 'root', password: 'Farmmaul1234!', database: 'farmmaul_db'
 });
 
-// 창고 문이 잘 열렸는지 확인
 db.connect((err) => {
-    if (err) {
-        console.error('❌ 데이터베이스 연결 실패:', err);
-        return;
-    }
+    if (err) { console.error('❌ DB 연결 실패:', err); return; }
     console.log('✅ 데이터베이스 창고 연결 성공!');
+    // 🌟 기존 테이블이 있다면 '조회수(views)' 기둥을 안전하게 몰래 추가합니다.
+    db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
 });
 
-// 📌 [1] 메인 화면 직통 통로
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
+app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 
-// 📌 [2] 회원가입 화면 직통 통로
-app.get('/register.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'register.html'));
-});
-
-// 📌 [3] 로그인 화면 직통 통로
-app.get('/login.html', (req, res) => {
-    res.sendFile(path.join(__dirname, 'login.html'));
-});
-
-// 📌 [4] 마을 HUB 거점 신청 받는 곳
 app.post('/api/hub-apply', (req, res) => {
     const { hub_name, hub_type, hub_address, hub_desc, hub_image } = req.body;
-
-    const createTableQuery = `
-        CREATE TABLE IF NOT EXISTS hub_applications_v2 (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            hub_name VARCHAR(255) NOT NULL,
-            hub_type VARCHAR(100) NOT NULL,
-            hub_address VARCHAR(500) NOT NULL,
-            hub_desc TEXT,
-            hub_image LONGTEXT,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    `;
-
+    const createTableQuery = `CREATE TABLE IF NOT EXISTS hub_applications_v2 (id INT AUTO_INCREMENT PRIMARY KEY, hub_name VARCHAR(255) NOT NULL, hub_type VARCHAR(100) NOT NULL, hub_address VARCHAR(500) NOT NULL, hub_desc TEXT, hub_image LONGTEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
     db.query(createTableQuery, (err) => {
-        if (err) {
-            console.error('테이블 생성 에러:', err);
-            return res.status(500).json({ success: false, message: 'DB 준비 중 오류가 발생했습니다.' });
-        }
-
         const insertQuery = `INSERT INTO hub_applications_v2 (hub_name, hub_type, hub_address, hub_desc, hub_image) VALUES (?, ?, ?, ?, ?)`;
-        
         db.query(insertQuery, [hub_name, hub_type, hub_address, hub_desc, hub_image], (err, result) => {
-            if (err) {
-                console.error('신청서 저장 에러:', err);
-                return res.status(500).json({ success: false, message: '저장 중 오류가 발생했습니다.' });
-            }
-            res.json({ success: true, message: '성공적으로 접수되었습니다! 팜마을 HUB가 되어주셔서 감사합니다.' });
+            res.json({ success: true, message: '성공적으로 접수되었습니다!' });
         });
     });
 });
 
-// 📌 [5] 전체 마을 HUB 목록 보내주기
 app.get('/api/hubs', (req, res) => {
-    const selectQuery = `SELECT * FROM hub_applications_v2 ORDER BY created_at DESC`;
-    db.query(selectQuery, (err, results) => {
-        if (err) {
-            console.error('목록 불러오기 에러:', err);
-            return res.status(500).json({ success: false, message: '데이터를 불러오는 중 오류가 발생했습니다.' });
-        }
+    db.query(`SELECT * FROM hub_applications_v2 ORDER BY created_at DESC`, (err, results) => {
         res.json({ success: true, data: results });
     });
 });
 
-// 📌 [6] 개별 마을 HUB 상세 정보 꺼내주기
 app.get('/api/hubs/:id', (req, res) => {
-    const hubId = req.params.id;
-    const selectOneQuery = `SELECT * FROM hub_applications_v2 WHERE id = ?`;
-    
-    db.query(selectOneQuery, [hubId], (err, result) => {
-        if (err) {
-            console.error('상세페이지 조회 에러:', err);
-            return res.status(500).json({ success: false, message: '데이터를 불러오는 중 오류가 발생했습니다.' });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ success: false, message: '해당 HUB 거점을 찾을 수 없습니다.' });
-        }
+    db.query(`SELECT * FROM hub_applications_v2 WHERE id = ?`, [req.params.id], (err, result) => {
         res.json({ success: true, data: result[0] });
     });
 });
 
-// 📌 [7] ★ 카카오 로그인 회원 처리 수신함 (세션 기억장치 보강!) ★
 app.get('/auth/kakao/callback', async (req, res) => {
     const authCode = req.query.code; 
-    const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; // 
+    const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; 
     const REDIRECT_URI = 'https://farmmaul.com/auth/kakao/callback'; 
-
     if (!authCode) return res.send("<script>alert('인증 코드가 없습니다.'); location.href='/';</script>");
 
     try {
-        const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' },
-            body: `grant_type=authorization_code&client_id=${KAKAO_REST_API_KEY}&redirect_uri=${REDIRECT_URI}&code=${authCode}`
-        });
+        const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }, body: `grant_type=authorization_code&client_id=${KAKAO_REST_API_KEY}&redirect_uri=${REDIRECT_URI}&code=${authCode}` });
         const tokenData = await tokenResponse.json();
-
-        const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', {
-            headers: { 'Authorization': `Bearer ${tokenData.access_token}` }
-        });
+        const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', { headers: { 'Authorization': `Bearer ${tokenData.access_token}` } });
         const userData = await userResponse.json();
 
         const kakaoId = userData.id;
         const nickname = userData.kakao_account?.profile?.nickname || '팜마을 회원';
         const email = userData.kakao_account?.email || '';
 
-        const createMemberTable = `
-            CREATE TABLE IF NOT EXISTS farm_members (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                kakao_id BIGINT UNIQUE NOT NULL,
-                nickname VARCHAR(100) NOT NULL,
-                email VARCHAR(100),
-                joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        `;
-        
-        db.query(createMemberTable, (err) => {
-            if (err) throw err;
-
-            const insertMember = `INSERT INTO farm_members (kakao_id, nickname, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=?`;
-            db.query(insertMember, [kakaoId, nickname, email, nickname], (err) => {
-                if (err) throw err;
-                
-                // ⭐ [핵심 보강] 로그인이 성공하면 서버 세션 비밀장부에 사용자 정보를 기억시킵니다!
+        db.query(`CREATE TABLE IF NOT EXISTS farm_members (id INT AUTO_INCREMENT PRIMARY KEY, kakao_id BIGINT UNIQUE NOT NULL, nickname VARCHAR(100) NOT NULL, email VARCHAR(100), joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
+            db.query(`INSERT INTO farm_members (kakao_id, nickname, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=?`, [kakaoId, nickname, email, nickname], () => {
                 req.session.user = { kakaoId: kakaoId, nickname: nickname };
-                
-                res.send(`<script>alert('${nickname}님, 반갑습니다! 팜마을 로그인에 성공했습니다 🎉'); location.href='/';</script>`);
+                res.send(`<script>alert('${nickname}님, 반갑습니다!'); location.href='/';</script>`);
             });
         });
-
-    } catch (error) {
-        console.error('카카오 인증 실패:', error);
-        res.send("<script>alert('카카오 로그인 중 오류가 발생했습니다.'); location.href='/';</script>");
-    }
+    } catch (error) { res.send("<script>alert('로그인 오류'); location.href='/';</script>"); }
 });
 
-// 📌 [8] ★ 로그인 상태 확인 창구 API ★
-// index.html 화면이 로드되자마자 이 창구를 호출해 "지금 로그인한 사람이 누구냐"고 서버에 묻습니다.
 app.get('/api/user', (req, res) => {
-    if (req.session && req.session.user) {
-        res.json({ loggedIn: true, user: req.session.user });
-    } else {
-        res.json({ loggedIn: false });
-    }
+    if (req.session && req.session.user) res.json({ loggedIn: true, user: req.session.user });
+    else res.json({ loggedIn: false });
 });
 
-// 📌 [9] ★ 로그아웃 처리 창구 API ★
-// 화면에서 [로그아웃] 버튼을 누르면 서버 비밀장부(세션)를 깨끗이 지우고 첫 화면으로 보냅니다.
 app.get('/auth/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) console.error('로그아웃 세션 삭제 에러:', err);
-        res.send("<script>alert('로그아웃되었습니다. 또 방문해 주세요!'); location.href='/';</script>");
-    });
+    req.session.destroy(() => res.send("<script>alert('로그아웃되었습니다.'); location.href='/';</script>"));
 });
 
-// 📌 [10] ★ 잔디밭 자유게시판 - 게시글 저장하기 (사진 여러 장 + 유튜브) ★
+// 📌 잔디밭 글 저장
 app.post('/api/board', (req, res) => {
     const { title, content, youtube_url, images } = req.body;
-    // 로그인된 사용자의 닉네임을 사용합니다. (로그인 전이면 익명)
     const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
-
-    // 게시판 테이블이 없으면 자동으로 생성 (이미지 장고는 LONGTEXT로 생성)
-    const createBoardTable = `
-        CREATE TABLE IF NOT EXISTS farm_board (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            nickname VARCHAR(100) NOT NULL,
-            title VARCHAR(255) NOT NULL,
-            content TEXT NOT NULL,
-            youtube_url VARCHAR(500),
-            images LONGTEXT, 
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    `;
-
-    db.query(createBoardTable, (err) => {
-        if (err) {
-            console.error('게시판 테이블 생성 에러:', err);
-            return res.status(500).json({ success: false, message: 'DB 준비 중 오류가 발생했습니다.' });
-        }
-
-        const insertQuery = `INSERT INTO farm_board (nickname, title, content, youtube_url, images) VALUES (?, ?, ?, ?, ?)`;
-        // 여러 장의 사진 배열을 텍스트(JSON) 형태로 변환하여 저장합니다.
-        const imagesJson = JSON.stringify(images || []);
-
-        db.query(insertQuery, [nickname, title, content, youtube_url, imagesJson], (err, result) => {
-            if (err) {
-                console.error('글 저장 에러:', err);
-                return res.status(500).json({ success: false, message: '글을 저장하는 중 오류가 발생했습니다.' });
-            }
-            res.json({ success: true, message: '잔디밭에 글이 성공적으로 등록되었습니다! 🌱' });
+    // 🌟 views 컬럼 포함하여 테이블 생성
+    db.query(`CREATE TABLE IF NOT EXISTS farm_board (id INT AUTO_INCREMENT PRIMARY KEY, nickname VARCHAR(100) NOT NULL, title VARCHAR(255) NOT NULL, content TEXT NOT NULL, youtube_url VARCHAR(500), images LONGTEXT, views INT DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
+        db.query(`INSERT INTO farm_board (nickname, title, content, youtube_url, images) VALUES (?, ?, ?, ?, ?)`, [nickname, title, content, youtube_url, JSON.stringify(images || [])], () => {
+            res.json({ success: true, message: '글이 성공적으로 등록되었습니다!' });
         });
     });
 });
 
-// 📌 [11] ★ 잔디밭 자유게시판 - 전체 글 목록 불러오기 ★
+// 📌 잔디밭 목록 보기 (조회수 포함)
 app.get('/api/board', (req, res) => {
-    const selectQuery = `SELECT id, nickname, title, youtube_url, images, created_at FROM farm_board ORDER BY created_at DESC`;
-    db.query(selectQuery, (err, results) => {
-        if (err) {
-            // 테이블이 아직 없을 때는 빈 배열을 반환하여 에러를 방지합니다.
-            return res.json({ success: true, data: [] });
-        }
+    db.query(`SELECT id, nickname, title, youtube_url, images, views, created_at FROM farm_board ORDER BY created_at DESC`, (err, results) => {
+        if(err) return res.json({ success: true, data: [] });
         res.json({ success: true, data: results });
     });
 });
 
-// 📌 [12] ★ 잔디밭 자유게시판 - 개별 글 상세 보기 ★
+// 📌 잔디밭 상세 보기 (조회수 증가 + 현재 로그인 유저 정보 전달)
 app.get('/api/board/:id', (req, res) => {
     const postId = req.params.id;
-    const selectOneQuery = `SELECT * FROM farm_board WHERE id = ?`;
-    
-    db.query(selectOneQuery, [postId], (err, result) => {
-        if (err) {
-            console.error('글 조회 에러:', err);
-            return res.status(500).json({ success: false, message: '글을 불러오는 중 오류가 발생했습니다.' });
-        }
-        if (result.length === 0) {
-            return res.status(404).json({ success: false, message: '해당 게시글을 찾을 수 없습니다.' });
-        }
-        res.json({ success: true, data: result[0] });
+    // 🌟 1. 글을 열면 먼저 조회수(views)를 1 올립니다.
+    db.query(`UPDATE farm_board SET views = views + 1 WHERE id = ?`, [postId], () => {
+        // 🌟 2. 그 다음 글 정보를 꺼내서 화면에 보냅니다.
+        db.query(`SELECT * FROM farm_board WHERE id = ?`, [postId], (err, result) => {
+            if (result.length === 0) return res.status(404).json({ success: false });
+            const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
+            res.json({ success: true, data: result[0], currentUser: currentUser });
+        });
     });
 });
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 힘차게 달리고 있습니다!`);
+
+// 📌 잔디밭 글 수정하기 (NEW)
+app.put('/api/board/:id', (req, res) => {
+    const postId = req.params.id;
+    const { title, content, youtube_url, images } = req.body;
+    const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
+    
+    db.query(`UPDATE farm_board SET title=?, content=?, youtube_url=?, images=? WHERE id=? AND nickname=?`, 
+    [title, content, youtube_url, JSON.stringify(images || []), postId, nickname], (err, result) => {
+         if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '수정 권한이 없습니다.'});
+         res.json({ success: true, message: '글이 성공적으로 수정되었습니다!' });
+    });
 });
+
+// 📌 잔디밭 글 삭제하기 (NEW)
+app.delete('/api/board/:id', (req, res) => {
+    const postId = req.params.id;
+    const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
+    
+    db.query(`DELETE FROM farm_board WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
+         if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
+         res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));

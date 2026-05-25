@@ -13,7 +13,7 @@
         .main-container { max-width: 800px; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .detail-header { padding: 25px 30px; border-bottom: 1px solid #f0f0f0; }
         .post-title { font-size: 1.6rem; font-weight: 800; color: #222; margin-bottom: 12px; line-height: 1.4; }
-        .post-info { font-size: 0.9rem; color: #666; display: flex; gap: 20px; }
+        .post-info { font-size: 0.9rem; color: #666; display: flex; gap: 15px; }
         
         .detail-body { padding: 30px; line-height: 1.7; font-size: 1.05rem; color: #444; }
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; margin-bottom: 25px; border-radius: 8px; }
@@ -22,6 +22,12 @@
         .image-gallery { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
         .gallery-img { width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; background: #fafafa; }
         .post-text-content { white-space: pre-wrap; margin-top: 20px; }
+
+        /* 🌟 수정/삭제 버튼 디자인 */
+        .author-actions { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: right; display: none; }
+        .btn-action { padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; margin-left: 10px; }
+        .btn-edit { background: #87B32E; color: white; }
+        .btn-delete { background: #ff4d4d; color: white; }
     </style>
 </head>
 <body>
@@ -37,74 +43,83 @@
             <div class="post-info">
                 <span id="postAuthor">🧑‍🌾 </span>
                 <span id="postDate">📅 </span>
+                <span id="postViews" style="color: #a066c0; font-weight: bold;">👁️ 조회수 </span>
             </div>
         </div>
         
         <div class="detail-body">
             <div id="videoArea"></div>
-
             <div class="image-gallery" id="imageGallery"></div>
-
             <div class="post-text-content" id="postContent"></div>
+
+            <div class="author-actions" id="authorActions">
+                <button class="btn-action btn-edit" onclick="editPost()">✏️ 수정하기</button>
+                <button class="btn-action btn-delete" onclick="deletePost()">🗑️ 삭제하기</button>
+            </div>
         </div>
     </div>
 
     <script>
-        // 유튜브 일반 링크를 재생 가능한 임베드 링크로 변환해주는 마법 함수
+        let currentPostId = null;
+
         function getYoutubeEmbedUrl(url) {
             if(!url) return null;
             let videoId = null;
-            if(url.includes('v=')) {
-                videoId = url.split('v=')[1].split('&')[0];
-            } else if(url.includes('youtu.be/')) {
-                videoId = url.split('youtu.be/')[1].split('?')[0];
-            }
+            if(url.includes('v=')) videoId = url.split('v=')[1].split('&')[0];
+            else if(url.includes('youtu.be/')) videoId = url.split('youtu.be/')[1].split('?')[0];
             return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
         }
 
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
+            currentPostId = urlParams.get('id');
 
-            fetch(`/api/board/${id}`)
+            fetch(`/api/board/${currentPostId}`)
                 .then(res => res.json())
                 .then(result => {
-                    if(!result.success) {
-                        alert('글을 가져올 수 없습니다.');
-                        location.href = 'board.html';
-                        return;
-                    }
+                    if(!result.success) { alert('글을 가져올 수 없습니다.'); location.href = 'board.html'; return; }
 
                     const post = result.data;
                     document.getElementById('postTitle').innerText = post.title;
-                    document.getElementById('postAuthor').innerText = `🧑‍🌾 생산자: ${post.nickname}`;
-                    document.getElementById('postDate').innerText = `📅 등록일: ${new Date(post.created_at).toLocaleDateString()}`;
+                    document.getElementById('postAuthor').innerText = `🧑‍🌾 ${post.nickname}`;
+                    document.getElementById('postDate').innerText = `📅 ${new Date(post.created_at).toLocaleDateString()}`;
+                    document.getElementById('postViews').innerText = `👁️ 조회 ${post.views || 0}`;
                     document.getElementById('postContent').innerText = post.content;
 
-                    // 1. 유튜브 연동 제어
-                    const embedUrl = getYoutubeEmbedUrl(post.youtube_url);
-                    if(embedUrl) {
-                        document.getElementById('videoArea').innerHTML = `
-                            <div class="video-container">
-                                <iframe src="${embedUrl}" allowfullscreen></iframe>
-                            </div>
-                        `;
+                    // 현재 로그인한 사람이 글쓴이와 같다면 수정/삭제 버튼 켜기
+                    if (result.currentUser === post.nickname) {
+                        document.getElementById('authorActions').style.display = 'block';
                     }
 
-                    // 2. 여러 장의 이미지 연동 제어
+                    const embedUrl = getYoutubeEmbedUrl(post.youtube_url);
+                    if(embedUrl) document.getElementById('videoArea').innerHTML = `<div class="video-container"><iframe src="${embedUrl}" allowfullscreen></iframe></div>`;
+
                     let images = [];
                     try { images = JSON.parse(post.images); } catch(e) { images = []; }
-                    
                     const gallery = document.getElementById('imageGallery');
                     images.forEach(imgBase64 => {
                         const imgTag = document.createElement('img');
-                        imgTag.className = 'gallery-img';
-                        imgTag.src = imgBase64;
+                        imgTag.className = 'gallery-img'; imgTag.src = imgBase64;
                         gallery.appendChild(imgTag);
                     });
-                })
-                .catch(err => console.error('상세 내용 조회 에러:', err));
+                });
         });
+
+        // 🌟 수정/삭제 기능 스위치
+        function editPost() {
+            location.href = `board_edit.html?id=${currentPostId}`;
+        }
+
+        function deletePost() {
+            if(confirm('정말 이 글을 영구적으로 삭제하시겠습니까?')) {
+                fetch(`/api/board/${currentPostId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(res => {
+                    alert(res.message);
+                    if(res.success) location.href = 'board.html';
+                });
+            }
+        }
     </script>
 </body>
 </html>

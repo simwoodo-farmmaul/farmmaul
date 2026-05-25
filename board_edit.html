@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 잔디밭 글수정</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f9fbf9; color: #333; padding-bottom: 30px; }
+        header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #87B32E; text-decoration: none; }
+        
+        .form-container { max-width: 700px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; border: 1px solid #eaeaea; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        h2 { margin-bottom: 20px; font-size: 1.5rem; color: #222; }
+        
+        .form-group { margin-bottom: 20px; }
+        .form-group label { font-weight: bold; color: #444; }
+        .form-group input[type="text"], .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; margin-top: 8px; }
+        .form-group textarea { height: 200px; resize: none; }
+        
+        .file-label { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 10px; border: 1px dashed #2e7d32; margin-top: 8px; }
+        .preview-container { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+        .preview-box { width: 90px; height: 90px; border-radius: 8px; background-size: cover; background-position: center; border: 1px solid #ddd; position: relative; }
+        
+        .btn-delete-img { position: absolute; top: -8px; right: -8px; background: #ff4d4d; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; font-weight: bold; }
+        .btn-submit { width: 100%; background: #87B32E; color: white; border: none; padding: 15px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        #loadingMsg { display: none; color: #e65100; font-weight: bold; margin-bottom: 10px; font-size: 0.95rem; }
+        .btn-mic { background: #87B32E; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-stop-mic { background: #ff4d4d; color: white; border: none; padding: 8px 14px; border-radius: 20px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: none; align-items: center; gap: 5px; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="board.html" class="logo">🌱 잔디밭 글수정</a>
+        <a href="javascript:history.back()" style="text-decoration: none; font-weight: bold; color: #666;">뒤로가기</a>
+    </header>
+
+    <div class="form-container">
+        <h2>작성한 글 고치기</h2>
+        <form id="boardForm">
+            <div class="form-group">
+                <label for="title">제목</label>
+                <input type="text" id="title" required>
+            </div>
+            
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="content">내용</label>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" class="btn-mic" id="btnMic">🎤 음성 시작</button>
+                        <button type="button" class="btn-stop-mic" id="btnStopMic">🛑 음성 종료</button>
+                    </div>
+                </div>
+                <textarea id="content" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>📸 사진 (기존 사진을 ✖로 지우거나 새로 추가 가능)</label>
+                <label for="imageFiles" class="file-label">➕ 사진 선택하기</label>
+                <div id="loadingMsg">안전하게 사진 용량을 줄이는 중입니다... ⏳</div>
+                <input type="file" id="imageFiles" multiple accept="image/*" style="display: none;">
+                <div class="preview-container" id="previewContainer"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="youtube_url">🎬 유튜브 동영상 주소</label>
+                <input type="text" id="youtube_url">
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">수정 완료하기 ✨</button>
+        </form>
+    </div>
+
+    <script>
+        let base64Images = [];
+        let currentPostId = new URLSearchParams(window.location.search).get('id');
+
+        // 기존 글 정보 불러오기
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch(`/api/board/${currentPostId}`)
+                .then(res => res.json())
+                .then(result => {
+                    if(!result.success) { alert('오류가 발생했습니다.'); history.back(); return; }
+                    const post = result.data;
+                    document.getElementById('title').value = post.title;
+                    document.getElementById('content').value = post.content;
+                    document.getElementById('youtube_url').value = post.youtube_url || '';
+
+                    try { base64Images = JSON.parse(post.images) || []; } catch(e) { base64Images = []; }
+                    
+                    const container = document.getElementById('previewContainer');
+                    base64Images.forEach(imgData => {
+                        const box = document.createElement('div');
+                        box.className = 'preview-box';
+                        box.style.backgroundImage = `url('${imgData}')`;
+                        const delBtn = document.createElement('div');
+                        delBtn.className = 'btn-delete-img'; delBtn.innerHTML = '✖';
+                        delBtn.onclick = function() {
+                            base64Images.splice(base64Images.indexOf(imgData), 1);
+                            container.removeChild(box);
+                        };
+                        box.appendChild(delBtn);
+                        container.appendChild(box);
+                    });
+                });
+        });
+
+        // 음성 마이크 장치 (글쓰기와 동일)
+        const btnMic = document.getElementById('btnMic'), btnStopMic = document.getElementById('btnStopMic'), contentArea = document.getElementById('content');
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (SpeechRecognition) {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'ko-KR'; recognition.continuous = true; 
+            let isRecording = false, speechTimeout = null;
+
+            function startSpeech() {
+                isRecording = true; recognition.start();
+                btnMic.innerHTML = '🎤 듣는 중...'; btnMic.style.background = '#e65100'; btnStopMic.style.display = 'inline-flex';
+                speechTimeout = setTimeout(() => { if (isRecording) stopSpeech(); }, 300000);
+            }
+            function stopSpeech() {
+                isRecording = false; recognition.stop();
+                btnMic.innerHTML = '🎤 음성 시작'; btnMic.style.background = '#87B32E'; btnStopMic.style.display = 'none';
+                if (speechTimeout) clearTimeout(speechTimeout);
+            }
+
+            btnMic.addEventListener('click', () => { if (!isRecording) startSpeech(); });
+            btnStopMic.addEventListener('click', () => { if (isRecording) stopSpeech(); });
+
+            recognition.onresult = function(e) {
+                let newTxt = '';
+                for (let i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) newTxt += e.results[i][0].transcript;
+                if (newTxt) contentArea.value += (contentArea.value ? ' ' : '') + newTxt;
+            };
+            recognition.onend = function() { if (isRecording) recognition.start(); };
+        } else { btnMic.style.display = 'none'; btnStopMic.style.display = 'none'; }
+
+        // 사진 압축 장치 (글쓰기와 동일)
+        function compressImage(file) {
+            return new Promise((resolve) => {
+                if (!file.type.match(/image.*/)) { resolve(null); return; }
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        let w = img.width, h = img.height;
+                        if (w > h) { if (w > 1200) { h = Math.round(h * 1200 / w); w = 1200; } } 
+                        else { if (h > 1200) { w = Math.round(w * 1200 / h); h = 1200; } }
+                        const cvs = document.createElement('canvas'); cvs.width = w; cvs.height = h;
+                        cvs.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve(cvs.toDataURL('image/jpeg', 0.7));
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        document.getElementById('imageFiles').addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (base64Images.length + files.length > 5) { alert('사진은 최대 5장까지만 등록할 수 있습니다.'); e.target.value = ''; return; }
+            
+            const container = document.getElementById('previewContainer');
+            document.getElementById('loadingMsg').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+
+            for(let i=0; i<files.length; i++) {
+                const imgData = await compressImage(files[i]);
+                if (imgData) {
+                    base64Images.push(imgData);
+                    const box = document.createElement('div');
+                    box.className = 'preview-box'; box.style.backgroundImage = `url('${imgData}')`;
+                    const delBtn = document.createElement('div');
+                    delBtn.className = 'btn-delete-img'; delBtn.innerHTML = '✖';
+                    delBtn.onclick = function() { base64Images.splice(base64Images.indexOf(imgData), 1); container.removeChild(box); };
+                    box.appendChild(delBtn); container.appendChild(box);
+                }
+            }
+            document.getElementById('loadingMsg').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+            e.target.value = '';
+        });
+
+        // 🌟 작성 완료가 아닌 수정 완료(PUT) 전송
+        document.getElementById('boardForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const submitData = {
+                title: document.getElementById('title').value,
+                youtube_url: document.getElementById('youtube_url').value,
+                content: document.getElementById('content').value,
+                images: base64Images
+            };
+            const btn = document.getElementById('submitBtn'); btn.innerText = '저장 중...'; btn.disabled = true;
+
+            fetch(`/api/board/${currentPostId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(submitData)
+            })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                if(result.success) location.href = `board_detail.html?id=${currentPostId}`;
+            });
+        });
+    </script>
+</body>
+</html>
