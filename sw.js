@@ -1,4 +1,4 @@
-// 팜마을 앱 오프라인 작동을 위한 서비스 워커
+// 팜마을 앱 오프라인 작동을 위한 서비스 워커 (버전 2)
 self.addEventListener('install', (pEvent) => {
   console.log('팜마을 서비스 워커 설치 완료!');
 });
