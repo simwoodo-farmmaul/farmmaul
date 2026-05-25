@@ -23,8 +23,6 @@
             --bg-color: #f9fbf9;
             --text-dark: #333;
             --text-light: #666;
-            --kakao-yellow: #FEE500;
-            --kakao-text: #3C1E1E;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
@@ -35,7 +33,7 @@
         .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); transition: transform 0.2s ease; }
         .logo-text:hover { transform: translateY(-2px); }
         .logo-leaf { font-size: 1.8rem; -webkit-text-fill-color: initial; }
-        .footer-logo-text { font-size: 1.6rem; margin-bottom: 5px; opacity: 0.9; }
+        .footer-logo-text { font-size: 1.6rem; margin-bottom: 0 !important; opacity: 0.9; }
         .footer-logo-text .logo-leaf { font-size: 1.3rem; }
 
         .top-notice-bar { background-color: #f1f3f5; color: var(--text-dark); font-size: 0.85rem; padding: 8px 20px; border-bottom: 1px solid #e9ecef; display: flex; justify-content: center; align-items: center; }
@@ -44,30 +42,26 @@
         .notice-text { font-weight: 600; cursor: pointer; }
         .notice-text:hover { text-decoration: underline; }
 
+        /* 🏠 1. 상단 헤더 구역 (불필요한 위치표시, 장바구니 모두 제거!) */
         header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .header-left { display: flex; align-items: center; gap: 25px; }
-        .location-picker { font-size: 1.05rem; font-weight: 800; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; gap: 5px; padding: 8px 12px; border-radius: 8px; background: #f1f3f5; transition: background 0.2s; }
-        .location-picker:hover { background: #e9ecef; }
-        .user-menu { display: flex; gap: 10px; align-items: center; }
-        .user-menu a { padding: 8px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 700; transition: transform 0.2s, box-shadow 0.2s; text-align: center; }
-        .user-menu a:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        .btn-producer { background-color: var(--primary-green); color: white !important; }
-        .btn-login { border: 1px solid var(--primary-blue); color: var(--primary-blue) !important; background-color: #fff; }
-        .btn-kakao { background-color: var(--kakao-yellow); color: var(--kakao-text) !important; }
+        
+        .auth-zone-flex { display: flex; gap: 8px; align-items: center; }
+        .btn-login { border: 1px solid var(--primary-blue); color: var(--primary-blue) !important; background-color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 800; transition: 0.2s; }
+        .btn-login:hover { background-color: #f0f7fd; }
+        
+        .btn-register-trigger { border: 1px solid var(--primary-orange); color: white !important; background-color: var(--primary-orange); padding: 6px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-decoration: none; }
+        .btn-register-trigger:hover { background-color: #d84315; }
 
-        .hero { background: linear-gradient(135deg, #4B9AD2 0%, #6bc75a 50%, #87B32E 100%); color: white; text-align: center; padding: 40px 20px 80px; }
-        .hero h1 { font-size: 2.6rem; margin-bottom: 15px; line-height: 1.3; text-shadow: 0px 2px 5px rgba(0,0,0,0.15); }
-        .hero p { font-size: 1.25rem; font-weight: 400; line-height: 1.4; text-shadow: 0px 1px 3px rgba(0,0,0,0.15); }
-        .search-bar { max-width: 650px; margin: 35px auto 0; display: flex; height: 55px; background: #fff; border-radius: 30px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
-        .search-bar input { flex: 1; border: none; outline: none; padding: 0 25px; font-size: 1.1rem; color: var(--text-dark); }
-        .search-bar button { width: 70px; border: none; background: var(--primary-orange); color: #fff; font-size: 1.5rem; cursor: pointer; transition: background 0.2s; }
+        .hero { background: linear-gradient(135deg, #4B9AD2 0%, #6bc75a 50%, #87B32E 100%); color: white; text-align: center; padding: 25px 20px 30px; }
+        .hero p { font-size: 1.25rem; font-weight: bold; line-height: 1.4; text-shadow: 0px 1px 3px rgba(0,0,0,0.15); margin-bottom: 5px; }
+        
+        .search-bar { max-width: 600px; margin: 15px auto 0; display: flex; height: 50px; background: #fff; border-radius: 25px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .search-bar input { flex: 1; border: none; outline: none; padding: 0 20px; font-size: 1rem; color: var(--text-dark); text-align: center; }
+        .search-bar button { width: 60px; border: none; background: var(--primary-orange); color: #fff; font-size: 1.3rem; cursor: pointer; transition: background 0.2s; }
         .search-bar button:hover { background: #d84315; }
-        .search-tags { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .search-tags a { background: rgba(0, 0, 0, 0.2); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; transition: background 0.2s; }
-        .search-tags a:hover { background: rgba(0, 0, 0, 0.4); }
 
-        .main-categories { max-width: 1200px; margin: -40px auto 40px; display: flex; justify-content: center; gap: 20px; padding: 0 20px; position: relative; z-index: 10; }
+        .main-categories { max-width: 1200px; margin: 25px auto 40px; display: flex; justify-content: center; gap: 20px; padding: 0 20px; position: relative; z-index: 10; }
         .category-box { border-radius: 18px; width: 120px; height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; border: none; }
         .category-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.15); }
         .category-box span.icon { font-size: 2.8rem; margin-bottom: 8px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
@@ -142,7 +136,7 @@
         .banner-shop { background: var(--primary-blue); }
         .banner-guide { background: var(--primary-green); }
         .banner-qa { background: var(--primary-orange); }
-        .banner-lawn { background: #a066c0; }
+        .banner-lawn { background: #a066c0; } 
 
         .integrated-guide-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .guide-box { background: #fff; border-radius: 15px; padding: 30px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
@@ -159,13 +153,21 @@
         .cta-btn-free { background: white; color: var(--primary-green); }
         .cta-btn-prod { background: var(--primary-orange); color: white; }
 
+        /* 🏢 2. 하단 푸터 구역 (장바구니와 상품등록이 팜마을 로고 옆으로 안전하게 이동!) */
         footer.company-info { background-color: #f1f3f5; padding: 50px 20px 80px; color: #666; font-size: 0.9rem; border-top: 1px solid #e9ecef; line-height: 1.6; }
         .footer-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
         .footer-details span { display: inline-block; margin-right: 25px; }
         .footer-details strong { color: #555; }
-        .footer-links { margin-bottom: 10px; }
+        .footer-links { margin-bottom: 5px; }
         .footer-links a { color: #555; font-weight: 700; margin-right: 15px; text-decoration: none; }
         .footer-links a:hover { color: var(--primary-green); }
+        
+        .footer-logo-zone { display: flex; align-items: center; gap: 25px; margin-bottom: 5px; flex-wrap: wrap; }
+        .footer-nav-link { font-size: 1rem; font-weight: 800; color: #444; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s; }
+        .footer-nav-link:hover { color: var(--primary-blue); }
+        .footer-btn-producer { background-color: var(--primary-green); color: white !important; padding: 6px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 800; transition: background 0.2s; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .footer-btn-producer:hover { background-color: #719626; }
+        
         .footer-copyright { font-size: 0.85rem; color: #999; margin-top: 10px; }
 
         .floating-menu { position: fixed; bottom: 40px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
@@ -179,21 +181,16 @@
 
         .mobile-bottom-nav { display: none; }
 
+        /* 📱 모바일 최적화 */
         @media (max-width: 768px) {
             .top-notice-bar { font-size: 0.75rem; padding: 8px 10px; }
-            .header-container { flex-direction: column; gap: 15px; padding: 15px 20px; }
-            .header-left { flex-direction: row; justify-content: center; align-items: center; gap: 15px; width: 100%; }
-            .user-menu { width: 100%; justify-content: center; gap: 8px; }
-            .user-menu a { padding: 8px 12px; font-size: 0.85rem; }
+            .header-container { padding: 12px 15px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; }
+            .logo-text { font-size: 1.7rem; }
             
-            .hero { padding: 20px 20px 50px; } 
-            .hero h1 { font-size: 1.9rem; margin-bottom: 10px; }
-            .hero p { font-size: 1.05rem; margin-bottom: 0; }
-            .search-bar { height: 50px; margin: 15px auto 0; width: 100%; }
-            .search-bar input { font-size: 1rem; padding: 0 15px; min-width: 0; }
-            .search-bar button { width: 55px; font-size: 1.3rem; flex-shrink: 0; }
+            .auth-zone-flex { gap: 6px; }
+            .btn-login, .btn-register-trigger { padding: 5px 10px; font-size: 0.85rem; }
 
-            .main-categories { flex-wrap: wrap; gap: 10px; }
+            .main-categories { flex-wrap: wrap; gap: 10px; margin: 15px auto 30px; }
             .category-box { width: calc(50% - 5px); height: 100px; }
             .category-box span.icon { font-size: 2.2rem; }
             .category-box span.title { font-size: 1rem; }
@@ -223,6 +220,7 @@
             .cta-buttons { flex-direction: column; gap: 10px; }
             .cta-btn { width: 100%; }
             
+            .footer-logo-zone { gap: 15px !important; }
             .footer-details span { display: block; margin-bottom: 5px; }
 
             body { padding-bottom: 65px; } 
@@ -249,36 +247,20 @@
 
     <header>
         <div class="header-container">
-            <div class="header-left">
-                <a href="index.html" class="logo-text"><span class="logo-leaf">🌱</span>팜마을</a>
-                <div class="location-picker" onclick="alert('동네 설정 팝업이 일립니다.')">📍 평택시 지산동 ▾</div>
-            </div>
+            <a href="index.html" class="logo-text"><span class="logo-leaf">🌱</span>팜마을</a>
             
-            <div class="user-menu">
-                <a href="cart.html" style="font-size: 1.3rem; background: transparent; padding: 5px 10px; border: none; box-shadow: none;" title="장바구니">🛒</a>
-                <a href="register.html" class="btn-producer">상품등록</a>
+            <div class="auth-zone-flex" id="auth-zone">
                 <a href="login.html" class="btn-login">로그인</a>  
-                <div id="auth-zone">
-                <a href="https://kauth.kakao.com/oauth/authorize?client_id=e2676a110b5565e56d2863dd7a9581c8&redirect_uri=https://farmmaul.com/auth/kakao/callback&response_type=code" class="btn-kakao">카카오 회원가입</a>
-             </div>
+                <a href="join.html" class="btn-register-trigger">회원가입</a>
+            </div>
         </div>
     </header>
 
     <section class="hero">
-        <h1>우리 동네 신선한 먹거리 직거래</h1>
-        <p>생산자 직접 배달부터 HUB 수령까지, 팜마을에서 시작하세요.</p>
-        
+        <p>생산자 직거래 HUB 수령까지</p>
         <div class="search-bar">
-            <input type="text" placeholder="우리 동네 신선한 농산물, 생산자를 검색해보세요">
+            <input type="text" placeholder="(       ) 검색">
             <button onclick="location.href='search_result.html'">🔍</button>
-        </div>
-        
-        <div class="search-tags">
-            <a href="search_result.html">#제철딸기</a>
-            <a href="search_result.html">#신선초란</a>
-            <a href="search_result.html">#무농약상추</a>
-            <a href="search_result.html">#수제간식</a>
-            <a href="search_result.html">#다육이</a>
         </div>
     </section>
 
@@ -405,23 +387,23 @@
     </section>
 
    <section class="common-section sub-menus">
-    <div class="sub-menu-banner banner-shop" onclick="location.href='shop.html'">
-        <div>🛠️ [생산용품관]</div>
-        <span class="desc">필요한 기구/용품 본사 구매</span>
-    </div>
-    <div class="sub-menu-banner banner-guide" onclick="location.href='knowhow.html'">
-        <div>📖 [잘키우는법]</div>
-        <span class="desc">생산 및 사육 가이드 제공</span>
-    </div>
-    <div class="sub-menu-banner banner-qa" onclick="location.href='qna.html'">
-        <div>💬 [질문있어요]</div>
-        <span class="desc">자주 묻는 질문(FAQ) 및 Q&A</span>
-    </div>
-    <div class="sub-menu-banner banner-lawn" onclick="location.href='board.html'">
-        <div>🌱 [잔디밭]</div>
-        <span class="desc">영상 및 사진 자유게시판</span>
-    </div>
-</section>
+        <div class="sub-menu-banner banner-shop" onclick="location.href='shop.html'">
+            <div>🛠️ [생산용품관]</div>
+            <span class="desc">필요한 기구/용품 본사 구매</span>
+        </div>
+        <div class="sub-menu-banner banner-guide" onclick="location.href='knowhow.html'">
+            <div>📖 [잘키우는법]</div>
+            <span class="desc">생산 및 사육 가이드 제공</span>
+        </div>
+        <div class="sub-menu-banner banner-qa" onclick="location.href='qna.html'">
+            <div>💬 [질문있어요]</div>
+            <span class="desc">자주 묻는 질문(FAQ) 및 Q&A</span>
+        </div>
+        <div class="sub-menu-banner banner-lawn" onclick="location.href='board.html'">
+            <div>🌱 [잔디밭]</div>
+            <span class="desc">영상 및 사진 자유게시판</span>
+        </div>
+    </section>
 
     <section class="common-section">
         <h2 class="section-title">팜마을 통합 가이드</h2>
@@ -455,7 +437,7 @@
             <h2>지금 팜마을을 시작해보세요</h2>
             <p>우리 동네 신선한 먹거리, 지금 바로 만나보세요</p>
             <div class="cta-buttons">
-                <a href="login.html" class="cta-btn cta-btn-free">무료 회원가입</a>
+                <a href="join.html" class="cta-btn cta-btn-free">무료 회원가입</a>
                 <a href="register.html" class="cta-btn cta-btn-prod">상품등록하기</a>
             </div>
         </div>
@@ -469,11 +451,15 @@
                 <a href="policy.html">개인정보처리방침</a>
                 <a href="qna.html">고객센터</a>
             </div>
-            <div class="footer-logo">
+            
+            <div class="footer-logo-zone">
                 <a href="index.html" class="logo-text footer-logo-text">
                     <span class="logo-leaf">🌱</span>팜마을
                 </a>
+                <a href="cart.html" class="footer-nav-link">🛒 장바구니</a>
+                <a href="register.html" class="footer-btn-producer">상품등록</a>
             </div>
+            
             <div class="footer-details">
                 <span><strong>디미가 주식회사</strong></span>
                 <span><strong>대표자:</strong> 이호선</span>
@@ -533,7 +519,6 @@
 
                     if(result.data.length === 0) {
                         container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">아직 승인된 우리동네 HUB 거점이 없습니다.</div>';
-                        // 💡 정식 구글맵 주소 형태로 완벽하게 교체되었습니다!
                         document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent('경기 평택시 지산동')}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
                         return;
                     }
@@ -559,42 +544,33 @@
             .catch(error => console.error('메인 허브 리스트 바인딩 실패:', error));
         });
 
-        // 🌟 마우스 오버 시 지도를 갱신하는 함수 (정식 구글맵 연동)
         function updateMainMap(address) {
             const iframe = document.getElementById('mainMapIframe');
             const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF-8&iwloc=&output=embed`;
-            
             if(iframe.src !== newSrc) {
                 iframe.src = newSrc;
             }
         }
-
-        if ('serviceWorker' in navigator) {
-          navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("팜마을 앱 등록 성공!"))
-            .catch((err) => console.log("앱 등록 실패:", err));
-        }
     </script>
-<script>
-    // 페이지가 열리면 즉시 서버에게 로그인한 사람이 있는지 물어봅니다.
-    document.addEventListener("DOMContentLoaded", function() {
-        fetch('/api/user')
-            .then(response => response.json())
-            .then(data => {
-                const authZone = document.getElementById('auth-zone');
-                
-                if (data.loggedIn) {
-                    // 🎉 로그인 상태라면: 회원가입 버튼을 숨기고 [환영 문구]와 [로그아웃] 버튼을 보여줍니다!
-                    authZone.innerHTML = `
-                        <span style="color: #333; font-weight: bold; margin-right: 15px;">
-                            👤 ${data.user.nickname}님 환영합니다
-                        </span>
-                        <a href="/auth/logout" style="padding: 6px 12px; background-color: #ff4d4d; color: white; border-radius: 5px; text-decoration: none; font-size: 14px;">로그아웃</a>
-                    `;
-                }
-            })
-            .catch(err => console.error('사용자 정보 조회 실패:', err));
-    });
-</script>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/user')
+                .then(response => response.json())
+                .then(data => {
+                    const authZone = document.getElementById('auth-zone');
+                    if (data.loggedIn) {
+                        // 로그인에 성공하면 기존 버튼들을 모두 지우고 환영인사와 로그아웃만 표시합니다.
+                        authZone.innerHTML = `
+                            <span style="color: #333; font-weight: 800; margin-right: 15px; font-size:0.95rem;">
+                                👤 ${data.user.nickname}님 환영합니다
+                            </span>
+                            <a href="/auth/logout" style="padding: 6px 14px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight:700; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">로그아웃</a>
+                        `;
+                    }
+                })
+                .catch(err => console.error('사용자 정보 조회 실패:', err));
+        });
+    </script>
 </body>
 </html>
