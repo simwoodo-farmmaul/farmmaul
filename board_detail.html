@@ -23,11 +23,12 @@
         .gallery-img { width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; background: #fafafa; }
         .post-text-content { white-space: pre-wrap; margin-top: 20px; }
 
-        /* 🌟 수정/삭제 버튼 디자인 */
         .author-actions { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: right; display: none; }
         .btn-action { padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; margin-left: 10px; }
         .btn-edit { background: #87B32E; color: white; }
         .btn-delete { background: #ff4d4d; color: white; }
+        /* 관리자 표시 라벨 */
+        .admin-badge { display:none; background: #ff4d4d; color: white; font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; vertical-align: middle; margin-right: 10px; }
     </style>
 </head>
 <body>
@@ -39,7 +40,7 @@
 
     <div class="main-container">
         <div class="detail-header">
-            <div class="post-title" id="postTitle">로딩 중입니다...</div>
+            <div class="post-title"><span id="adminBadge" class="admin-badge">관리자 권한</span><span id="postTitle">로딩 중입니다...</span></div>
             <div class="post-info">
                 <span id="postAuthor">🧑‍🌾 </span>
                 <span id="postDate">📅 </span>
@@ -53,7 +54,7 @@
             <div class="post-text-content" id="postContent"></div>
 
             <div class="author-actions" id="authorActions">
-                <button class="btn-action btn-edit" onclick="editPost()">✏️ 수정하기</button>
+                <button class="btn-action btn-edit" id="btnEdit" onclick="editPost()">✏️ 수정하기</button>
                 <button class="btn-action btn-delete" onclick="deletePost()">🗑️ 삭제하기</button>
             </div>
         </div>
@@ -86,9 +87,15 @@
                     document.getElementById('postViews').innerText = `👁️ 조회 ${post.views || 0}`;
                     document.getElementById('postContent').innerText = post.content;
 
-                    // 현재 로그인한 사람이 글쓴이와 같다면 수정/삭제 버튼 켜기
-                    if (result.currentUser === post.nickname) {
+                    // 🌟 로그인한 사람이 '작성자 본인'이거나 '관리자'라면 권한 버튼을 보여줍니다.
+                    if (result.currentUser === post.nickname || result.isAdmin) {
                         document.getElementById('authorActions').style.display = 'block';
+                        
+                        // 단, 관리자라도 '남이 쓴 글'을 내 마음대로 수정(조작)하면 안 되므로, 수정 버튼은 숨기고 '삭제'만 가능하게 합니다.
+                        if (result.currentUser !== post.nickname && result.isAdmin) {
+                            document.getElementById('btnEdit').style.display = 'none';
+                            document.getElementById('adminBadge').style.display = 'inline-block';
+                        }
                     }
 
                     const embedUrl = getYoutubeEmbedUrl(post.youtube_url);
@@ -105,13 +112,10 @@
                 });
         });
 
-        // 🌟 수정/삭제 기능 스위치
-        function editPost() {
-            location.href = `board_edit.html?id=${currentPostId}`;
-        }
+        function editPost() { location.href = `board_edit.html?id=${currentPostId}`; }
 
         function deletePost() {
-            if(confirm('정말 이 글을 영구적으로 삭제하시겠습니까?')) {
+            if(confirm('정말 이 글을 삭제하시겠습니까?')) {
                 fetch(`/api/board/${currentPostId}`, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(res => {

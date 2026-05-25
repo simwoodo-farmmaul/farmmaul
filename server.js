@@ -26,9 +26,12 @@ const db = mysql.createConnection({
 db.connect((err) => {
     if (err) { console.error('❌ DB 연결 실패:', err); return; }
     console.log('✅ 데이터베이스 창고 연결 성공!');
-    // 🌟 기존 테이블이 있다면 '조회수(views)' 기둥을 안전하게 몰래 추가합니다.
     db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
 });
+
+// 🌟 [핵심] 관리자로 임명할 이사장님의 카카오톡 닉네임(이름)을 적어줍니다.
+// 현재 카카오톡 프로필 이름과 똑같이 적어주셔야 컴퓨터가 알아봅니다!
+const adminNames = ['김영진', '김영진(지산)', '지산']; 
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
@@ -91,11 +94,16 @@ app.get('/auth/logout', (req, res) => {
     req.session.destroy(() => res.send("<script>alert('로그아웃되었습니다.'); location.href='/';</script>"));
 });
 
-// 📌 잔디밭 글 저장
+// 📌 잔디밭 글 저장 (비회원 원천 차단)
 app.post('/api/board', (req, res) => {
+    // 🌟 로그인을 안 했으면 아예 서버에서 글쓰기를 튕겨냅니다.
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
+    }
+
     const { title, content, youtube_url, images } = req.body;
-    const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
-    // 🌟 views 컬럼 포함하여 테이블 생성
+    const nickname = req.session.user.nickname;
+    
     db.query(`CREATE TABLE IF NOT EXISTS farm_board (id INT AUTO_INCREMENT PRIMARY KEY, nickname VARCHAR(100) NOT NULL, title VARCHAR(255) NOT NULL, content TEXT NOT NULL, youtube_url VARCHAR(500), images LONGTEXT, views INT DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
         db.query(`INSERT INTO farm_board (nickname, title, content, youtube_url, images) VALUES (?, ?, ?, ?, ?)`, [nickname, title, content, youtube_url, JSON.stringify(images || [])], () => {
             res.json({ success: true, message: '글이 성공적으로 등록되었습니다!' });
@@ -103,7 +111,6 @@ app.post('/api/board', (req, res) => {
     });
 });
 
-// 📌 잔디밭 목록 보기 (조회수 포함)
 app.get('/api/board', (req, res) => {
     db.query(`SELECT id, nickname, title, youtube_url, images, views, created_at FROM farm_board ORDER BY created_at DESC`, (err, results) => {
         if(err) return res.json({ success: true, data: [] });
@@ -111,25 +118,27 @@ app.get('/api/board', (req, res) => {
     });
 });
 
-// 📌 잔디밭 상세 보기 (조회수 증가 + 현재 로그인 유저 정보 전달)
+// 📌 상세보기 (관리자 여부를 화면에 알려주기)
 app.get('/api/board/:id', (req, res) => {
     const postId = req.params.id;
-    // 🌟 1. 글을 열면 먼저 조회수(views)를 1 올립니다.
     db.query(`UPDATE farm_board SET views = views + 1 WHERE id = ?`, [postId], () => {
-        // 🌟 2. 그 다음 글 정보를 꺼내서 화면에 보냅니다.
         db.query(`SELECT * FROM farm_board WHERE id = ?`, [postId], (err, result) => {
             if (result.length === 0) return res.status(404).json({ success: false });
+            
             const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
-            res.json({ success: true, data: result[0], currentUser: currentUser });
+            // 🌟 이 글을 보는 사람이 관리자 명단에 있는지 확인합니다.
+            const isAdmin = adminNames.includes(currentUser); 
+            
+            res.json({ success: true, data: result[0], currentUser: currentUser, isAdmin: isAdmin });
         });
     });
 });
 
-// 📌 잔디밭 글 수정하기 (NEW)
 app.put('/api/board/:id', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '권한이 없습니다.'});
     const postId = req.params.id;
     const { title, content, youtube_url, images } = req.body;
-    const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
+    const nickname = req.session.user.nickname;
     
     db.query(`UPDATE farm_board SET title=?, content=?, youtube_url=?, images=? WHERE id=? AND nickname=?`, 
     [title, content, youtube_url, JSON.stringify(images || []), postId, nickname], (err, result) => {
@@ -138,15 +147,26 @@ app.put('/api/board/:id', (req, res) => {
     });
 });
 
-// 📌 잔디밭 글 삭제하기 (NEW)
+// 📌 삭제하기 (관리자는 모든 글 삭제 가능)
 app.delete('/api/board/:id', (req, res) => {
-    const postId = req.params.id;
-    const nickname = (req.session && req.session.user) ? req.session.user.nickname : '익명 주민';
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.'});
     
-    db.query(`DELETE FROM farm_board WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
-         if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
-         res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
-    });
+    const postId = req.params.id;
+    const nickname = req.session.user.nickname;
+    const isAdmin = adminNames.includes(nickname); // 이 사람이 관리자인가?
+
+    // 🌟 관리자라면 작성자 이름(nickname)을 따지지 않고 무조건 삭제합니다!
+    if (isAdmin) {
+        db.query(`DELETE FROM farm_board WHERE id=?`, [postId], (err, result) => {
+            res.json({ success: true, message: '관리자 권한으로 글을 삭제했습니다.' });
+        });
+    } else {
+        // 일반 회원은 자기가 쓴 글만 삭제 가능
+        db.query(`DELETE FROM farm_board WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
+             if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
+             res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
+        });
+    }
 });
 
 const PORT = process.env.PORT || 3000;

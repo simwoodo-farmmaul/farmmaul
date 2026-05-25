@@ -32,13 +32,27 @@
     <div class="container">
         <div class="board-header">
             <h1>전체 이야기</h1>
-            <a href="board_write.html" class="btn-write">✏️ 글쓰기</a>
+            <a href="javascript:void(0)" onclick="checkLoginForWrite()" class="btn-write">✏️ 글쓰기</a>
         </div>
         
         <div class="post-list" id="postListContainer"></div>
     </div>
 
     <script>
+        // 🌟 비회원 글쓰기 차단 기능
+        function checkLoginForWrite() {
+            fetch('/api/user')
+                .then(res => res.json())
+                .then(data => {
+                    if(data.loggedIn) {
+                        location.href = 'board_write.html'; // 회원이면 글쓰기 화면으로
+                    } else {
+                        alert('팜마을 회원만 글을 쓸 수 있습니다. 로그인 화면으로 이동합니다.');
+                        location.href = 'login.html'; // 비회원이면 쫓아내기
+                    }
+                });
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/board')
                 .then(response => response.json())
@@ -50,7 +64,6 @@
                     }
                     result.data.forEach(post => {
                         const date = new Date(post.created_at).toLocaleDateString();
-                        // 🌟 조회수(views)를 화면에 추가했습니다.
                         const views = post.views || 0;
                         const itemHtml = `
                             <div class="post-item" onclick="location.href='board_detail.html?id=${post.id}'">
