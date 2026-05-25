@@ -23,6 +23,8 @@
             --bg-color: #f9fbf9;
             --text-dark: #333;
             --text-light: #666;
+            --kakao-yellow: #FEE500;
+            --kakao-text: #3C1E1E;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
@@ -42,28 +44,27 @@
         .notice-text { font-weight: 600; cursor: pointer; }
         .notice-text:hover { text-decoration: underline; }
 
+        /* 🏠 상단 헤더 구역 (좌측 로고 - 우측 로그인/회원가입 완벽한 한 줄) */
         header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
         
         .auth-zone-flex { display: flex; gap: 8px; align-items: center; }
-        .btn-login { border: 1px solid var(--primary-blue); color: var(--primary-blue) !important; background-color: #fff; padding: 6px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 800; transition: 0.2s; }
+        .btn-login { border: 1px solid var(--primary-blue); color: var(--primary-blue) !important; background-color: #fff; padding: 4px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; transition: 0.2s; }
         .btn-login:hover { background-color: #f0f7fd; }
         
-        .btn-register-trigger { border: 1px solid var(--primary-orange); color: white !important; background-color: var(--primary-orange); padding: 6px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: 0.2s; text-decoration: none; }
+        .btn-register-trigger { border: 1px solid var(--primary-orange); color: white !important; background-color: var(--primary-orange); padding: 4px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: 0.2s; text-decoration: none; }
         .btn-register-trigger:hover { background-color: #d84315; }
 
-        /* 🌟 로그인 환영 인사말 및 로그아웃 버튼 디자인 (PC 기준) */
-        .welcome-text { color: #333; font-size: 0.95rem; font-weight: 700; margin-right: 15px; display: inline-block; }
-        .welcome-text b { color: var(--primary-blue); font-weight: 900; }
-        .btn-logout { padding: 6px 14px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 0.9rem; font-weight: 800; box-shadow: 0 2px 4px rgba(0,0,0,0.1); white-space: nowrap; transition: 0.2s; }
-        .btn-logout:hover { background-color: #e63939; }
-
         .hero { background: linear-gradient(135deg, #4B9AD2 0%, #6bc75a 50%, #87B32E 100%); color: white; text-align: center; padding: 25px 20px 30px; }
-        .hero p { font-size: 1.25rem; font-weight: bold; line-height: 1.4; text-shadow: 0px 1px 3px rgba(0,0,0,0.15); margin-bottom: 5px; }
         
-        .search-bar { max-width: 600px; margin: 15px auto 0; display: flex; height: 50px; background: #fff; border-radius: 25px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        .search-bar input { flex: 1; border: none; outline: none; padding: 0 20px; font-size: 1rem; color: var(--text-dark); text-align: center; }
-        .search-bar button { width: 60px; border: none; background: var(--primary-orange); color: #fff; font-size: 1.3rem; cursor: pointer; transition: background 0.2s; }
+        /* 🌟 추가 및 수정된 메인 문구 스타일 🌟 */
+        .hero-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 5px; text-shadow: 0px 2px 4px rgba(0,0,0,0.2); }
+        .hero-subtitle { font-size: 1.1rem; font-weight: bold; line-height: 1.4; text-shadow: 0px 1px 3px rgba(0,0,0,0.15); margin-bottom: 15px; opacity: 0.95; }
+        
+        /* 🌟 검색창 상하 폭 20% 축소 (50px -> 40px) 🌟 */
+        .search-bar { max-width: 600px; margin: 0 auto; display: flex; height: 40px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .search-bar input { flex: 1; border: none; outline: none; padding: 0 20px; font-size: 0.95rem; color: var(--text-dark); text-align: center; }
+        .search-bar button { width: 50px; border: none; background: var(--primary-orange); color: #fff; font-size: 1.1rem; cursor: pointer; transition: background 0.2s; }
         .search-bar button:hover { background: #d84315; }
 
         .main-categories { max-width: 1200px; margin: 25px auto 40px; display: flex; justify-content: center; gap: 20px; padding: 0 20px; position: relative; z-index: 10; }
@@ -185,22 +186,11 @@
 
         .mobile-bottom-nav { display: none; }
 
-        /* 📱 🌟 모바일 환영인사 우측 쏠림 & 로고 겹침 완벽 해결! */
         @media (max-width: 768px) {
             .top-notice-bar { font-size: 0.75rem; padding: 8px 10px; }
             
             .header-container { padding: 12px 15px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; }
-            /* 로고 폰트 크기 살짝 조절하여 공간 확보 */
-            .logo-text { font-size: 1.5rem; flex-shrink: 0; }
-            .logo-leaf { font-size: 1.3rem; }
-            
-            /* 버튼과 인삿말이 우측에 바짝 붙도록 설정 */
-            .auth-zone-flex { gap: 6px; flex: 1; justify-content: flex-end; }
-            .btn-login, .btn-register-trigger { padding: 5px 10px; font-size: 0.85rem; }
-
-            /* 환영인사 텍스트가 두 줄로 쪼개지지 않고(nowrap) 작게 우측에 붙게 설정 */
-            .welcome-text { font-size: 0.8rem; margin-right: 8px; white-space: nowrap; }
-            .btn-logout { padding: 5px 10px; font-size: 0.8rem; }
+            .logo-text { font-size: 1.7rem; }
 
             .main-categories { flex-wrap: wrap; gap: 10px; margin: 15px auto 30px; }
             .category-box { width: calc(50% - 5px); height: 100px; }
@@ -263,15 +253,16 @@
             
             <div class="auth-zone-flex" id="auth-zone">
                 <a href="login.html" class="btn-login">로그인</a>  
-                <a href="join.html" class="btn-register-trigger">회원가입</a>
+                <a href="register.html" class="btn-register-trigger">회원가입</a>
             </div>
         </div>
     </header>
 
     <section class="hero">
-        <p>생산자 직거래 HUB 수령까지</p>
+        <div class="hero-title">우리동네 신선한 먹거리</div>
+        <div class="hero-subtitle">생산자 직거래 HUB 수령까지</div>
         <div class="search-bar">
-            <input type="text" placeholder="(       ) 검색">
+            <input type="text" placeholder="어떤 상품을 찾으시나요?">
             <button onclick="location.href='search_result.html'">🔍</button>
         </div>
     </section>
@@ -449,7 +440,7 @@
             <h2>지금 팜마을을 시작해보세요</h2>
             <p>우리 동네 신선한 먹거리, 지금 바로 만나보세요</p>
             <div class="cta-buttons">
-                <a href="join.html" class="cta-btn cta-btn-free">무료 회원가입</a>
+                <a href="register.html" class="cta-btn cta-btn-free">무료 회원가입</a>
                 <a href="register.html" class="cta-btn cta-btn-prod">상품등록하기</a>
             </div>
         </div>
@@ -564,24 +555,23 @@
             }
         }
     </script>
-    
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('/api/user')
-                .then(response => response.json())
-                .then(data => {
-                    const authZone = document.getElementById('auth-zone');
-                    if (data.loggedIn) {
-                        authZone.innerHTML = `
-                            <span class="welcome-text">
-                                👤 <b>${data.user.nickname}</b>님 환영합니다
-                            </span>
-                            <a href="/auth/logout" class="btn-logout">로그아웃</a>
-                        `;
-                    }
-                })
-                .catch(err => console.error('사용자 정보 조회 실패:', err));
-        });
-    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/user')
+            .then(response => response.json())
+            .then(data => {
+                const authZone = document.getElementById('auth-zone');
+                if (data.loggedIn) {
+                    authZone.innerHTML = `
+                        <span style="color: #333; font-weight: bold; margin-right: 15px; font-size:14px;">
+                            👤 ${data.user.nickname}님 환영합니다
+                        </span>
+                        <a href="/auth/logout" style="padding: 5px 12px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight:700;">로그아웃</a>
+                    `;
+                }
+            })
+            .catch(err => console.error('사용자 정보 조회 실패:', err));
+    });
+</script>
 </body>
 </html>
