@@ -562,12 +562,12 @@
             .then(data => {
                 const authZone = document.getElementById('auth-zone');
                 if (data.loggedIn) {
-                    authZone.innerHTML = `
-                        <span style="color: #333; font-weight: bold; margin-right: 15px; font-size:14px;">
-                            👤 ${data.user.nickname}님 환영합니다
-                        </span>
-                        <a href="/auth/logout" style="padding: 5px 12px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight:700;">로그아웃</a>
-                    `;
+                   authZone.innerHTML = `
+                  <span style="color: #333; font-weight: bold; margin-right: 8px; font-size:13px; white-space: nowrap;">
+                  👤 ${data.user.nickname}님 환영합니다
+                 </span>
+                 <a href="/auth/logout" style="padding: 5px 10px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap;">로그아웃</a>
+`;
                 }
             })
             .catch(err => console.error('사용자 정보 조회 실패:', err));
