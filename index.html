@@ -235,6 +235,21 @@
             .floating-menu { bottom: 85px; right: 20px; } 
             .float-btn { width: 50px; height: 50px; }
         }
+
+        /* 🌟 모바일 헤더(상단바) 초밀착 및 좌측 정렬 특별 패치 🌟 */
+        @media (max-width: 768px) {
+            /* 1. 화면 양끝 빈 공간(여백)을 줄여서 전체를 좌측으로 당김 */
+            .header-container { padding: 10px 5px !important; }
+            
+            /* 2. 로고 아이콘 크기를 줄이고, '팜마을' 글씨와 바짝 붙임 */
+            .logo-text { font-size: 1.5rem !important; gap: 2px !important; letter-spacing: -1.5px !important; }
+            .logo-icon { height: 2.0rem !important; }
+            
+            /* 3. 환영인사 글씨를 살짝 줄여 로그아웃 버튼을 좌측으로 당김 */
+            #auth-zone { gap: 4px !important; }
+            #auth-zone span { font-size: 12px !important; margin-right: 3px !important; letter-spacing: -0.5px; }
+            #auth-zone a[href="/auth/logout"] { padding: 5px 8px !important; font-size: 12px !important; }
+        }
     </style>
 </head>
 <body>
