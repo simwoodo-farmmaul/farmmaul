@@ -17,17 +17,28 @@
         .tab-item { flex: 1; text-align: center; padding: 15px 20px; font-weight: 800; color: #888; cursor: pointer; transition: 0.2s; }
         .tab-item.active { color: var(--primary-orange); border-bottom: 3px solid var(--primary-orange); }
 
-        .content-container { max-width: 800px; margin: 30px auto; padding: 30px; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); min-height: 50vh; }
+        .content-container { max-width: 800px; margin: 30px auto; padding: 30px; background: #fff; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); min-height: 50vh; position: relative; }
         .content-section { display: none; line-height: 1.8; color: #555; font-size: 0.95rem; animation: fadeIn 0.3s; }
         .content-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        h2 { color: #222; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        h2 { color: #222; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
         h3 { color: #444; margin-top: 25px; margin-bottom: 10px; font-size: 1.1rem; }
         
         /* 고객센터 박스 */
         .cs-box { background: #f4f9ea; border: 1px solid #dcedc8; padding: 25px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
         .cs-number { font-size: 2rem; font-weight: 900; color: var(--primary-green); margin: 10px 0; }
+
+        /* 🌟 새로 추가된 관리자 모드 디자인 */
+        .admin-panel { display: none; } /* 처음엔 숨김 */
+        .btn-edit { background: #fff; border: 1px solid var(--primary-blue); color: var(--primary-blue); padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.85rem; }
+        .btn-save { background: var(--primary-orange); border: 1px solid var(--primary-orange); color: #fff; padding: 5px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; font-size: 0.85rem; display: none; }
+        .text-body { outline: none; border-radius: 5px; transition: 0.2s; }
+        .text-body[contenteditable="true"] { border: 2px dashed var(--primary-orange); padding: 15px; background: #fffdf5; }
+        
+        .admin-trigger-zone { text-align: center; padding: 50px 20px; }
+        .btn-admin-login { background: transparent; border: none; color: #ccc; font-size: 0.8rem; cursor: pointer; }
+        .btn-admin-login:hover { color: #888; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -46,60 +57,92 @@
     <div class="content-container">
         
         <div id="view-about" class="content-section active">
-            <h2>회사소개</h2>
-            <p><b>(주)디미가</b>는 도시와 농촌을 잇는 스마트 농업 직거래 플랫폼 <b>'팜마을'</b>을 운영합니다.</p>
-            <p>우리는 누구나 쉽게 생산자가 되어 자신의 텃밭과 농장에서 키운 건강한 먹거리를 이웃과 나눌 수 있는 세상을 꿈꿉니다. 복잡한 유통 과정을 없애고, 내 동네를 기반으로 한 '방문 수거', '마을 HUB 보관' 등 혁신적인 직거래 방식을 통해 생산자에게는 정당한 수익을, 소비자에게는 신선함과 신뢰를 제공합니다.</p>
-            <p>또한, 도시농업대학 디미가를 통해 귀농·귀촌 교육 및 스마트팜 교육을 지원하며, 지속 가능한 농업 생태계 구축에 앞장서고 있습니다.</p>
-            <ul style="list-style:none; padding:0; font-weight:700; margin-top:30px; background:#f9f9f9; padding:20px; border-radius:10px;">
-                <li>▪ 법인명: (주)디미가</li>
-                <li>▪ 대표이사: 이호선</li>
-                <li>▪ 총괄 관리책임자: 김영진</li>
-            </ul>
+            <h2>회사소개
+                <div class="admin-panel">
+                    <button class="btn-edit" id="btn-edit-about" onclick="editMode('about')">수정</button>
+                    <button class="btn-save" id="btn-save-about" onclick="saveMode('about')">저장</button>
+                </div>
+            </h2>
+            <div id="text-about" class="text-body">
+                <p><b>(주)디미가</b>는 도시와 농촌을 잇는 스마트 농업 직거래 플랫폼 <b>'팜마을'</b>을 운영합니다.</p>
+                <p>우리는 누구나 쉽게 생산자가 되어 자신의 텃밭과 농장에서 키운 건강한 먹거리를 이웃과 나눌 수 있는 세상을 꿈꿉니다. 복잡한 유통 과정을 없애고, 내 동네를 기반으로 한 '방문 수거', '마을 HUB 보관' 등 혁신적인 직거래 방식을 통해 생산자에게는 정당한 수익을, 소비자에게는 신선함과 신뢰를 제공합니다.</p>
+                <p>또한, 도시농업대학 디미가를 통해 귀농·귀촌 교육 및 스마트팜 교육을 지원하며, 지속 가능한 농업 생태계 구축에 앞장서고 있습니다.</p>
+                <ul style="list-style:none; padding:0; font-weight:700; margin-top:30px; background:#f9f9f9; padding:20px; border-radius:10px;">
+                    <li>▪ 법인명: (주)디미가</li>
+                    <li>▪ 대표이사: 이호선</li>
+                    <li>▪ 총괄 관리책임자: 김영진</li>
+                </ul>
+            </div>
         </div>
 
         <div id="view-terms" class="content-section">
-            <h2>이용약관</h2>
-            <h3>제1조 (목적)</h3>
-            <p>본 약관은 (주)디미가(이하 "회사")가 제공하는 팜마을 플랫폼 서비스의 이용과 관련하여, 회사와 회원 간의 권리, 의무, 책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
-            <h3>제2조 (회원의 정의 및 역할)</h3>
-            <p>1. 회원은 팜마을에 가입하여 서비스를 이용하는 자를 말합니다.<br>
-               2. 회원은 본인의 선택 및 회사의 승인 절차에 따라 '구매자', '생산자', '마을 HUB'의 역할을 겸할 수 있습니다.</p>
-            <h3>제3조 (직거래의 책임)</h3>
-            <p>회사는 생산자와 구매자 간의 자유로운 거래를 위한 시스템(플랫폼)을 제공할 뿐, 회원 간에 성립된 거래와 관련된 책임은 거래 당사자들에게 있습니다. 단, 결제 및 환불 등의 분쟁 발생 시 회사는 원만한 해결을 위해 중재 절차를 지원합니다.</p>
-            <p style="font-size:0.85rem; color:#888; margin-top:20px;">* 본 약관은 2026년 5월부터 시행됩니다.</p>
+            <h2>이용약관
+                <div class="admin-panel">
+                    <button class="btn-edit" id="btn-edit-terms" onclick="editMode('terms')">수정</button>
+                    <button class="btn-save" id="btn-save-terms" onclick="saveMode('terms')">저장</button>
+                </div>
+            </h2>
+            <div id="text-terms" class="text-body">
+                <h3>제1조 (목적)</h3>
+                <p>본 약관은 (주)디미가(이하 "회사")가 제공하는 팜마을 플랫폼 서비스의 이용과 관련하여, 회사와 회원 간의 권리, 의무, 책임사항 및 기타 필요한 사항을 규정함을 목적으로 합니다.</p>
+                <h3>제2조 (회원의 정의 및 역할)</h3>
+                <p>1. 회원은 팜마을에 가입하여 서비스를 이용하는 자를 말합니다.<br>
+                   2. 회원은 본인의 선택 및 회사의 승인 절차에 따라 '구매자', '생산자', '마을 HUB'의 역할을 겸할 수 있습니다.</p>
+                <h3>제3조 (직거래의 책임)</h3>
+                <p>회사는 생산자와 구매자 간의 자유로운 거래를 위한 시스템(플랫폼)을 제공할 뿐, 회원 간에 성립된 거래와 관련된 책임은 거래 당사자들에게 있습니다. 단, 결제 및 환불 등의 분쟁 발생 시 회사는 원만한 해결을 위해 중재 절차를 지원합니다.</p>
+                <p style="font-size:0.85rem; color:#888; margin-top:20px;">* 본 약관은 2026년 5월부터 시행됩니다.</p>
+            </div>
         </div>
 
         <div id="view-privacy" class="content-section">
-            <h2>개인정보처리방침</h2>
-            <p>회사는 회원의 개인정보를 가장 소중하게 생각하며, 관련 법령을 엄격히 준수합니다.</p>
-            <h3>1. 수집하는 개인정보 항목</h3>
-            <p>이름, 이메일, 전화번호, 주소 (생산자 및 HUB 가입 시 농장/매장 정보 및 정산 계좌 정보 추가 수집)</p>
-            <h3>2. 개인정보의 이용 목적</h3>
-            <p>서비스 제공, 회원 관리, 직거래 시 상품 배송 및 수령 안내, 결제 및 정산 처리, 신규 서비스 안내</p>
-            <h3>3. 개인정보의 보유 및 이용기간</h3>
-            <p>원칙적으로 회원 탈퇴 시 지체 없이 파기합니다. 단, 전자상거래법 등 관련 법령에 의하여 보존할 필요가 있는 경우 해당 법령에서 정한 기간 동안 보존합니다.</p>
+            <h2>개인정보처리방침
+                <div class="admin-panel">
+                    <button class="btn-edit" id="btn-edit-privacy" onclick="editMode('privacy')">수정</button>
+                    <button class="btn-save" id="btn-save-privacy" onclick="saveMode('privacy')">저장</button>
+                </div>
+            </h2>
+            <div id="text-privacy" class="text-body">
+                <p>회사는 회원의 개인정보를 가장 소중하게 생각하며, 관련 법령을 엄격히 준수합니다.</p>
+                <h3>1. 수집하는 개인정보 항목</h3>
+                <p>이름, 이메일, 전화번호, 주소 (생산자 및 HUB 가입 시 농장/매장 정보 및 정산 계좌 정보 추가 수집)</p>
+                <h3>2. 개인정보의 이용 목적</h3>
+                <p>서비스 제공, 회원 관리, 직거래 시 상품 배송 및 수령 안내, 결제 및 정산 처리, 신규 서비스 안내</p>
+                <h3>3. 개인정보의 보유 및 이용기간</h3>
+                <p>원칙적으로 회원 탈퇴 시 지체 없이 파기합니다. 단, 전자상거래법 등 관련 법령에 의하여 보존할 필요가 있는 경우 해당 법령에서 정한 기간 동안 보존합니다.</p>
+            </div>
         </div>
 
         <div id="view-cs" class="content-section">
-            <h2>고객센터</h2>
-            <div class="cs-box">
-                <div style="font-weight:800; color:#555;">팜마을 고객센터 대표번호</div>
-                <div class="cs-number">031-419-1151</div>
-                <div>평일 10:00 ~ 17:00 (주말 및 공휴일 휴무)</div>
+            <h2>고객센터
+                <div class="admin-panel">
+                    <button class="btn-edit" id="btn-edit-cs" onclick="editMode('cs')">수정</button>
+                    <button class="btn-save" id="btn-save-cs" onclick="saveMode('cs')">저장</button>
+                </div>
+            </h2>
+            <div id="text-cs" class="text-body">
+                <div class="cs-box">
+                    <div style="font-weight:800; color:#555;">팜마을 고객센터 대표번호</div>
+                    <div class="cs-number">031-419-1151</div>
+                    <div>평일 10:00 ~ 17:00 (주말 및 공휴일 휴무)</div>
+                </div>
+                <h3>💬 기타 문의 채널</h3>
+                <ul style="line-height:2;">
+                    <li><b>온라인 1:1 문의:</b> 앱 하단 '질문있어요' 메뉴 활용</li>
+                    <li><b>오늘톡 실시간 채팅:</b> 앱 내 플로팅 버튼(💬) 클릭 시 연결</li>
+                    <li><b>이메일 문의:</b> canu9000@naver.com</li>
+                    <li><b>제휴 및 입점 문의:</b> 디미가 안산 본부 또는 제주 교육장 참조</li>
+                </ul>
             </div>
-            
-            <h3>💬 기타 문의 채널</h3>
-            <ul style="line-height:2;">
-                <li><b>온라인 1:1 문의:</b> 앱 하단 '질문있어요' 메뉴 활용</li>
-                <li><b>오늘톡 실시간 채팅:</b> 앱 내 플로팅 버튼(💬) 클릭 시 연결</li>
-                <li><b>이메일 문의:</b> canu9000@naver.com</li>
-                <li><b>제휴 및 입점 문의:</b> 디미가 안산 본부 또는 제주 교육장 참조</li>
-            </ul>
         </div>
 
     </div>
 
+    <div class="admin-trigger-zone">
+        <button class="btn-admin-login" onclick="loginAdmin()">⚙️ 관리자 모드 접속</button>
+    </div>
+
     <script>
+        // 상단 탭 전환 기능
         function switchTab(viewId, element) {
             document.querySelectorAll('.tab-item').forEach(item => item.classList.remove('active'));
             element.classList.add('active');
@@ -107,6 +150,26 @@
             document.querySelectorAll('.content-section').forEach(view => view.classList.remove('active'));
             document.getElementById('view-' + viewId).classList.add('active');
         }
-    </script>
-</body>
-</html>
+
+        // 🌟 새로 추가된 스크립트: 관리자 기능
+        function loginAdmin() {
+            // 임시 비밀번호 설정 (현재 1234로 세팅되어 있습니다)
+            let pwd = prompt("관리자 비밀번호를 입력하세요.");
+            if(pwd === "1234") {
+                // 비밀번호가 맞으면 모든 수정 버튼을 화면에 나타나게 함
+                document.querySelectorAll('.admin-panel').forEach(el => el.style.display = 'block');
+                alert("관리자 모드로 전환되었습니다.");
+            } else {
+                alert("비밀번호가 일치하지 않습니다.");
+            }
+        }
+
+        function editMode(section) {
+            // 텍스트 영역을 '수정 가능 상태'로 변경
+            let contentArea = document.getElementById('text-' + section);
+            contentArea.setAttribute("contenteditable", "true");
+            contentArea.focus();
+
+            // 수정 버튼 숨기고, 저장 버튼 보이기
+            document.getElementById('btn-edit-' + section).style.display = 'none';
+            document.getElementById('btn-save
