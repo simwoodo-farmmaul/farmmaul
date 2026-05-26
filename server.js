@@ -206,3 +206,45 @@ app.delete('/api/board/:id', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
+
+// ==========================================
+// [팜마을 관리자] 회사소개 및 약관 DB 연동 API
+// ==========================================
+
+// 1. DB에서 저장된 약관 내용 불러오기
+app.get('/api/policy/:section', async (req, res) => {
+    try {
+        const conn = await pool.getConnection(); // 설정하신 DB 변수명(pool) 확인
+        const rows = await conn.query("SELECT content FROM farm_policy WHERE section_name = ?", [req.params.section]);
+        conn.release();
+        
+        if (rows.length > 0) {
+            res.json({ success: true, content: rows[0].content });
+        } else {
+            res.json({ success: false }); 
+        }
+    } catch (err) {
+        console.error("약관 불러오기 에러:", err);
+        res.status(500).json({ success: false });
+    }
+});
+
+// 2. 화면에서 수정한 약관 내용을 DB에 저장하기
+app.post('/api/policy', async (req, res) => {
+    const { section, content } = req.body;
+    try {
+        const conn = await pool.getConnection();
+        // 내용이 이미 있으면 덮어쓰기(UPDATE), 없으면 새로 만들기(INSERT)
+        await conn.query(`
+            INSERT INTO farm_policy (section_name, content) 
+            VALUES (?, ?) 
+            ON DUPLICATE KEY UPDATE content = ?
+        `, [section, content, content]);
+        conn.release();
+        
+        res.json({ success: true });
+    } catch (err) {
+        console.error("약관 저장 에러:", err);
+        res.status(500).json({ success: false });
+    }
+});
