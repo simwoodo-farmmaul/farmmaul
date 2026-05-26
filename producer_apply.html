@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>팜마을 - 생산자 등록 신청</title>
+    <style>
+        :root { --primary-green: #87B32E; --bg-color: #f4f7f6; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; word-break: keep-all; }
+        body { background-color: var(--bg-color); color: #333; padding-bottom: 50px; }
+        
+        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        .btn-back { font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #333; margin-right: 15px; font-weight: 900; }
+        .header-title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); flex: 1; }
+
+        .container { max-width: 600px; margin: 20px auto; padding: 0 15px; }
+        .info-box { background: #e8f5e9; border: 1px solid #c8e6c9; border-radius: 12px; padding: 15px; margin-bottom: 25px; color: #2e7d32; font-size: 0.95rem; line-height: 1.5; font-weight: 700; }
+
+        .form-section { background: #fff; padding: 25px 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .form-title { font-size: 1.15rem; font-weight: 900; margin-bottom: 20px; color: #222; display: flex; align-items: center; gap: 8px; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; font-weight: 800; margin-bottom: 8px; font-size: 0.95rem; color: #555; }
+        .input-group input, .input-group textarea { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; transition: 0.2s; background: #fafafa; }
+        .input-group input:focus, .input-group textarea:focus { border-color: var(--primary-green); background: #fff; }
+        .input-group textarea { resize: none; height: 100px; }
+
+        /* 사진 업로드 디자인 */
+        .upload-area { display: flex; gap: 15px; }
+        .upload-box { flex: 1; border: 2px dashed #ccc; border-radius: 12px; height: 120px; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fafafa; cursor: pointer; position: relative; overflow: hidden; transition: 0.2s; }
+        .upload-box:hover { border-color: var(--primary-green); background: #f0f7f0; }
+        .upload-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; display: none; }
+        .upload-box span { font-size: 2rem; margin-bottom: 5px; }
+        .upload-box div { font-size: 0.85rem; font-weight: 800; color: #888; }
+        .upload-box input { display: none; }
+
+        .btn-submit { width: 100%; padding: 16px; background: var(--primary-green); color: #fff; border: none; border-radius: 12px; font-size: 1.15rem; font-weight: 900; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(135,179,46,0.2); margin-top: 10px; }
+        .btn-submit:hover { background: #719626; transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="index.html" class="btn-back">←</a>
+        <div class="header-title">생산자 등록 신청</div>
+    </div>
+
+    <div class="container">
+        <div class="info-box">
+            🧑‍🌾 팜마을 생산자가 되어 이웃에게 건강한 먹거리를 직거래로 제공해 보세요! 입력하신 정보는 심사 후 농장 프로필에 공개됩니다.
+        </div>
+
+        <form id="producerForm">
+            <div class="form-section">
+                <div class="form-title"><span>🌱</span> 농장 기본 정보</div>
+                <div class="input-group">
+                    <label for="farmName">농장 / 상호명 (필수)</label>
+                    <input type="text" id="farmName" placeholder="예: 김평택 농부님, 자연꼬꼬 농장" required>
+                </div>
+                <div class="input-group">
+                    <label for="farmShort">농장 한 줄 소개 (필수)</label>
+                    <input type="text" id="farmShort" placeholder="예: 무농약 제철 채소를 정직하게 키웁니다." required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label for="farmDesc">농장 상세 소개</label>
+                    <textarea id="farmDesc" placeholder="농장의 역사, 키우는 작물, 철학 등을 이웃들에게 자유롭게 소개해 주세요."></textarea>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-title"><span>📸</span> 농장 사진 등록</div>
+                <div class="upload-area">
+                    <label class="upload-box" style="flex: 0.8; border-radius: 50%; height: 130px; width: 130px; margin: 0 auto;">
+                        <span>🧑‍🌾</span>
+                        <div>프로필 사진</div>
+                        <input type="file" id="profileImg" accept="image/*" onchange="previewImage(this, 'previewProfile')">
+                        <img id="previewProfile">
+                    </label>
+                    <label class="upload-box" style="height: 130px;">
+                        <span>🌄</span>
+                        <div>배경(커버) 사진</div>
+                        <input type="file" id="coverImg" accept="image/*" onchange="previewImage(this, 'previewCover')">
+                        <img id="previewCover">
+                    </label>
+                </div>
+                <div style="text-align: center; font-size: 0.8rem; color: #999; margin-top: 15px; font-weight: 700;">* 사진 칸을 터치하여 이미지를 등록해 주세요.</div>
+            </div>
+
+            <div class="form-section">
+                <div class="form-title"><span>💰</span> 판매 대금 정산 계좌</div>
+                <div class="input-group">
+                    <label for="bankName">은행명 (필수)</label>
+                    <input type="text" id="bankName" placeholder="예: 농협, 국민은행" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label for="accountNum">계좌번호 (필수, '-' 제외)</label>
+                    <input type="number" id="accountNum" placeholder="예: 3521234567890" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">생산자 등록 심사 요청하기</button>
+        </form>
+    </div>
+
+    <script>
+        // 사진 미리보기 기능
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // 폼 제출 (서버 DB 연동 준비)
+        document.getElementById('producerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // 입력된 데이터 수집
+            const farmName = document.getElementById('farmName').value;
+            const farmShort = document.getElementById('farmShort').value;
+            const profileImgSrc = document.getElementById('previewProfile').src;
+            
+            // 아직 서버 연결 코드가 없으므로 임시 성공 처리 알림
+            alert(`🎉 [${farmName}] 농장으로 생산자 등록 신청이 완료되었습니다!\n\n관리자 심사 후 메인 화면과 생산자 이야기에 반영됩니다.`);
+            
+            // 신청 완료 후 메인 화면으로 돌아가기
+            location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
