@@ -138,7 +138,13 @@
     </div>
 
     <div class="admin-trigger-zone">
-        <button class="btn-admin-login" onclick="loginAdmin()">⚙️ 관리자 모드 접속</button>
+        <div id="admin-btn-box">
+            <button class="btn-admin-login" onclick="showAdminInput()">⚙️ 관리자 모드 접속</button>
+        </div>
+        <div id="admin-input-box" style="display: none; margin-top: 10px;">
+            <input type="password" id="admin-pwd" placeholder="비밀번호" style="padding: 5px; width: 100px; border: 1px solid #ccc; border-radius: 4px; vertical-align: middle; outline: none;">
+            <button onclick="checkAdmin()" style="padding: 6px 12px; background: #87B32E; color: white; border: none; border-radius: 4px; cursor: pointer; vertical-align: middle; font-weight: bold;">확인</button>
+        </div>
     </div>
 
 <script>
