@@ -90,7 +90,7 @@
         .producer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .producer-card { background: #fff; border-radius: 15px; padding: 25px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.2s; cursor: pointer; }
         .producer-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); border-color: var(--primary-green); }
-        .producer-img { width: 80%; aspect-ratio: 1 / 1; border-radius: 10px; object-fit: cover; margin: 0 auto 15px; border: 4px solid #e8f5e9; }
+       .producer-img { width: 100%; aspect-ratio: 4 / 3; border-radius: 10px; object-fit: cover; margin: 0 auto 15px; border: 4px solid #e8f5e9; }
         .producer-name { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); margin-bottom: 5px; }
         .producer-desc { font-size: 0.9rem; color: var(--text-light); margin-bottom: 15px; }
         .btn-follow { background: #e8f5e9; color: var(--primary-green); border: none; padding: 8px 24px; border-radius: 20px; font-weight: 800; cursor: pointer; transition: background 0.2s; }
@@ -418,46 +418,31 @@
         <p class="section-subtitle">이웃들에게 사랑받는 생산자들의 진솔한 농장 일기를 만나보세요.</p>
         <div class="producer-story-section">
             
-            <div class="story-card-horizontal" onclick="location.href='producer_story.html'">
-                <div class="story-image-box">
-                    <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=200&auto=format&fit=crop" alt="김평택 농부님">
-                </div>
-                <div class="story-content-box">
-                    <div class="story-farm-name">김평택 농부님</div>
-                    <div class="story-title">무농약 제철 채소 전문<br><span style="color:#E69138;">⭐ 4.9 (단골 128명)</span></div>
-                </div>
+            <div class="producer-grid">
+            <div class="producer-card" onclick="location.href='producer_story.html'">
+                <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=200&auto=format&fit=crop" alt="생산자" class="producer-img">
+                <h3 class="producer-name">김평택 농부님</h3>
+                <p class="producer-desc">무농약 제철 채소 전문<br>⭐ 4.9 (단골 128명)</p>
+                <button class="btn-follow">농장 구경하기</button>
             </div>
-
-            <div class="story-card-horizontal" onclick="location.href='producer_story.html'">
-                <div class="story-image-box">
-                    <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=200&auto=format&fit=crop" alt="자연꼬꼬 농장">
-                </div>
-                <div class="story-content-box">
-                    <div class="story-farm-name">자연꼬꼬 농장</div>
-                    <div class="story-title">당일 산란 신선 유정란<br><span style="color:#E69138;">⭐ 4.8 (단골 95명)</span></div>
-                </div>
+            <div class="producer-card" onclick="location.href='producer_story.html'">
+                <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=200&auto=format&fit=crop" alt="생산자" class="producer-img">
+                <h3 class="producer-name">자연꼬꼬 농장</h3>
+                <p class="producer-desc">당일 산란 신선 유정란<br>⭐ 4.8 (단골 95명)</p>
+                <button class="btn-follow">농장 구경하기</button>
             </div>
-
-            <div class="story-card-horizontal" onclick="location.href='producer_story.html'">
-                <div class="story-image-box">
-                    <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=200&auto=format&fit=crop" alt="반려사랑 수제공방">
-                </div>
-                <div class="story-content-box">
-                    <div class="story-farm-name">반려사랑 수제공방</div>
-                    <div class="story-title">프리미엄 펫푸드 & 용품<br><span style="color:#E69138;">⭐ 5.0 (단골 210명)</span></div>
-                </div>
+            <div class="producer-card" onclick="location.href='producer_story.html'">
+                <img src="https://images.unsplash.com/photo-1581578731548-c64695cc6952?q=80&w=200&auto=format&fit=crop" alt="생산자" class="producer-img">
+                <h3 class="producer-name">반려사랑 수제공방</h3>
+                <p class="producer-desc">프리미엄 펫푸드 & 용품<br>⭐ 5.0 (단골 210명)</p>
+                <button class="btn-follow">농장 구경하기</button>
             </div>
-
-            <div class="story-card-horizontal" onclick="location.href='producer_story.html'">
-                <div class="story-image-box">
-                    <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=200&auto=format&fit=crop" alt="물소리 수족관">
-                </div>
-                <div class="story-content-box">
-                    <div class="story-farm-name">물소리 수족관</div>
-                    <div class="story-title">관상어 및 수초 전문<br><span style="color:#E69138;">⭐ 4.7 (단골 64명)</span></div>
-                </div>
+            <div class="producer-card" onclick="location.href='producer_story.html'">
+                <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=200&auto=format&fit=crop" alt="생산자" class="producer-img">
+                <h3 class="producer-name">물소리 수족관</h3>
+                <p class="producer-desc">관상어 및 수초 전문<br>⭐ 4.7 (단골 64명)</p>
+                <button class="btn-follow">농장 구경하기</button>
             </div>
-
         </div>
     </section>
 
