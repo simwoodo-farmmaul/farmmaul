@@ -212,9 +212,9 @@ app.delete('/api/board/:id', (req, res) => {
 // 🌟 [상품 등록 창구] 화면에서 보낸 데이터를 DB에 저장
 // ==========================================
 app.post('/api/products', (req, res) => {
-    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade } = req.body;
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, image } = req.body;
     
-    // 1. 팜마을 전용 상품 테이블(farm_products)이 없다면 완벽한 구조로 자동 생성합니다.
+    // 1. 팜마을 전용 상품 테이블(farm_products)에 image 칸을 추가하여 자동 생성합니다.
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS farm_products (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -225,6 +225,7 @@ app.post('/api/products', (req, res) => {
             sale_price INT DEFAULT 0,
             p_date VARCHAR(50),
             p_grade VARCHAR(50),
+            image LONGTEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `;
@@ -238,11 +239,49 @@ app.post('/api/products', (req, res) => {
         // 2. 완벽하게 준비된 새 금고 상자에 데이터를 안전하게 집어넣습니다.
         const insertQuery = `
             INSERT INTO farm_products 
-            (farm_name, category, title, org_price, sale_price, p_date, p_grade) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (farm_name, category, title, org_price, sale_price, p_date, p_grade, image) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
                 
-           db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade], (insertErr, result) => {
+           db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image], (insertErr, result) => {
+            if (insertErr) {
+                console.error('상품 DB 저장 중 에러 발생:', insertErr);
+                return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+            }
+            res.json({ success: true, message: '상품 등록 완료!' });
+        });
+    });
+});
+
+// ==========================================
+// 🌟 [상품 목록 가져오기 창구] DB에 저장된 상품들을 최신순으로 전달
+// ==========================================
+app.get('/api/products', (req, res) => {
+    db.query(`SELECT * FROM farm_products ORDER BY created_at DESC`, (err, results) => {
+        if(err) {
+            console.error('상품 목록 불러오기 실패:', err);
+            return res.json({ success: false, data: [] });
+        }
+        res.json({ success: true, data: results });
+    });
+});
+
+// ==========================================
+// 🌟 [상품 상세 정보 가져오기 창구] 특정 ID의 상품 한 개 전달 (상세페이지용)
+// ==========================================
+app.get('/api/products/:id', (req, res) => {
+    db.query(`SELECT * FROM farm_products WHERE id = ?`, [req.params.id], (err, result) => {
+        if(err) {
+            console.error('상품 상세 불러오기 실패:', err);
+            return res.status(500).json({ success: false });
+        }
+        if(result.length > 0) {
+            res.json({ success: true, data: result[0] });
+        } else {
+            res.json({ success: false, message: '상품을 찾을 수 없습니다.' });
+        }
+    });
+});
             if (insertErr) {
                 console.error('상품 DB 저장 중 에러 발생:', insertErr);
                 return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });

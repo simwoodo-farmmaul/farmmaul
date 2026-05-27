@@ -731,12 +731,12 @@
                 container.innerHTML = ''; // 기존의 가짜 샘플 카드들을 무조건 깨끗하게 청소합니다!
                 
                 if (result.data.length > 0) {
-                    result.data.forEach(product => {
-                        // 현재 사진 저장은 개발 전이므로 기본 스마트 팜 연동용 대표 이미지를 띄웁니다.
-                        const imgUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
-                        
-                        const itemHtml = `
-                            <div class="product-card" onclick="location.href='detail.html?id=${product.id}'">
+            result.data.forEach(product => {
+                    // 🌟 금고(DB)에 진짜 저장된 상품 사진을 불러오고, 없을 때만 기본 토마토 이미지를 사용합니다.
+                    const imgUrl = product.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
+                    
+                    const itemHtml = `
+                        <div class="product-card" onclick="location.href='detail.html?id=${product.id}'">
                                 <div class="product-image" style="background-image: url('${imgUrl}');"></div>
                                 <div class="product-info">
                                     <h3>${product.title}</h3>
