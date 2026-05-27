@@ -210,18 +210,41 @@ app.delete('/api/board/:id', (req, res) => {
 app.post('/api/products', (req, res) => {
     const { farmName, category, title, orgPrice, salePrice, pDate, pGrade } = req.body;
     
-    const query = `
-        INSERT INTO products 
-        (farmName, category, title, orgPrice, salePrice, pDate, pGrade) 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+    // 1. 팜마을 전용 상품 테이블(farm_products)이 없다면 완벽한 구조로 자동 생성합니다.
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_products (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            farm_name VARCHAR(255),
+            category VARCHAR(100),
+            title VARCHAR(255) NOT NULL,
+            org_price INT DEFAULT 0,
+            sale_price INT DEFAULT 0,
+            p_date VARCHAR(50),
+            p_grade VARCHAR(50),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
     `;
     
-    db.query(query, [farmName, category, title, orgPrice, salePrice, pDate, pGrade], (err, result) => {
+    db.query(createTableQuery, (err) => {
         if (err) {
-            console.error('상품 DB 저장 중 에러 발생:', err);
-            return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+            console.error('상품 테이블 생성 실패:', err);
+            return res.status(500).json({ success: false, message: '테이블 개설 중 오류가 발생했습니다.' });
         }
-        res.json({ success: true, message: '상품 등록 완료!' });
+        
+        // 2. 완벽하게 준비된 새 금고 상자에 데이터를 안전하게 집어넣습니다.
+        const insertQuery = `
+            INSERT INTO farm_products 
+            (farm_name, category, title, org_price, sale_price, p_date, p_grade) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade], (insertErr, result) => {
+            if (insertErr) {
+                console.error('상품 DB 저장 중 에러 발생:', insertErr);
+                return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+            }
+            res.json({ success: true, message: '상품 등록 완료!' });
+        });
     });
 });
 
