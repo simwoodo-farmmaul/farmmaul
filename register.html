@@ -262,7 +262,7 @@
         </div>
     </div>
 
-    <button class="submit-btn" onclick="alert('팜마을에 상품이 완벽하게 등록되었습니다!')">팜마을 최종 상품 등록하기</button>
+    <button id="btnSubmitProduct" class="submit-btn">팜마을 최종 상품 등록하기</button>
 
     <script>
         // 변수 초기화
@@ -466,6 +466,61 @@
         }
 
         renderTags(); renderCerts(); sync();
+
+        // ==========================================
+        // 🌟 상품 데이터를 서버 DB로 전송하는 배달부 코드 🌟
+        // ==========================================
+        document.getElementById('btnSubmitProduct').addEventListener('click', function() {
+            // 1. 화면에 입력된 필수 정보 가져오기
+            const farmName = document.getElementById('farmName').value || "지산동 영진농원";
+            const title = document.getElementById('title').value;
+            const orgPrice = document.getElementById('orgPrice').value || 0;
+            const salePrice = document.getElementById('salePrice').value || 0;
+            const pDate = document.getElementById('pDate').value;
+            const pGrade = document.getElementById('pGrade').value;
+            
+            // 카테고리 (체크된 라디오 버튼 값)
+            const catEl = document.querySelector('input[name="p_cat"]:checked');
+            const category = catEl ? catEl.value : "농산물";
+
+            // 빈칸 검사 (안전을 위한 방어막)
+            if (!title || !salePrice) {
+                alert("상품 제목과 할인 판매 가격은 꼭 입력해 주세요!");
+                return;
+            }
+
+            // 2. 서버로 보낼 택배 상자(JSON) 포장하기
+            const productData = {
+                farmName: farmName,
+                category: category,
+                title: title,
+                orgPrice: Number(orgPrice),
+                salePrice: Number(salePrice),
+                pDate: pDate,
+                pGrade: pGrade
+                // (추후 사진, 해시태그 등도 여기에 추가하여 보낼 수 있습니다)
+            };
+
+            // 3. 서버 금고 창구('/api/products')로 쏘아 보내기
+            fetch('/api/products', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert('🎉 팜마을에 상품이 완벽하게 등록되었습니다!');
+                    location.href = 'index.html'; // 등록 완료 후 메인 화면으로 자동 이동
+                } else {
+                    alert('등록 실패: ' + data.message);
+                }
+            })
+            .catch(err => {
+                alert('서버 통신 중 오류가 발생했습니다. (백엔드 서버 설정 필요)');
+                console.error(err);
+            });
+        });
     </script>
 </body>
 </html>

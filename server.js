@@ -198,10 +198,31 @@ app.delete('/api/board/:id', (req, res) => {
         });
     } else {
         db.query(`DELETE FROM farm_board WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
-             if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
-             res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
-        });
-    }
+             if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
+             res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
+        });
+    }
+});
+
+// ==========================================
+// 🌟 [상품 등록 창구] 화면에서 보낸 데이터를 DB에 저장
+// ==========================================
+app.post('/api/products', (req, res) => {
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade } = req.body;
+    
+    const query = `
+        INSERT INTO products 
+        (farmName, category, title, orgPrice, salePrice, pDate, pGrade) 
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    
+    db.query(query, [farmName, category, title, orgPrice, salePrice, pDate, pGrade], (err, result) => {
+        if (err) {
+            console.error('상품 DB 저장 중 에러 발생:', err);
+            return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+        }
+        res.json({ success: true, message: '상품 등록 완료!' });
+    });
 });
 
 const PORT = process.env.PORT || 3000;
