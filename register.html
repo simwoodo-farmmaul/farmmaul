@@ -431,41 +431,53 @@
             }
         }
 
-       // 사진 파일 업로드
-        let mainImageBase64 = ""; // 🌟 메인 사진 데이터를 보관할 변수 추가
-        document.getElementById('f_main').addEventListener('change', function() {
-            const f = this.files[0];
-            if(f) {
-                const r = new FileReader();
-                r.onload = (e) => { 
-                    mainImageBase64 = e.target.result; // 🌟 사진 데이터 대입
-                    document.getElementById('pvMainArea').innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover;">`; 
+       // 사진 파일 업로드 및 자동 용량 압축 (Canvas 활용)
+        let mainImageBase64 = ""; 
+        
+        document.getElementById('f_main').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // 🌟 가로, 세로 최대 크기 지정 (이 크기에 맞춰 자동으로 줄어듭니다)
+                    const MAX_WIDTH = 800;
+                    const MAX_HEIGHT = 800;
+                    let width = img.width;
+                    let height = img.height;
+
+                    // 비율을 유지하면서 크기 계산
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
+                    }
+
+                    // 🌟 도화지(캔버스)를 꺼내서 줄어든 크기로 사진을 다시 그립니다
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // 🌟 다시 그린 사진을 가벼운 데이터로 변환 (0.7은 화질을 70%로 맞추어 용량을 대폭 줄인다는 뜻입니다)
+                    mainImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
+
+                    // 화면에 미리보기 띄우기
+                    document.getElementById('pvMainArea').innerHTML = `<img src="${mainImageBase64}" style="width:100%; height:100%; object-fit:cover;">`;
                 };
-                r.readAsDataURL(f);
-            }
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         });
-
-        document.getElementById('f_sub').addEventListener('change', function() {
-            const files = Array.from(this.files);
-            if(contents.length + files.length > 10) return alert("최대 10장까지만 가능합니다.");
-            files.forEach(f => {
-                const r = new FileReader();
-                r.onload = (e) => { contents.push({src: e.target.result, desc: ''}); renderImages(); };
-                r.readAsDataURL(f);
-            });
-            this.value = '';
-        });
-
-        function renderImages() {
-            const l = document.getElementById('editList'); const w = document.getElementById('pvDetail');
-            document.getElementById('f_count').innerText = `➕ 추가 사진 (${contents.length}/10)`;
-            l.innerHTML = ''; w.innerHTML = '';
-            contents.forEach((it, i) => {
-                l.innerHTML += `<div class="image-edit-item"><div class="edit-img-wrap"><img src="${it.src}"></div><div style="flex:1"><textarea placeholder="상세 설명 입력" oninput="contents[${i}].desc=this.value; sync();">${it.desc}</textarea></div></div>`;
-                w.innerHTML += `<div><img style="width:100%; border-radius:15px; margin-top:20px;" src="${it.src}"><div style="padding:15px; line-height:1.7; display:${it.desc?'block':'none'}">${it.desc}</div></div>`;
-            });
-            sync();
-        }
 
         renderTags(); renderCerts(); sync();
 
