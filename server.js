@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname)));
 
 // 🌟 접속자가 없어도 DB 금고가 수면 상태로 빠지지 않도록 'createPool' 적용 완료
 const db = mysql.createPool({
-    host: 'farm-db3', 
+    host: 'localhost', 
     port: 3306, 
     user: 'root', 
     password: 'Farmmaul1234!', 
