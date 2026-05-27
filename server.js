@@ -19,7 +19,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-// 🌟 [수정] 접속자가 없어도 DB 금고가 수면 상태로 빠지지 않도록 'createPool'로 전면 업그레이드합니다.
+// 🌟 접속자가 없어도 DB 금고가 수면 상태로 빠지지 않도록 'createPool' 적용 완료
 const db = mysql.createPool({
     host: 'farm-db3', 
     port: 3306, 
@@ -31,7 +31,6 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-// 풀(Pool) 시스템은 대기 회선을 자동으로 관리하므로 끊김 없이 즉시 명령을 수행합니다.
 db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
 const createEmailMembersTable = `
     CREATE TABLE IF NOT EXISTS farm_email_users (
@@ -45,24 +44,17 @@ const createEmailMembersTable = `
 db.query(createEmailMembersTable, () => {});
 console.log('✅ 데이터베이스 창고 무중단 풀(Pool) 연결 성공!');
 
-const adminNames = ['김영진', '김영진(지산)', '지산'];
+const adminNames = ['김영진', '김영진(지산)', '지산']; 
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
 app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/join.html', (req, res) => res.sendFile(path.join(__dirname, 'join.html')));
 
-// 🌟 [신규] 진짜 이메일 회원가입 처리 창구
 app.post('/api/register', (req, res) => {
     const { name, email, password } = req.body;
-    
-    // 이미 존재하는 이메일인지 먼저 확인
     db.query('SELECT * FROM farm_email_users WHERE email = ?', [email], (err, results) => {
-        if (results && results.length > 0) {
-            return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
-        }
-        
-        // 데이터베이스 창고에 안전하게 저장
+        if (results && results.length > 0) return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
         db.query('INSERT INTO farm_email_users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, result) => {
             if (err) return res.status(500).json({ success: false, message: '가입 처리 중 데이터베이스 오류가 발생했습니다.' });
             res.json({ success: true, message: '팜마을 회원가입이 성공적으로 완료되었습니다! 🎉' });
@@ -70,15 +62,11 @@ app.post('/api/register', (req, res) => {
     });
 });
 
-// 🌟 [신규] 진짜 이메일 로그인 처리 창구
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
-    
     db.query('SELECT * FROM farm_email_users WHERE email = ? AND password = ?', [email, password], (err, results) => {
         if (err) return res.status(500).json({ success: false, message: '로그인 처리 중 오류 발생' });
-        
         if (results && results.length > 0) {
-            // 로그인 성공 시 세션 열쇠 전달 (이름을 닉네임으로 사용)
             req.session.user = { kakaoId: null, nickname: results[0].name, email: results[0].email };
             res.json({ success: true, message: `${results[0].name}님, 반갑습니다!` });
         } else {
@@ -115,17 +103,14 @@ app.get('/auth/kakao/callback', async (req, res) => {
     const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; 
     const REDIRECT_URI = 'https://farmmaul.com/auth/kakao/callback'; 
     if (!authCode) return res.send("<script>alert('인증 코드가 없습니다.'); location.href='/';</script>");
-
     try {
         const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }, body: `grant_type=authorization_code&client_id=${KAKAO_REST_API_KEY}&redirect_uri=${REDIRECT_URI}&code=${authCode}` });
         const tokenData = await tokenResponse.json();
         const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', { headers: { 'Authorization': `Bearer ${tokenData.access_token}` } });
         const userData = await userResponse.json();
-
         const kakaoId = userData.id;
         const nickname = userData.kakao_account?.profile?.nickname || '팜마을 회원';
         const email = userData.kakao_account?.email || '';
-
         db.query(`CREATE TABLE IF NOT EXISTS farm_members (id INT AUTO_INCREMENT PRIMARY KEY, kakao_id BIGINT UNIQUE NOT NULL, nickname VARCHAR(100) NOT NULL, email VARCHAR(100), joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
             db.query(`INSERT INTO farm_members (kakao_id, nickname, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=?`, [kakaoId, nickname, email, nickname], () => {
                 req.session.user = { kakaoId: kakaoId, nickname: nickname };
@@ -145,12 +130,9 @@ app.get('/auth/logout', (req, res) => {
 });
 
 app.post('/api/board', (req, res) => {
-    if (!req.session || !req.session.user) {
-        return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
-    }
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
     const { title, content, youtube_url, images } = req.body;
     const nickname = req.session.user.nickname;
-    
     db.query(`CREATE TABLE IF NOT EXISTS farm_board (id INT AUTO_INCREMENT PRIMARY KEY, nickname VARCHAR(100) NOT NULL, title VARCHAR(255) NOT NULL, content TEXT NOT NULL, youtube_url VARCHAR(500), images LONGTEXT, views INT DEFAULT 0, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
         db.query(`INSERT INTO farm_board (nickname, title, content, youtube_url, images) VALUES (?, ?, ?, ?, ?)`, [nickname, title, content, youtube_url, JSON.stringify(images || [])], () => {
             res.json({ success: true, message: '글이 성공적으로 등록되었습니다!' });
@@ -182,7 +164,6 @@ app.put('/api/board/:id', (req, res) => {
     const postId = req.params.id;
     const { title, content, youtube_url, images } = req.body;
     const nickname = req.session.user.nickname;
-    
     db.query(`UPDATE farm_board SET title=?, content=?, youtube_url=?, images=? WHERE id=? AND nickname=?`, 
     [title, content, youtube_url, JSON.stringify(images || []), postId, nickname], (err, result) => {
          if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '수정 권한이 없습니다.'});
@@ -195,26 +176,24 @@ app.delete('/api/board/:id', (req, res) => {
     const postId = req.params.id;
     const nickname = req.session.user.nickname;
     const isAdmin = adminNames.includes(nickname);
-
     if (isAdmin) {
         db.query(`DELETE FROM farm_board WHERE id=?`, [postId], (err, result) => {
             res.json({ success: true, message: '관리자 권한으로 글을 삭제했습니다.' });
         });
     } else {
         db.query(`DELETE FROM farm_board WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
-             if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
-             res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
-        });
-    }
+             if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
+             res.json({ success: true, message: '글이 안전하게 삭제되었습니다.' });
+        });
+    }
 });
 
 // ==========================================
-// 🌟 [상품 등록 창구] 화면에서 보낸 데이터를 DB에 저장
+// 🌟 [상품 등록 창구] 화면에서 보낸 데이터를 DB에 저장 (사진 포함)
 // ==========================================
 app.post('/api/products', (req, res) => {
     const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, image } = req.body;
     
-    // 1. 팜마을 전용 상품 테이블(farm_products)에 image 칸을 추가하여 자동 생성합니다.
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS farm_products (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -236,14 +215,13 @@ app.post('/api/products', (req, res) => {
             return res.status(500).json({ success: false, message: '테이블 개설 중 오류가 발생했습니다.' });
         }
         
-        // 2. 완벽하게 준비된 새 금고 상자에 데이터를 안전하게 집어넣습니다.
         const insertQuery = `
             INSERT INTO farm_products 
             (farm_name, category, title, org_price, sale_price, p_date, p_grade, image) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
                 
-           db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image], (insertErr, result) => {
+        db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image], (insertErr, result) => {
             if (insertErr) {
                 console.error('상품 DB 저장 중 에러 발생:', insertErr);
                 return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
@@ -254,53 +232,23 @@ app.post('/api/products', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [상품 목록 가져오기 창구] DB에 저장된 상품들을 최신순으로 전달
+// 🌟 [상품 목록 조회 창구] 
 // ==========================================
 app.get('/api/products', (req, res) => {
     db.query(`SELECT * FROM farm_products ORDER BY created_at DESC`, (err, results) => {
-        if(err) {
-            console.error('상품 목록 불러오기 실패:', err);
-            return res.json({ success: false, data: [] });
-        }
+        if(err) return res.json({ success: false, data: [] });
         res.json({ success: true, data: results });
     });
 });
 
 // ==========================================
-// 🌟 [상품 상세 정보 가져오기 창구] 특정 ID의 상품 한 개 전달 (상세페이지용)
+// 🌟 [상품 상세 조회 창구]
 // ==========================================
 app.get('/api/products/:id', (req, res) => {
     db.query(`SELECT * FROM farm_products WHERE id = ?`, [req.params.id], (err, result) => {
-        if(err) {
-            console.error('상품 상세 불러오기 실패:', err);
-            return res.status(500).json({ success: false });
-        }
-        if(result.length > 0) {
-            res.json({ success: true, data: result[0] });
-        } else {
-            res.json({ success: false, message: '상품을 찾을 수 없습니다.' });
-        }
-    });
-});
-            if (insertErr) {
-                console.error('상품 DB 저장 중 에러 발생:', insertErr);
-                return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
-            }
-            res.json({ success: true, message: '상품 등록 완료!' });
-        });
-    });
-});
-
-// ==========================================
-// 🌟 [상품 목록 가져오기 창구] DB에 저장된 상품들을 최신순으로 전달
-// ==========================================
-app.get('/api/products', (req, res) => {
-    db.query(`SELECT * FROM farm_products ORDER BY created_at DESC`, (err, results) => {
-        if(err) {
-            console.error('상품 목록 불러오기 실패:', err);
-            return res.json({ success: false, data: [] });
-        }
-        res.json({ success: true, data: results });
+        if(err) return res.status(500).json({ success: false });
+        if(result.length > 0) res.json({ success: true, data: result[0] });
+        else res.json({ success: false, message: '상품을 찾을 수 없습니다.' });
     });
 });
 
@@ -308,37 +256,21 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 
 // ==========================================
-// [팜마을 관리자] 회사소개 및 약관 DB 연동 API
+// [팜마을 관리자] 회사소개 및 약관 API
 // ==========================================
-
-// 1. DB에서 저장된 약관 내용 불러오기
 app.get('/api/policy/:section', (req, res) => {
     db.query("SELECT content FROM farm_policy WHERE section_name = ?", [req.params.section], (err, results) => {
-        if (err) {
-            console.error("약관 불러오기 에러:", err);
-            return res.status(500).json({ success: false });
-        }
-        if (results.length > 0) {
-            res.json({ success: true, content: results[0].content });
-        } else {
-            res.json({ success: false }); 
-        }
+        if (err) return res.status(500).json({ success: false });
+        if (results.length > 0) res.json({ success: true, content: results[0].content });
+        else res.json({ success: false }); 
     });
 });
 
-// 2. 화면에서 수정한 약관 내용을 DB에 저장하기
 app.post('/api/policy', (req, res) => {
     const { section, content } = req.body;
-    const query = `
-        INSERT INTO farm_policy (section_name, content) 
-        VALUES (?, ?) 
-        ON DUPLICATE KEY UPDATE content = ?
-    `;
+    const query = `INSERT INTO farm_policy (section_name, content) VALUES (?, ?) ON DUPLICATE KEY UPDATE content = ?`;
     db.query(query, [section, content, content], (err, result) => {
-        if (err) {
-            console.error("약관 저장 에러:", err);
-            return res.status(500).json({ success: false });
-        }
+        if (err) return res.status(500).json({ success: false });
         res.json({ success: true });
     });
 });
