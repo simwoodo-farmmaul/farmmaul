@@ -237,14 +237,27 @@ app.post('/api/products', (req, res) => {
             (farm_name, category, title, org_price, sale_price, p_date, p_grade) 
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        
-        db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade], (insertErr, result) => {
+                
+           db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade], (insertErr, result) => {
             if (insertErr) {
                 console.error('상품 DB 저장 중 에러 발생:', insertErr);
                 return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
             }
             res.json({ success: true, message: '상품 등록 완료!' });
         });
+    });
+});
+
+// ==========================================
+// 🌟 [상품 목록 가져오기 창구] DB에 저장된 상품들을 최신순으로 전달
+// ==========================================
+app.get('/api/products', (req, res) => {
+    db.query(`SELECT * FROM farm_products ORDER BY created_at DESC`, (err, results) => {
+        if(err) {
+            console.error('상품 목록 불러오기 실패:', err);
+            return res.json({ success: false, data: [] });
+        }
+        res.json({ success: true, data: results });
     });
 });
 
