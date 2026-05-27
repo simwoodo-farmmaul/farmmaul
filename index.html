@@ -700,6 +700,9 @@
         });
     </script>
 <script>
+
+
+<script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js')
@@ -708,35 +711,35 @@
         });
     }
 </script>
-// 🌟 페이지가 켜질 때 DB 금고에서 진짜 상품 목록을 원격으로 가져와 화면에 그립니다.
-        document.addEventListener("DOMContentLoaded", function() {
-            fetch('/api/products')
-            .then(response => response.json())
-            .then(result => {
-                if(result.success && result.data.length > 0) {
-                    const container = document.getElementById('mainProductContainer');
-                    container.innerHTML = ''; // 기존의 가짜 카드들을 깨끗하게 청소합니다.
+    // 🌟 페이지가 켜질 때 DB 금고에서 진짜 상품 목록을 원격으로 가져와 화면에 그립니다.
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/api/products')
+        .then(response => response.json())
+        .then(result => {
+            if(result.success && result.data.length > 0) {
+                const container = document.getElementById('mainProductContainer');
+                container.innerHTML = ''; // 기존의 가짜 카드들을 깨끗하게 청소합니다.
+                
+                result.data.forEach(product => {
+                    // 현재 사진 저장은 개발 전이므로 기본 스마트 팜 연동용 대표 이미지를 띄웁니다.
+                    const imgUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
                     
-                    result.data.forEach(product => {
-                        // 현재 사진 저장은 개발 전이므로 기본 스마트 팜 연동용 대표 이미지를 띄웁니다.
-                        const imgUrl = 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
-                        
-                        const itemHtml = `
-                            <div class="product-card" onclick="location.href='detail.html?id=${product.id}'">
-                                <div class="product-image" style="background-image: url('${imgUrl}');"></div>
-                                <div class="product-info">
-                                    <h3>${product.title}</h3>
-                                    <div class="price">${Number(product.sale_price).toLocaleString()}원</div>
-                                    <div class="producer">🧑‍🌾 ${product.farm_name}</div>
-                                </div>
+                    const itemHtml = `
+                        <div class="product-card" onclick="location.href='detail.html?id=${product.id}'">
+                            <div class="product-image" style="background-image: url('${imgUrl}');"></div>
+                            <div class="product-info">
+                                <h3>${product.title}</h3>
+                                <div class="price">${Number(product.sale_price).toLocaleString()}원</div>
+                                <div class="producer">🧑‍🌾 ${product.farm_name}</div>
                             </div>
-                        `;
-                        container.insertAdjacentHTML('beforeend', itemHtml);
-                    });
-                }
-            })
-            .catch(error => console.error('메인 상품 리스트 불러오기 실패:', error));
-        });
-    </script>
+                        </div>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            }
+        })
+        .catch(error => console.error('메인 상품 리스트 불러오기 실패:', error));
+    });
+</script>
 </body>
 </html>

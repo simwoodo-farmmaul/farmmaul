@@ -19,29 +19,33 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname)));
 
-const db = mysql.createConnection({
-    host: 'farm-db3', port: 3306, user: 'root', password: 'Farmmaul1234!', database: 'farmmaul_db'
+// 🌟 [수정] 접속자가 없어도 DB 금고가 수면 상태로 빠지지 않도록 'createPool'로 전면 업그레이드합니다.
+const db = mysql.createPool({
+    host: 'farm-db3', 
+    port: 3306, 
+    user: 'root', 
+    password: 'Farmmaul1234!', 
+    database: 'farmmaul_db',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-db.connect((err) => {
-    if (err) { console.error('❌ DB 연결 실패:', err); return; }
-    console.log('✅ 데이터베이스 창고 연결 성공!');
-    db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
-    
-    // 🌟 [중요] 일반 이메일 회원들을 저장할 전용 테이블을 자동으로 개설합니다.
-    const createEmailMembersTable = `
-        CREATE TABLE IF NOT EXISTS farm_email_users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(100) NOT NULL,
-            email VARCHAR(100) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    `;
-    db.query(createEmailMembersTable, () => {});
-});
+// 풀(Pool) 시스템은 대기 회선을 자동으로 관리하므로 끊김 없이 즉시 명령을 수행합니다.
+db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
+const createEmailMembersTable = `
+    CREATE TABLE IF NOT EXISTS farm_email_users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+`;
+db.query(createEmailMembersTable, () => {});
+console.log('✅ 데이터베이스 창고 무중단 풀(Pool) 연결 성공!');
 
-const adminNames = ['김영진', '김영진(지산)', '지산']; 
+const adminNames = ['김영진', '김영진(지산)', '지산'];
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
