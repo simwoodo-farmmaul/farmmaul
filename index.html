@@ -566,10 +566,18 @@
                 <span><strong>통신판매업신고:</strong> 제2026-경기안산-0001호</span>
                 <span><strong>사업장 주소:</strong> 경기도 안산시 상록구 사사안골길 106(사사동)</span>
             </div>
-            <div class="footer-details">
-                <span><strong>고객센터:</strong> 031-419-1151 / 010-3768-2491</span>
-                <span><strong>홈페이지관리:</strong> 010-3967-0919 </span>               
-                <span><strong>이메일:</strong> greenpic@naver.com</span>
+            <div class="footer-details" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; justify-content: space-between; margin-top: 10px;">
+                <div style="flex: 1; min-width: 250px;">
+                    <div style="margin-bottom: 15px;">
+                        <span><strong>고객센터:</strong> 031-419-1151 / 010-3768-2491</span><br>
+                        <span><strong>홈페이지관리:</strong> 010-3967-0919 </span><br>            
+                        <span><strong>이메일:</strong> greenpic@naver.com</span>
+                    </div>
+                </div>
+                <div style="flex: 1; min-width: 250px; max-width: 400px;">
+                    <div style="font-weight: 800; color: #555; margin-bottom: 8px;">📍 오시는 길</div>
+                    <div id="kakao-map" style="width: 100%; height: 160px; border-radius: 10px; border: 1px solid #ddd;"></div>
+                </div>
             </div>
             <div class="footer-copyright">
                 Copyright © 디미가 주식회사 All rights reserved.
@@ -756,7 +764,37 @@
             }
         })
         .catch(error => console.error('메인 상품 리스트 불러오기 실패:', error));
+   });
+</script>
+
+<!-- 카카오 지도 API 및 실행 스크립트 시작 -->
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var mapContainer = document.getElementById('kakao-map'); 
+        if(mapContainer) {
+            var mapOption = {
+                center: new kakao.maps.LatLng(37.288283, 126.883709), // 임시 중심 좌표
+                level: 4 
+            };
+            var map = new kakao.maps.Map(mapContainer, mapOption); 
+            
+            // 주소-좌표 변환 객체를 생성하여 회사 주소를 찾습니다
+            var geocoder = new kakao.maps.services.Geocoder();
+            geocoder.addressSearch('경기도 안산시 상록구 사사안골길 106', function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    var marker = new kakao.maps.Marker({
+                        map: map,
+                        position: coords
+                    });
+                    map.setCenter(coords); // 마커가 있는 곳으로 지도 화면을 이동
+                } 
+            });
+        }
     });
 </script>
+<!-- 카카오 지도 API 스크립트 끝 -->
+
 </body>
 </html>
