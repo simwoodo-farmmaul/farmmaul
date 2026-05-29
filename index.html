@@ -540,6 +540,7 @@
 
 <footer class="company-info">
         <div class="footer-container">
+            <!-- 상단 메뉴 -->
             <div class="footer-links">
                 <a href="policy.html">회사소개</a>
                 <a href="policy.html">이용약관</a>
@@ -547,14 +548,24 @@
                 <a href="qna.html">고객센터</a>
             </div>
             
-            <div class="footer-logo-zone">
-                <a href="index.html" class="logo-text footer-logo-text">
+            <!-- 🛒 장바구니, 📢 공지사항, 📍 오시는 길 버튼이 모여있는 곳 -->
+            <div class="footer-logo-zone" style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                <a href="index.html" class="logo-text footer-logo-text" style="margin-right: 10px;">
                     <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
                 </a>
                 <a href="cart.html" class="footer-nav-link">🛒 장바구니</a>
                 <a href="qna.html" class="footer-nav-link">📢 공지사항</a>
+                
+                <!-- 오시는 길 버튼 -->
+                <div onclick="toggleMap()" style="font-weight: 800; cursor: pointer; display: inline-block; padding: 6px 14px; background: #e8f5e9; color: #2e7d32; border-radius: 8px; border: 1px solid #c8e6c9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">📍 오시는 길 (클릭하여 지도 보기) ⬇️</div>
+            </div>
+
+            <!-- 숨겨진 카카오 지도 영역 -->
+            <div id="map-wrapper" style="display: none; width: 100%; max-width: 400px; margin-bottom: 20px;">
+                <div id="kakao-map" style="width: 100%; height: 200px; border-radius: 10px; border: 1px solid #ddd;"></div>
             </div>
             
+            <!-- 회사 정보 -->
             <div class="footer-details">
                 <span><strong>디미가 주식회사</strong></span>
                 <span><strong>대표자:</strong> 이호선</span>
@@ -567,25 +578,14 @@
                 <span><strong>사업장 주소:</strong> 경기도 안산시 상록구 사사안골길 106(사사동)</span>
             </div>
             
-            <!-- 여기서부터 고객센터와 오시는 길이 찰싹 붙습니다 -->
-            <div class="footer-details" style="display: flex; gap: 15px; align-items: flex-start; margin-top: 15px;">
-                
-                <!-- 왼쪽: 고객센터 정보 -->
-                <div style="line-height: 1.8; white-space: nowrap;">
-                    <span><strong>고객센터:</strong> 031-419-1151 / 010-3768-2491</span><br>
-                    <span><strong>홈페이지관리:</strong> 010-3967-0919 </span><br>               
-                    <span><strong>이메일:</strong> greenpic@naver.com</span>
-                </div>
-
-                <!-- 오른쪽: 오시는 길 버튼 및 숨겨진 지도 -->
-                <div style="width: 100%; max-width: 400px; margin-top: 1px;">
-                    <div onclick="toggleMap()" style="font-weight: 800; cursor: pointer; display: inline-block; padding: 6px 14px; background: #e8f5e9; color: #2e7d32; border-radius: 8px; border: 1px solid #c8e6c9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">📍 오시는 길 (클릭하여 지도 보기) ⬇️</div>
-                    <div id="map-wrapper" style="display: none; width: 100%; margin-top: 10px;">
-                        <div id="kakao-map" style="width: 100%; height: 200px; border-radius: 10px; border: 1px solid #ddd;"></div>
-                    </div>
-                </div>
-
-            </div>            
+            <!-- 원상복구된 하단 고객센터 연락처 -->
+            <div class="footer-details" style="line-height: 1.8; margin-top: 15px;">
+                <span><strong>고객센터:</strong> 031-419-1151 / 010-3768-2491</span><br>
+                <span><strong>홈페이지관리:</strong> 010-3967-0919 </span><br>               
+                <span><strong>이메일:</strong> greenpic@naver.com</span>
+            </div>
+            
+            <!-- 카피라이트 -->
             <div class="footer-copyright" style="margin-top: 20px;">
                 Copyright © 디미가 주식회사 All rights reserved.
             </div>
