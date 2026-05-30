@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 명인 약초꾼</title>
+    <style>
+        :root { --herb-dark: #2e7d32; --bg-color: #f9fbf9; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding-bottom: 50px; color: #333; }
+        
+        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .title { font-weight: 900; font-size: 1.3rem; color: var(--herb-dark); }
+        
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
+        .page-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 30px; text-align: center; color: #222; }
+
+        .gatherer-list { display: flex; flex-direction: column; gap: 20px; }
+        .g-card { background: #fff; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: 1px solid #eaeaea; display: flex; gap: 25px; align-items: center; }
+        .g-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #e8f5e9; flex-shrink: 0; }
+        .g-info { flex: 1; }
+        .g-name { font-size: 1.4rem; font-weight: 900; color: #222; margin-bottom: 8px; }
+        .g-desc { font-size: 1rem; color: #555; line-height: 1.5; margin-bottom: 12px; }
+        .g-tags span { display: inline-block; background: #f1f8e9; color: var(--herb-dark); padding: 5px 10px; border-radius: 6px; font-weight: 800; font-size: 0.85rem; margin-right: 6px; margin-bottom: 6px; }
+        
+        .g-action { text-align: right; }
+        .btn-contact { background: var(--herb-dark); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 900; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn-contact:hover { background: #1b5e20; }
+
+        @media (max-width: 768px) {
+            .g-card { flex-direction: column; text-align: center; }
+            .g-action { text-align: center; width: 100%; margin-top: 10px; }
+            .btn-contact { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="herb.html" style="text-decoration: none; font-size: 1.2rem; font-weight: 900; color: #333;">←</a>
+        <div class="title">🧑‍🌾 팜마을 명인 약초꾼</div>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">자연을 빚는 팜마을의 약초 명인들</div>
+        
+        <div class="gatherer-list" id="gathererArea">
+            <div class="g-card">
+                <img src="https://images.unsplash.com/photo-1595874223259-86641e5f0131?q=80&w=300&auto=format&fit=crop" class="g-img">
+                <div class="g-info">
+                    <div class="g-name">지리산 털보 심마니</div>
+                    <div class="g-desc">평생을 산과 함께하며 야생 산삼과 영지버섯을 채취해 왔습니다. 자연이 허락한 만큼만 거두어 정성껏 보내드립니다.</div>
+                    <div class="g-tags"><span>#야생산삼</span><span>#영지버섯</span><span>#직접채취</span></div>
+                </div>
+                <div class="g-action">
+                    <a href="index.html" class="btn-contact">판매 상품 보기</a>
+                </div>
+            </div>
+
+            <div class="g-card">
+                <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=300&auto=format&fit=crop" class="g-img">
+                <div class="g-info">
+                    <div class="g-name">약초 짓는 할매</div>
+                    <div class="g-desc">가족이 먹는다는 생각으로 당귀와 헛개나무를 직접 캐고 깨끗하게 말려 수제 약초차를 덖습니다.</div>
+                    <div class="g-tags"><span>#수제약초차</span><span>#당귀</span><span>#정성건조</span></div>
+                </div>
+                <div class="g-action">
+                    <a href="index.html" class="btn-contact">판매 상품 보기</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

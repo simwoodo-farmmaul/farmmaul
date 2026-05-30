@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 신선 약초 장터</title>
+    <style>
+        :root { --herb-dark: #2e7d32; --bg-color: #f9fbf9; --primary-orange: #E69138; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding-bottom: 50px; color: #333; }
+        
+        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .title { font-weight: 900; font-size: 1.3rem; color: var(--herb-dark); }
+        
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .page-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 30px; text-align: center; color: #222; }
+
+        /* 상품 그리드 */
+        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eaeaea; cursor: pointer; transition: 0.2s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); border-color: var(--herb-dark); }
+        .product-image { width: 100%; height: 200px; background-size: cover; background-position: center; background-color: #eee; position: relative; }
+        .badge-wild { position: absolute; top: 10px; left: 10px; background: var(--herb-dark); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 900; }
+        .product-info { padding: 15px; }
+        .product-info h3 { font-size: 1.1rem; margin-bottom: 8px; color: #222; font-weight: 900; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .product-info .price { font-size: 1.3rem; font-weight: bold; color: var(--primary-orange); }
+        .product-info .producer { font-size: 0.95rem; color: #666; margin-top: 8px; font-weight: 600; }
+        .empty-msg { grid-column: 1 / -1; text-align: center; padding: 50px; font-size: 1.1rem; color: #888; font-weight: 700; background: #fff; border-radius: 15px; border: 1px dashed #ccc; }
+
+        @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; } .product-image { height: 160px; } }
+        @media (max-width: 768px) { .page-title { font-size: 1.5rem; } }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="herb.html" style="text-decoration: none; font-size: 1.2rem; font-weight: 900; color: #333;">←</a>
+        <div class="title">🌱 팜마을 신선 약초 장터</div>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">방금 캐온 신선 약초 & 건강즙</div>
+        
+        <div class="product-grid" id="herbProductList">
+            <!-- 서버에서 약초 상품을 불러와 여기에 그립니다 -->
+            <div class="empty-msg">약초 상품을 불러오는 중입니다...🌿</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/products')
+            .then(res => res.json())
+            .then(result => {
+                const list = document.getElementById('herbProductList');
+                if (result.success) {
+                    // 서버 전체 상품 중 '#약초' 태그가 포함된 상품만 필터링합니다.
+                    const herbs = result.data.filter(p => p.tags && p.tags.includes('약초'));
+                    
+                    if (herbs.length === 0) {
+                        list.innerHTML = '<div class="empty-msg">아직 등록된 약초 상품이 없습니다.<br>첫 번째 약초를 등록해 보세요! 🌿</div>';
+                        return;
+                    }
+                    
+                    list.innerHTML = ''; // 로딩 메시지 지우기
+                    
+                    herbs.forEach(p => {
+                        let priceHtml = '';
+                        if (p.org_price && p.org_price > p.sale_price) {
+                            priceHtml += `<span style="text-decoration:line-through; color:#aaa; font-size:0.95rem; margin-right:6px;">${Number(p.org_price).toLocaleString()}원</span>`;
+                        }
+                        priceHtml += `${Number(p.sale_price).toLocaleString()}원`;
+
+                        list.innerHTML += `
+                        <div class="product-card" onclick="location.href='detail.html?id=${p.id}'">
+                            <div class="product-image" style="background-image: url('${p.image || ''}');">
+                                <span class="badge-wild">${p.category}</span>
+                            </div>
+                            <div class="product-info">
+                                <h3>${p.title}</h3>
+                                <div class="price">${priceHtml}</div>
+                                <div class="producer">🧑‍🌾 ${p.farm_name || '팜마을 농가'}</div>
+                            </div>
+                        </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<div class="empty-msg">상품을 불러오는데 실패했습니다.</div>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('herbProductList').innerHTML = '<div class="empty-msg">서버 통신 오류가 발생했습니다.</div>';
+            });
+        });
+    </script>
+</body>
+</html>

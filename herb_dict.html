@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 약초 도감</title>
+    <style>
+        :root { --herb-dark: #2e7d32; --bg-color: #f9fbf9; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding-bottom: 50px; color: #333; }
+        
+        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .title { font-weight: 900; font-size: 1.3rem; color: var(--herb-dark); }
+        
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .page-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 30px; text-align: center; color: #222; }
+
+        .dict-list { display: flex; flex-direction: column; gap: 15px; }
+        .dict-card { background: #fff; border-radius: 12px; border: 1px solid #eee; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.03); }
+        .dict-header { padding: 20px; display: flex; align-items: center; gap: 15px; cursor: pointer; background: #fff; transition: 0.2s; }
+        .dict-header:hover { background: #f1f8e9; }
+        .dict-icon { font-size: 2rem; background: #e8f5e9; width: 60px; height: 60px; border-radius: 12px; display: flex; justify-content: center; align-items: center; flex-shrink: 0; }
+        .dict-title-area { flex: 1; }
+        .dict-title-area h4 { font-size: 1.2rem; font-weight: 900; margin: 0 0 5px 0; color: #222; }
+        .dict-title-area p { font-size: 0.95rem; margin: 0; color: #666; }
+        
+        .dict-body { padding: 20px; border-top: 1px dashed #ddd; background: #fafafa; display: none; line-height: 1.7; font-size: 1.05rem; color: #444; }
+        .dict-body.active { display: block; }
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="herb.html" style="text-decoration: none; font-size: 1.2rem; font-weight: 900; color: #333;">←</a>
+        <div class="title">📖 팜마을 약초 도감</div>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="page-title">올바른 약초 복용법 & 지식 공유방</div>
+        
+        <div class="dict-list">
+            <div class="dict-card">
+                <div class="dict-header" onclick="toggleDict(this)">
+                    <div class="dict-icon">🌿</div>
+                    <div class="dict-title-area">
+                        <h4>면역력을 높이는 3대 약초 달임법</h4>
+                        <p>당귀, 황기, 백작약의 황금 비율과 끓이는 시간</p>
+                    </div>
+                </div>
+                <div class="dict-body">
+                    <strong>[달임법 핵심 요약]</strong><br><br>
+                    1. <b>당귀, 황기, 백작약</b>을 1:1:1 비율로 준비합니다.<br>
+                    2. 흐르는 물에 가볍게 씻어 먼지를 제거합니다.<br>
+                    3. 물 2L에 약초를 넣고 강불에서 끓이다가, 물이 끓기 시작하면 약불로 줄여 1시간 정도 푹 달여냅니다.<br><br>
+                    이 달임물은 평택 지산동의 맑은 공기를 마시고 자란 약초들과 특히 궁합이 좋으며, 환절기 기력 회복에 탁월한 효과가 있습니다.
+                </div>
+            </div>
+
+            <div class="dict-card">
+                <div class="dict-header" onclick="toggleDict(this)">
+                    <div class="dict-icon">🥃</div>
+                    <div class="dict-title-area">
+                        <h4>자연산 약초 담금주 담그는 비법</h4>
+                        <p>초보자도 실패 없는 도수 선택과 숙성 보관 요령</p>
+                    </div>
+                </div>
+                <div class="dict-body">
+                    <strong>[담금주 성공 비법]</strong><br><br>
+                    생약초의 경우 수분이 많으므로 <b>30도 이상의 담금용 소주</b>를 사용해야 부패를 막을 수 있습니다. 건재를 사용할 때는 25도 소주도 무방합니다.<br>
+                    햇빛이 들지 않는 서늘한 곳에 최소 6개월 이상 숙성해야 약성이 충분히 우러나오며, 1년이 지나면 약초 건더기를 걸러내고 맑은 술만 보관하는 것이 좋습니다.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleDict(el) {
+            const body = el.nextElementSibling;
+            if(body.classList.contains('active')) {
+                body.classList.remove('active');
+            } else {
+                // 열려있는 다른 창 모두 닫기
+                document.querySelectorAll('.dict-body').forEach(b => b.classList.remove('active'));
+                body.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
