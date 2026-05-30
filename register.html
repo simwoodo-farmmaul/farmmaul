@@ -444,26 +444,13 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    const MAX_WIDTH = 800;
-                    const MAX_HEIGHT = 800;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > MAX_WIDTH) {
-                            height *= MAX_WIDTH / width;
-                            width = MAX_WIDTH;
-                        }
-                    } else {
-                        if (height > MAX_HEIGHT) {
-                            width *= MAX_HEIGHT / height;
-                            height = MAX_HEIGHT;
-                        }
-                    }
+                    const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
+                    let width = img.width; let height = img.height;
+                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
 
                     const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
+                    canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
@@ -475,20 +462,72 @@
             reader.readAsDataURL(file);
         });
 
-        // 초기 화면 세팅
+        // ★ 10장 추가 사진 + 설명글 등록 로직 ★
+        document.getElementById('f_sub').addEventListener('change', function(event) {
+            const files = event.target.files;
+            if(!files || files.length === 0) return;
+            
+            if(contents.length + files.length > 10) {
+                alert('추가 사진은 최대 10장까지만 등록 가능합니다.');
+                return;
+            }
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
+                        let width = img.width; let height = img.height;
+                        if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                        else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                        
+                        const canvas = document.createElement('canvas');
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        contents.push({ img: canvas.toDataURL('image/jpeg', 0.7), text: '' });
+                        renderContents();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function renderContents() {
+            const list = document.getElementById('editList');
+            list.innerHTML = '';
+            document.getElementById('f_count').innerText = `추가 사진 (${contents.length}/10)`;
+            
+            contents.forEach((c, i) => {
+                list.innerHTML += `
+                    <div class="image-edit-item">
+                        <div class="edit-img-wrap"><img src="${c.img}"></div>
+                        <div style="flex:1; display:flex; flex-direction:column; gap:5px;">
+                            <textarea placeholder="이 사진에 대한 설명을 적어주세요 (상세페이지에 노출됩니다)" style="flex:1; padding:10px;" oninput="contents[${i}].text=this.value; sync();">${c.text}</textarea>
+                            <button onclick="contents.splice(${i},1); renderContents(); sync();" style="align-self:flex-end; background:#ff5e62; color:#fff; border:none; padding:5px 12px; border-radius:5px; font-weight:800; cursor:pointer;">삭제</button>
+                        </div>
+                    </div>
+                `;
+            });
+            sync();
+        }
+
         renderTags(); renderCerts(); sync();
 
         // ==========================================
-        // 🌟 수정 모드 확인 및 기존 데이터 불러오기 🌟
+        // 🌟 수정 모드 시 서버에서 기존 데이터 복구 🌟
         // ==========================================
-        const urlParamsObj = new URLSearchParams(window.location.search);
-        const editIdValue = urlParamsObj.get('edit');
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('edit');
 
-        if (editIdValue) {
+        if (editId) {
             document.getElementById('btnSubmitProduct').innerText = "팜마을 상품 수정 완료하기";
             document.querySelector('.header span').innerText = "FarmMaul 상품 수정 관리자";
 
-            fetch('/api/products/' + editIdValue)
+            fetch('/api/products/' + editId)
             .then(res => res.json())
             .then(result => {
                 if(result.success) {
@@ -510,6 +549,21 @@
                         document.getElementById('pvMainArea').innerHTML = `<img src="${mainImageBase64}" style="width:100%; height:100%; object-fit:cover;">`;
                     }
                     
+                    // 해시태그 서버 동기화 복구
+                    if(p.tags) {
+                        activeTags = p.tags.split(',');
+                        activeTags.forEach(t => { if(t && !tags.includes(t)) tags.push(t); });
+                        renderTags();
+                    }
+
+                    // 추가 사진 및 설명 복구
+                    if(p.content_data) {
+                        try {
+                            contents = JSON.parse(p.content_data);
+                            renderContents();
+                        } catch(e) {}
+                    }
+                    
                     if(p.delivery) {
                         document.getElementById('chk_p').checked = p.delivery.includes('방문수거');
                         document.getElementById('chk_h').checked = p.delivery.includes('HUB보관');
@@ -525,7 +579,7 @@
         }
 
         // ==========================================
-        // 🌟 상품 데이터를 서버 DB로 전송하는 배달부 코드 🌟
+        // 🌟 상품 데이터를 서버 DB로 최종 전송 🌟
         // ==========================================
         document.getElementById('btnSubmitProduct').addEventListener('click', function() {
             const farmName = document.getElementById('farmName').value || "지산동 영진농원";
@@ -558,11 +612,13 @@
                 pDate: pDate,
                 pGrade: pGrade,
                 image: mainImageBase64,
-                delivery: deliveryOptions.join(',') 
+                delivery: deliveryOptions.join(','),
+                tags: activeTags.join(','), // 서버로 태그 전송
+                contentData: JSON.stringify(contents) // 서버로 10장 사진/글 전송
             };
 
-            const fetchUrl = editIdValue ? '/api/products/' + editIdValue : '/api/products';
-            const fetchMethod = editIdValue ? 'PUT' : 'POST';
+            const fetchUrl = editId ? '/api/products/' + editId : '/api/products';
+            const fetchMethod = editId ? 'PUT' : 'POST';
 
             fetch(fetchUrl, {
                 method: fetchMethod,
@@ -572,7 +628,7 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    alert(editIdValue ? '✨ 상품이 성공적으로 수정되었습니다!' : '🎉 팜마을에 상품이 완벽하게 등록되었습니다!');
+                    alert(editId ? '✨ 상품이 성공적으로 수정되었습니다!' : '🎉 팜마을에 상품이 완벽하게 등록되었습니다!');
                     location.href = 'index.html'; 
                 } else {
                     alert('처리 실패: ' + data.message);

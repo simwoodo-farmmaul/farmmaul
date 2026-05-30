@@ -314,22 +314,29 @@
             const mapArea = document.getElementById('mapGuideArea');
             const mapTitle = document.getElementById('mapInfoTitle');
             const mapAddr = document.getElementById('mapAddress');
+            const mapPlaceholder = document.querySelector('.map-placeholder'); // 지도 화면 영역
 
             if(option === '방문수거') {
                 mapArea.style.display = 'block';
                 mapTitle.innerHTML = '📍 방문 장소 확인';
-                mapAddr.innerText = '경기도 평택시 지산동 123-4 영진농원 정문';
+                const addr = '경기도 평택시 지산동 123-4'; // 등록된 주소
+                mapAddr.innerText = addr + ' 영진농원 정문';
+                mapPlaceholder.innerHTML = `<iframe src="http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(addr)}&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0; border-radius:10px;"></iframe>`;
+                mapPlaceholder.style.background = 'transparent';
             } else if(option === 'HUB보관') {
                 mapArea.style.display = 'block';
                 const hub = document.getElementById('selectedHub').value;
                 mapTitle.innerHTML = `📍 ${hub} 위치 확인`;
-                if(hub.includes('1호 카페')) mapAddr.innerText = '평택시 지산동 55-1 카페초록 앞';
-                else mapAddr.innerText = '송탄역 2번 출구 앞 제일편의점';
+                let addr = '';
+                if(hub.includes('1호 카페')) addr = '경기도 평택시 지산동 55-1';
+                else addr = '경기도 평택시 지산동 793'; // 송탄역 부근 임의 좌표
+                mapAddr.innerText = addr;
+                mapPlaceholder.innerHTML = `<iframe src="http://googleusercontent.com/maps.google.com/maps?q=${encodeURIComponent(addr)}&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0; border-radius:10px;"></iframe>`;
+                mapPlaceholder.style.background = 'transparent';
             } else {
                 mapArea.style.display = 'none';
             }
         }
-
         // ★ 장바구니에 진짜로 데이터를 저장하는 기능 ★
         function addToCart() {
             // 1. 화면에 있는 상품 이름과 선택한 수령 방식을 읽어옵니다.
@@ -420,10 +427,45 @@
                         } else {
                             youtubeBox.style.display = 'none';
                         }
+
+                        // ★ 1. 상품 분류(카테고리) 뱃지 연동
+                        const catBadge = document.querySelector('.category-badge');
+                        if (catBadge) catBadge.innerText = p.category || '농산물';
+
+                        // ★ 2. 해시태그 연동
+                        const tagsContainer = document.querySelector('.tags');
+                        if (tagsContainer && p.tags) {
+                            tagsContainer.innerHTML = p.tags.split(',').filter(t => t).map(t => `<span>#${t.trim()}</span>`).join('');
+                        }
+
+                        // ★ 3. 추가 사진 및 설명 연동
+                        const detailSection = document.querySelector('.bottom-section');
+                        if (p.content_data) {
+                            try {
+                                const contents = JSON.parse(p.content_data);
+                                if (contents.length > 0) {
+                                    // 기존 가짜 샘플 블록 지우기
+                                    const oldBlocks = detailSection.querySelectorAll('.detail-block');
+                                    oldBlocks.forEach(b => b.remove());
+                                    
+                                    // FAQ 타이틀 위에 차례대로 추가하기
+                                    const faqTitle = Array.from(detailSection.querySelectorAll('h2.sec-title')).find(h => h.innerText.includes('FAQ'));
+                                    
+                                    contents.forEach(c => {
+                                        const block = document.createElement('div');
+                                        block.className = 'detail-block';
+                                        block.innerHTML = `
+                                            <img src="${c.img}" class="detail-img" alt="상세 사진">
+                                            <div class="detail-text">${c.text ? c.text.replace(/\n/g, '<br>') : '상세 설명이 없습니다.'}</div>
+                                        `;
+                                        detailSection.insertBefore(block, faqTitle);
+                                    });
+                                }
+                            } catch(e) {}
+                        }
                         
                         // 하단 회색 요약 박스의 등급과 날짜도 등록한 정보로 바꿉니다.
-                        const summaryValues = document.querySelectorAll('.s-value');
-                        if (summaryValues.length >= 3) {
+                        const summaryValues = document.querySelectorAll('.s-value');                        if (summaryValues.length >= 3) {
                             summaryValues[0].innerText = p.p_grade || '일반';
                             summaryValues[2].innerText = p.p_date || '-';
                         }
