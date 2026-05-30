@@ -264,8 +264,8 @@
 
     <button id="btnSubmitProduct" class="submit-btn">팜마을 최종 상품 등록하기</button>
 
-    <script>
-        // 변수 초기화
+   <script>
+        // 1. 변수 초기화 및 해시태그 기본값 설정
         let contents = [];
         let faqs = [];
         let tags = JSON.parse(localStorage.getItem('farm_tags')) || ['산지직송', '무농약', '지산동', '당일수확'];
@@ -281,7 +281,7 @@
             el.style.display = el.style.display === 'block' ? 'none' : 'block';
         }
 
-        // 해시태그 함수
+        // 해시태그 함수 (기본값 지원 및 추가/삭제 기능)
         function addTag() {
             const v = document.getElementById('tagIn').value.trim();
             if(v && !tags.includes(v)) { 
@@ -342,7 +342,7 @@
             sync(); 
         }
 
-        // 전체 데이터 실시간 동기화
+        // 전체 데이터 실시간 동기화 (미리보기 화면 연동)
         function sync() {
             try {
                 document.getElementById('pvFarm').innerText = document.getElementById('farmName').value || "지산동 영진농원";
@@ -431,7 +431,7 @@
             }
         }
 
-       // 사진 파일 업로드 및 자동 용량 압축 (Canvas 활용)
+        // 사진 파일 업로드 및 자동 용량 압축 (Canvas 활용)
         let mainImageBase64 = ""; 
         
         document.getElementById('f_main').addEventListener('change', function(event) {
@@ -442,13 +442,11 @@
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // 🌟 가로, 세로 최대 크기 지정 (이 크기에 맞춰 자동으로 줄어듭니다)
                     const MAX_WIDTH = 800;
                     const MAX_HEIGHT = 800;
                     let width = img.width;
                     let height = img.height;
 
-                    // 비율을 유지하면서 크기 계산
                     if (width > height) {
                         if (width > MAX_WIDTH) {
                             height *= MAX_WIDTH / width;
@@ -461,17 +459,13 @@
                         }
                     }
 
-                    // 🌟 도화지(캔버스)를 꺼내서 줄어든 크기로 사진을 다시 그립니다
                     const canvas = document.createElement('canvas');
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // 🌟 다시 그린 사진을 가벼운 데이터로 변환 (0.7은 화질을 70%로 맞추어 용량을 대폭 줄인다는 뜻입니다)
                     mainImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
-
-                    // 화면에 미리보기 띄우기
                     document.getElementById('pvMainArea').innerHTML = `<img src="${mainImageBase64}" style="width:100%; height:100%; object-fit:cover;">`;
                 };
                 img.src = e.target.result;
@@ -479,59 +473,20 @@
             reader.readAsDataURL(file);
         });
 
+        // 초기 화면 세팅
         renderTags(); renderCerts(); sync();
 
         // ==========================================
-        // 🌟 상품 데이터를 서버 DB로 전송하는 배달부 코드 🌟
+        // 🌟 수정 모드 확인 및 기존 데이터 불러오기 🌟
         // ==========================================
-        const urlParams = new URLSearchParams(window.location.search);
-        const editId = urlParams.get('edit');
+        const urlParamsObj = new URLSearchParams(window.location.search);
+        const editIdValue = urlParamsObj.get('edit');
 
-        if (editId) {
-            // 버튼과 상단 타이틀을 수정 모드에 맞게 변경합니다.
+        if (editIdValue) {
             document.getElementById('btnSubmitProduct').innerText = "팜마을 상품 수정 완료하기";
             document.querySelector('.header span').innerText = "FarmMaul 상품 수정 관리자";
 
-            // 서버에서 기존 상품 정보를 가져와 빈칸에 채워 넣습니다.
-            fetch('/api/products/' + editId)
-            .then(res => res.json())
-            .then(result => {
-                if(result.success) {
-                    const p = result.data;
-                    document.getElementById('farmName').value = p.farm_name || '';
-                    document.getElementById('title').value = p.title || '';
-                    document.getElementById('orgPrice').value = p.org_price || '';
-                    document.getElementById('salePrice').value = p.sale_price || '';
-                    if (p.p_date) document.getElementById('pDate').value = p.p_date;
-                    if (p.p_grade) document.getElementById('pGrade').value = p.p_grade;
-                    
-                    // 카테고리 선택 버튼 복구
-                    const catRadios = document.getElementsByName('p_cat');
-                    for(let i=0; i<catRadios.length; i++) {
-                        if(catRadios[i].value === p.category) catRadios[i].checked = true;
-                    }
-
-                    // 등록했던 메인 사진 복구
-                    if(p.image) {
-                        mainImageBase64 = p.image;
-                        document.getElementById('pvMainArea').innerHTML = `<img src="${mainImageBase64}" style="width:100%; height:100%; object-fit:cover;">`;
-                    }
-                    sync(); // 채워진 데이터로 미리보기 화면 새로고침
-                }
-            });
-        }
-
-        // ==========================================
-        // 🌟 상품 데이터를 서버 DB로 전송하는 배달부 코드 (등록/수정 공통) 🌟
-        // ==========================================
-        const urlParams = new URLSearchParams(window.location.search);
-        const editId = urlParams.get('edit');
-
-        if (editId) {
-            document.getElementById('btnSubmitProduct').innerText = "팜마을 상품 수정 완료하기";
-            document.querySelector('.header span').innerText = "FarmMaul 상품 수정 관리자";
-
-            fetch('/api/products/' + editId)
+            fetch('/api/products/' + editIdValue)
             .then(res => res.json())
             .then(result => {
                 if(result.success) {
@@ -553,7 +508,6 @@
                         document.getElementById('pvMainArea').innerHTML = `<img src="${mainImageBase64}" style="width:100%; height:100%; object-fit:cover;">`;
                     }
                     
-                    // 배송 방식 체크박스 복구
                     if(p.delivery) {
                         document.getElementById('chk_p').checked = p.delivery.includes('방문수거');
                         document.getElementById('chk_h').checked = p.delivery.includes('HUB보관');
@@ -587,7 +541,6 @@
                 return;
             }
 
-            // 체크된 배송 방법 수집
             let deliveryOptions = [];
             if(document.getElementById('chk_p').checked) deliveryOptions.push("방문수거");
             if(document.getElementById('chk_h').checked) deliveryOptions.push("HUB보관");
@@ -606,8 +559,8 @@
                 delivery: deliveryOptions.join(',') 
             };
 
-            const fetchUrl = editId ? '/api/products/' + editId : '/api/products';
-            const fetchMethod = editId ? 'PUT' : 'POST';
+            const fetchUrl = editIdValue ? '/api/products/' + editIdValue : '/api/products';
+            const fetchMethod = editIdValue ? 'PUT' : 'POST';
 
             fetch(fetchUrl, {
                 method: fetchMethod,
@@ -617,7 +570,7 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    alert(editId ? '✨ 상품이 성공적으로 수정되었습니다!' : '🎉 팜마을에 상품이 완벽하게 등록되었습니다!');
+                    alert(editIdValue ? '✨ 상품이 성공적으로 수정되었습니다!' : '🎉 팜마을에 상품이 완벽하게 등록되었습니다!');
                     location.href = 'index.html'; 
                 } else {
                     alert('처리 실패: ' + data.message);
