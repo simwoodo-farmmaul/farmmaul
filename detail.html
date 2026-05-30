@@ -390,14 +390,20 @@
                         // 3. 꿀토마토로 고정되어 있던 글자와 사진을 진짜 정보로 싹 바꿉니다.
                         document.querySelector('.prod-title').innerText = p.title;
                         document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
-                        document.querySelector('.farm-name').innerText = '🧑‍🌾 ' + p.farm_name;
+                        document.querySelector('.farm-name').innerText = '🧑‍🌾 ' + (p.farm_name || '지산동 영진농원');
                         
-                        // 원가가 0원이면 숨기고, 입력했으면 할인 전 가격으로 보여줍니다.
-                        if (p.org_price && p.org_price > 0) {
+                        // 원가가 0원이면 숨기고, 입력했으면 할인율(%)과 원래 가격을 계산해서 보여줍니다.
+                        if (p.org_price && p.org_price > 0 && p.org_price > p.sale_price) {
                             document.querySelector('.org-price').innerText = Number(p.org_price).toLocaleString() + '원';
+                            // 등록된 가격에 맞춰 세일 퍼센트(%)를 자동으로 계산합니다.
+                            document.querySelector('.discount').innerText = Math.round(((p.org_price - p.sale_price) / p.org_price) * 100) + '%';
+                            
+                            // 혹시 숨겨져 있었다면 다시 보이도록 처리
+                            document.querySelector('.org-price').style.display = 'inline';
+                            document.querySelector('.discount').style.display = 'inline';
                         } else {
                             document.querySelector('.org-price').style.display = 'none';
-                            document.querySelector('.discount').style.display = 'none'; // 원가가 없으면 % 세일 마크도 숨김
+                            document.querySelector('.discount').style.display = 'none';
                         }
 
                         // 등록된 사진이 있다면 메인 사진도 교체합니다.
@@ -411,6 +417,25 @@
                             summaryValues[0].innerText = p.p_grade || '일반';
                             summaryValues[2].innerText = p.p_date || '-';
                         }
+
+                        // ★ 허용되지 않은 수령 방식(라디오 버튼) 숨기기 ★
+                        const delOptions = p.delivery || '방문수거,HUB보관,택배배송'; 
+                        
+                        const rdo_p = document.querySelector('input[value="방문수거"]').closest('.radio-label');
+                        const rdo_h = document.querySelector('input[value="HUB보관"]').closest('.radio-label');
+                        const rdo_d = document.querySelector('input[value="택배배송"]').closest('.radio-label');
+
+                        // 설정한 것만 block으로 보여주고, 안 한 것은 none으로 숨깁니다.
+                        rdo_p.style.display = delOptions.includes('방문수거') ? 'block' : 'none';
+                        rdo_h.style.display = delOptions.includes('HUB보관') ? 'block' : 'none';
+                        rdo_d.style.display = delOptions.includes('택배배송') ? 'block' : 'none';
+
+                        // 화면에 남아있는 첫 번째 옵션을 자동으로 기본 선택해 줍니다.
+                        if(delOptions.includes('방문수거')) document.querySelector('input[value="방문수거"]').checked = true;
+                        else if(delOptions.includes('HUB보관')) document.querySelector('input[value="HUB보관"]').checked = true;
+                        else if(delOptions.includes('택배배송')) document.querySelector('input[value="택배배송"]').checked = true;
+
+                        updateMap(); // 변경된 기본 선택에 맞게 지도 안내창 갱신
                     }
                 })
                 .catch(error => console.error('상세페이지 데이터 불러오기 실패:', error));
