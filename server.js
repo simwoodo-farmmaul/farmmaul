@@ -231,6 +231,7 @@ app.post('/api/products', (req, res) => {
         });
     });
 });
+
 // ==========================================
 // 🌟 [상품 목록 조회 창구] 
 // ==========================================
@@ -267,11 +268,10 @@ app.put('/api/products/:id', (req, res) => {
                     WHERE id=?
                 `;
                 db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery || '방문수거', tags || '', contentData || '[]', req.params.id], (err, result) => {
-            if (err) {
-                console.error('상품 DB 수정 중 에러 발생:', err);
-                return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
-            }
-            res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+                    if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
+                    res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+                });
+            });
         });
     });
 });
