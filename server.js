@@ -253,14 +253,21 @@ app.get('/api/products/:id', (req, res) => {
 // ==========================================
 app.put('/api/products/:id', (req, res) => {
     const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery } = req.body;
-    const updateQuery = `
-        UPDATE farm_products 
-        SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, image=?, delivery=? 
-        WHERE id=?
-    `;
-    db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery || '방문수거', req.params.id], (err, result) => {
-        if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
-        res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+    
+    // 수정을 먼저 시도할 경우를 대비하여, 배송방법(delivery) 컬럼을 안전하게 확인하고 추가합니다.
+    db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
+        const updateQuery = `
+            UPDATE farm_products 
+            SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, image=?, delivery=? 
+            WHERE id=?
+        `;
+        db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery || '방문수거', req.params.id], (err, result) => {
+            if (err) {
+                console.error('상품 DB 수정 중 에러 발생:', err);
+                return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
+            }
+            res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+        });
     });
 });
 
