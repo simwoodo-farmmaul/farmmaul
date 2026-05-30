@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 약초관 마스터 관리자</title>
+    <style>
+        :root { --herb-dark: #2e7d32; --bg-color: #f1f3f5; }
+        body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding-bottom: 50px; color: #333; }
+        
+        .header { background: #fff; padding: 15px 20px; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .title { font-weight: 900; font-size: 1.3rem; color: var(--herb-dark); }
+        
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; display: flex; flex-direction: column; gap: 30px; }
+        
+        .admin-card { background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--herb-dark); }
+        .card-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 800; margin-bottom: 8px; font-size: 0.95rem; }
+        .form-group input, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; box-sizing: border-box; outline: none; }
+        .form-group textarea { height: 100px; resize: vertical; }
+        
+        .btn-submit { background: var(--herb-dark); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.2s; }
+        .btn-submit:hover { background: #1b5e20; }
+        
+        .link-btn { display: block; background: #e8f5e9; color: var(--herb-dark); text-align: center; padding: 15px; border-radius: 8px; font-weight: 900; text-decoration: none; font-size: 1.1rem; border: 1px solid #c8e6c9; }
+        .link-btn:hover { background: #c8e6c9; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <a href="herb.html" style="text-decoration: none; font-size: 1.2rem; font-weight: 900; color: #333;">← 돌아가기</a>
+        <div class="title">🌿 약초관 마스터 관리자</div>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="container">
+        
+        <!-- 1. 약초 상품 등록 (기존 register.html로 연결) -->
+        <div class="admin-card">
+            <div class="card-title">🛒 1. 약초 상품 등록 및 관리</div>
+            <p style="font-size: 0.95rem; color: #666; margin-bottom: 20px;">생약초, 건재, 건강즙 등을 장터에 등록합니다. 등록 시 상품 분류를 '약초/건강'으로 선택해 주세요.</p>
+            <a href="register.html" class="link-btn">👉 약초 상품 등록 페이지로 이동</a>
+        </div>
+
+        <!-- 2. 약초꾼(심마니) 프로필 등록 -->
+        <div class="admin-card">
+            <div class="card-title">🧑‍🌾 2. 명인 약초꾼 프로필 등록</div>
+            <div class="form-group">
+                <label>약초꾼 이름 또는 상호명</label>
+                <input type="text" id="g_name" placeholder="예: 지리산 털보 심마니">
+            </div>
+            <div class="form-group">
+                <label>한 줄 소개 (전문 분야)</label>
+                <input type="text" id="g_desc" placeholder="예: 40년 경력, 야생 산삼 및 영지버섯 전문">
+            </div>
+            <div class="form-group">
+                <label>대표 해시태그 (쉼표로 구분)</label>
+                <input type="text" id="g_tags" placeholder="예: 산삼, 영지버섯, 직접채취">
+            </div>
+            <div class="form-group">
+                <label>프로필 사진 URL (또는 파일 업로드 예정)</label>
+                <input type="text" id="g_img" placeholder="사진 주소를 입력하세요">
+            </div>
+            <button class="btn-submit" onclick="submitGatherer()">약초꾼 명단에 등록하기</button>
+        </div>
+
+        <!-- 3. 약초 도감 지식 글쓰기 -->
+        <div class="admin-card">
+            <div class="card-title">📖 3. 팜마을 약초 도감 글쓰기</div>
+            <div class="form-group">
+                <label>도감 제목</label>
+                <input type="text" id="d_title" placeholder="예: 면역력을 높이는 3대 약초 달임법">
+            </div>
+            <div class="form-group">
+                <label>핵심 요약 (부제목)</label>
+                <input type="text" id="d_sub" placeholder="예: 당귀, 황기, 백작약의 황금 비율">
+            </div>
+            <div class="form-group">
+                <label>도감 상세 내용</label>
+                <textarea id="d_content" placeholder="약초의 효능, 먹는 방법, 주의사항 등을 상세히 적어주세요."></textarea>
+            </div>
+            <div class="form-group">
+                <label>대표 아이콘 (이모지)</label>
+                <input type="text" id="d_icon" placeholder="예: 🌿, 🍵, 🥃" style="width: 100px; text-align: center; font-size: 1.5rem;">
+            </div>
+            <button class="btn-submit" onclick="submitDict()">도감 지식 등록하기</button>
+        </div>
+
+    </div>
+
+    <script>
+        function submitGatherer() {
+            const name = document.getElementById('g_name').value;
+            const desc = document.getElementById('g_desc').value;
+            if(!name || !desc) {
+                alert('약초꾼 이름과 소개를 입력해 주세요!');
+                return;
+            }
+            // 임시 저장 알림 (추후 server.js와 연동 가능)
+            alert(`[${name}] 명인님의 프로필이 팜마을 약초꾼 명단에 성공적으로 임시 등록되었습니다! 🌿`);
+            
+            // 입력칸 비우기
+            document.getElementById('g_name').value = '';
+            document.getElementById('g_desc').value = '';
+            document.getElementById('g_tags').value = '';
+            document.getElementById('g_img').value = '';
+        }
+
+        function submitDict() {
+            const title = document.getElementById('d_title').value;
+            const content = document.getElementById('d_content').value;
+            if(!title || !content) {
+                alert('도감 제목과 상세 내용을 입력해 주세요!');
+                return;
+            }
+            // 임시 저장 알림 (추후 server.js와 연동 가능)
+            alert(`[${title}] 도감 지식이 성공적으로 발행되었습니다! 📖`);
+            
+            // 입력칸 비우기
+            document.getElementById('d_title').value = '';
+            document.getElementById('d_sub').value = '';
+            document.getElementById('d_content').value = '';
+            document.getElementById('d_icon').value = '';
+        }
+    </script>
+</body>
+</html>
