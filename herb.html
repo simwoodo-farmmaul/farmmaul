@@ -3,11 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팜마을 - 신선한 약초</title>
-
-    <link rel="icon" type="image/webp" href="farmmaul.webp">
-    <link rel="apple-touch-icon" href="farmmaul.webp">
-
+    <title>팜마을 - 청정 약초관</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
@@ -15,64 +11,84 @@
             --primary-green: #87B32E;
             --primary-orange: #E69138;
             --primary-blue: #4B9AD2;
+            --herb-dark: #2e7d32;
             --bg-color: #f9fbf9;
             --text-dark: #333;
             --text-light: #666;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
-        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 65px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; word-break: keep-all; }
+        body { background-color: var(--bg-color); color: var(--text-dark); }
         a { text-decoration: none; color: inherit; }
-        
+
         /* 헤더 (메인과 동일) */
         header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; }
-        .logo-leaf { font-size: 1.8rem; -webkit-text-fill-color: initial; }
-        .location-picker { font-size: 1.05rem; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 8px; background: #f1f3f5; margin-left: 20px; display: inline-block; }
+        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); }
+        .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
+        .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; }
+
+        /* 약초 전용 히어로 배너 */
+        .herb-hero { background: linear-gradient(135deg, rgba(46,125,50,0.8) 0%, rgba(135,179,46,0.9) 100%), url('https://images.unsplash.com/photo-1540420773420-3366772f4999?q=80&w=1200&auto=format&fit=crop') center/cover; color: white; text-align: center; padding: 60px 20px 90px; }
+        .herb-title { font-size: 2.2rem; font-weight: 900; margin-bottom: 10px; text-shadow: 0px 2px 5px rgba(0,0,0,0.3); }
+        .herb-subtitle { font-size: 1.15rem; font-weight: bold; text-shadow: 0px 1px 4px rgba(0,0,0,0.3); opacity: 0.95; }
+
+        /* 약초 4대 하부 카테고리 */
+        .herb-menu-grid { max-width: 1200px; margin: -50px auto 50px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; padding: 0 20px; position: relative; z-index: 10; }
+        .herb-menu-box { background: #fff; border-radius: 18px; padding: 25px 10px; text-align: center; box-shadow: 0 6px 20px rgba(0,0,0,0.08); border: 2px solid #e8f5e9; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+        .herb-menu-box:hover { transform: translateY(-8px); box-shadow: 0 10px 25px rgba(0,0,0,0.12); border-color: var(--herb-dark); }
+        .herb-menu-box .icon { font-size: 3rem; display: block; margin-bottom: 15px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+        .herb-menu-box .title { font-size: 1.15rem; font-weight: 900; color: #111; margin-bottom: 5px; }
+        .herb-menu-box .desc { font-size: 0.85rem; color: #666; font-weight: 600; word-break: keep-all; line-height: 1.4; }
+
+        /* 공통 섹션 */
+        .common-section { max-width: 1200px; margin: 0 auto 70px; padding: 0 20px; }
+        .section-title { font-size: 1.6rem; color: var(--text-dark); margin-bottom: 25px; border-left: 5px solid var(--herb-dark); padding-left: 12px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; }
         
-        /* 카테고리 전용 상단 배너 (약초 테마) */
-        .category-hero {
-            background: linear-gradient(135deg, #6bc75a 0%, #388e3c 100%);
-            color: white; text-align: center; padding: 50px 20px; margin-bottom: 30px;
-        }
-        .category-hero h1 { font-size: 2.4rem; margin-bottom: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .category-hero p { font-size: 1.1rem; opacity: 0.9; }
+        /* 약초꾼 이야기 카드 */
+        .gatherer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        .gatherer-card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eaeaea; transition: transform 0.2s; display: flex; align-items: center; padding: 20px; cursor: pointer; }
+        .gatherer-card:hover { transform: translateY(-5px); border-color: var(--herb-dark); }
+        .gatherer-img { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid #e8f5e9; margin-right: 20px; }
+        .gatherer-info h3 { font-size: 1.2rem; font-weight: 900; color: #222; margin-bottom: 5px; }
+        .gatherer-info p { font-size: 0.95rem; color: #555; margin-bottom: 8px; line-height: 1.4; }
+        .gatherer-tags span { font-size: 0.8rem; background: #f1f8e9; color: var(--herb-dark); padding: 4px 8px; border-radius: 6px; font-weight: 800; margin-right: 5px; }
 
-        /* 필터 및 정렬 바 */
-        .filter-bar {
-            max-width: 1200px; margin: 0 auto 20px; padding: 0 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .item-count { font-weight: 700; color: var(--text-dark); }
-        .item-count span { color: var(--primary-green); }
-        .sort-select { padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; font-weight: 600; outline: none; cursor: pointer; }
-
-        /* 상품 그리드 (메인과 동일) */
-        .product-grid { max-width: 1200px; margin: 0 auto 60px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-        .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eaeaea; transition: transform 0.2s; cursor: pointer; }
+        /* 상품 그리드 (기존 메인과 동일한 규격) */
+        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eaeaea; cursor: pointer; transition: 0.2s; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        .product-image { width: 100%; height: 200px; background-color: #f0f0f0; object-fit: cover; }
+        .product-image { width: 100%; height: 200px; background-size: cover; background-position: center; position: relative; }
+        .badge-wild { position: absolute; top: 10px; left: 10px; background: var(--herb-dark); color: white; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 900; }
         .product-info { padding: 15px; }
-        .product-info h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-dark); }
+        .product-info h3 { font-size: 1.1rem; margin-bottom: 8px; color: #222; }
         .product-info .price { font-size: 1.2rem; font-weight: bold; color: var(--primary-orange); }
         .product-info .producer { font-size: 0.9rem; color: var(--text-light); margin-top: 5px; }
 
-        /* 모바일 하단 메뉴 */
-        .mobile-bottom-nav { display: none; }
+        /* 약초 도감 리스트 */
+        .herb-dict-list { display: flex; flex-direction: column; gap: 15px; }
+        .dict-item { background: #fff; padding: 20px; border-radius: 12px; border: 1px solid #eee; display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.2s; }
+        .dict-item:hover { background: #f9fbf9; border-color: var(--herb-dark); }
+        .dict-left { display: flex; align-items: center; gap: 15px; }
+        .dict-icon { font-size: 2rem; background: #e8f5e9; width: 60px; height: 60px; border-radius: 12px; display: flex; justify-content: center; align-items: center; }
+        .dict-text h4 { font-size: 1.15rem; font-weight: 900; color: #222; margin-bottom: 4px; }
+        .dict-text p { font-size: 0.9rem; color: #666; }
+        .dict-arrow { color: #ccc; font-weight: bold; font-size: 1.2rem; }
 
-        /* 반응형 */
-        @media (max-width: 768px) {
-            .header-container { flex-direction: column; gap: 10px; }
-            .location-picker { margin-left: 0; }
-            .category-hero { padding: 30px 20px; }
-            .category-hero h1 { font-size: 1.8rem; }
+        @media (max-width: 1024px) {
+            .herb-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .gatherer-grid { grid-template-columns: 1fr; }
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .product-image { height: 140px; }
-            
-            .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; justify-content: space-around; align-items: center; border-top: 1px solid #eaeaea; }
-            .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.75rem; font-weight: 600; width: 25%; }
-            .nav-item .icon { font-size: 1.3rem; }
+            .product-image { height: 160px; }
+        }
+        @media (max-width: 768px) {
+            .herb-title { font-size: 1.8rem; }
+            .herb-subtitle { font-size: 1rem; }
+            .herb-menu-box { padding: 15px 10px; }
+            .herb-menu-box .icon { font-size: 2.2rem; margin-bottom: 10px; }
+            .herb-menu-box .title { font-size: 1rem; }
+            .herb-menu-box .desc { font-size: 0.75rem; }
+            .section-title { font-size: 1.3rem; }
         }
     </style>
 </head>
@@ -80,76 +96,159 @@
 
     <header>
         <div class="header-container">
-            <a href="index.html" class="logo-text">
-                <span class="logo-leaf">🌱</span>팜마을
-            </a>
-            <div class="location-picker">📍 평택시 지산동 ▾</div>
+            <div style="display: flex; align-items: center;">
+                <a href="index.html" class="header-back">←</a>
+                <a href="index.html" class="logo-text">
+                    <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
+                </a>
+            </div>
         </div>
     </header>
 
-    <div class="category-hero">
-        <h1>🌿 신선한 지역 약초</h1>
-        <p>우리 동네 산과 들에서 자란 건강한 약초를 만나보세요.</p>
-    </div>
+    <section class="herb-hero">
+        <div class="herb-title">자연이 품은 보약, 팜마을 약초관</div>
+        <div class="herb-subtitle">깊은 산골 약초꾼이 캔 생명력을 그대로 전해드립니다.</div>
+    </section>
 
-    <div class="filter-bar">
-        <div class="item-count">총 <span>24</span>개의 상품</div>
-        <select class="sort-select">
-            <option>최신등록순</option>
-            <option>인기순</option>
-            <option>낮은가격순</option>
-        </select>
-    </div>
-
-    <div class="product-grid">
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1596547609652-9fc5d8d42e4b?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>자연산 말린 쑥 500g</h3>
-                <div class="price">18,000원</div>
-                <div class="producer">🧑‍🌾 평택시 지산동 김약초님</div>
-            </div>
+    <!-- 🌟 핵심: 4가지 하부 카테고리 -->
+    <div class="herb-menu-grid">
+        <div class="herb-menu-box" onclick="alert('약초꾼 이야기 페이지로 이동합니다.')">
+            <span class="icon">🧑‍🌾</span>
+            <div class="title">심마니·약초꾼</div>
+            <div class="desc">전문 채취인의 진솔한 산행기와 단골 맺기</div>
         </div>
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1628157731776-80db2687fcc8?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>산지직송 생 칡뿌리 1kg</h3>
-                <div class="price">22,000원</div>
-                <div class="producer">🧑‍🌾 평택시 송탄 생산자</div>
-            </div>
+        <div class="herb-menu-box" onclick="alert('생약초/건재 장터로 이동합니다.')">
+            <span class="icon">🌱</span>
+            <div class="title">생약초·건재</div>
+            <div class="desc">자연산 생약초와 볕에 말린 정성 가득 건재</div>
         </div>
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1596547610115-373307b2203e?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>햇 당귀 뿌리 300g</h3>
-                <div class="price">35,000원</div>
-                <div class="producer">🧑‍🌾 오산시 생산자 (HUB보관)</div>
-            </div>
+        <div class="herb-menu-box" onclick="alert('건강즙/약초차 장터로 이동합니다.')">
+            <span class="icon">🍵</span>
+            <div class="title">건강즙·약초차</div>
+            <div class="desc">달여 먹기 편한 즙, 차, 그리고 담금주 재료</div>
         </div>
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1611162458324-aae1eb4129a4?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>직접 덖은 뽕잎차 세트</h3>
-                <div class="price">15,000원</div>
-                <div class="producer">🧑‍🌾 안성시 생산자</div>
-            </div>
+        <div class="herb-menu-box" onclick="alert('약초 도감 페이지로 이동합니다.')">
+            <span class="icon">📖</span>
+            <div class="title">약초 도감</div>
+            <div class="desc">계절별 약초 효능과 올바른 복용법 공유방</div>
         </div>
     </div>
 
-    <div class="mobile-bottom-nav">
-        <a href="index.html" class="nav-item">
-            <span class="icon">🏠</span><span class="text">홈</span>
-        </a>
-        <a href="search_result.html" class="nav-item">
-            <span class="icon">🔍</span><span class="text">동네검색</span>
-        </a>
-        <a href="chat.html" class="nav-item">
-            <span class="icon">💬</span><span class="text">채팅</span>
-        </a>
-        <a href="mypage.html" class="nav-item">
-            <span class="icon">👤</span><span class="text">내정보</span>
-        </a>
-    </div>
+    <!-- 약초꾼 소개 섹션 -->
+    <section class="common-section">
+        <h2 class="section-title">우리 동네 명인 약초꾼</h2>
+        <div class="gatherer-grid">
+            <div class="gatherer-card">
+                <img src="https://images.unsplash.com/photo-1595874223259-86641e5f0131?q=80&w=200&auto=format&fit=crop" class="gatherer-img" alt="약초꾼">
+                <div class="gatherer-info">
+                    <h3>지리산 털보 심마니</h3>
+                    <p>40년 경력, 야생 산삼 및 영지버섯 전문 채취인입니다.</p>
+                    <div class="gatherer-tags"><span>#산삼</span><span>#영지버섯</span></div>
+                </div>
+            </div>
+            <div class="gatherer-card">
+                <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=200&auto=format&fit=crop" class="gatherer-img" alt="약초꾼">
+                <div class="gatherer-info">
+                    <h3>약초 짓는 할매</h3>
+                    <p>직접 캔 당귀와 헛개나무로 정성껏 약초차를 덖습니다.</p>
+                    <div class="gatherer-tags"><span>#수제약초차</span><span>#당귀</span></div>
+                </div>
+            </div>
+            <div class="gatherer-card">
+                <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=200&auto=format&fit=crop" class="gatherer-img" alt="약초꾼">
+                <div class="gatherer-info">
+                    <h3>자연애 약초방</h3>
+                    <p>깨끗한 환경에서 세척하고 건조한 최고급 건재만 취급합니다.</p>
+                    <div class="gatherer-tags"><span>#건재장터</span><span>#도라지</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 방금 올라온 약초 상품 섹션 -->
+    <section class="common-section">
+        <h2 class="section-title">
+            <span>방금 캐온 신선 약초 장터</span>
+            <a href="register.html" style="font-size: 0.85rem; background: var(--herb-dark); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; cursor: pointer;">+ 약초 등록</a>
+        </h2>
+        <div class="product-grid">
+            <div class="product-card" onclick="location.href='detail.html'">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1596547609652-9cb5d8d736a6?q=80&w=400&auto=format&fit=crop');">
+                    <span class="badge-wild">자연산</span>
+                </div>
+                <div class="product-info">
+                    <h3>야생 참당귀 뿌리 (생물) 500g</h3>
+                    <div class="price">35,000원</div>
+                    <div class="producer">🧑‍🌾 지리산 털보 심마니</div>
+                </div>
+            </div>
+            <div class="product-card" onclick="location.href='detail.html'">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1611078813735-bc324fcce199?q=80&w=400&auto=format&fit=crop');"></div>
+                <div class="product-info">
+                    <h3>햇 구기자 도라지 건강즙 30포</h3>
+                    <div class="price">42,000원</div>
+                    <div class="producer">🧑‍🌾 약초 짓는 할매 (HUB보관)</div>
+                </div>
+            </div>
+            <div class="product-card" onclick="location.href='detail.html'">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1582210928929-e88df6eecc84?q=80&w=400&auto=format&fit=crop');">
+                    <span class="badge-wild">특품</span>
+                </div>
+                <div class="product-info">
+                    <h3>자연 건조 산수유 열매 1kg</h3>
+                    <div class="price">28,000원</div>
+                    <div class="producer">🧑‍🌾 자연애 약초방</div>
+                </div>
+            </div>
+            <div class="product-card" onclick="location.href='detail.html'">
+                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1555519808-16e537d97b39?q=80&w=400&auto=format&fit=crop');">
+                    <span class="badge-wild">자연산</span>
+                </div>
+                <div class="product-info">
+                    <h3>자연산 상황버섯 300g</h3>
+                    <div class="price">85,000원</div>
+                    <div class="producer">🧑‍🌾 강원도 약초마을</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 약초 도감 지식 섹션 -->
+    <section class="common-section">
+        <h2 class="section-title">팜마을 약초 도감 & 비법</h2>
+        <div class="herb-dict-list">
+            <div class="dict-item">
+                <div class="dict-left">
+                    <div class="dict-icon">🌿</div>
+                    <div class="dict-text">
+                        <h4>면역력을 높이는 3대 약초 달임법</h4>
+                        <p>당귀, 황기, 백작약의 황금 비율과 끓이는 시간</p>
+                    </div>
+                </div>
+                <div class="dict-arrow">›</div>
+            </div>
+            <div class="dict-item">
+                <div class="dict-left">
+                    <div class="dict-icon">🥃</div>
+                    <div class="dict-text">
+                        <h4>자연산 약초 담금주 담그는 비법</h4>
+                        <p>초보자도 실패 없는 도수 선택과 숙성 보관 요령</p>
+                    </div>
+                </div>
+                <div class="dict-arrow">›</div>
+            </div>
+            <div class="dict-item">
+                <div class="dict-left">
+                    <div class="dict-icon">📖</div>
+                    <div class="dict-text">
+                        <h4>알쏭달쏭 약초 유사종 구별하기</h4>
+                        <p>독초와 헷갈리기 쉬운 산나물/약초 완벽 구별 가이드</p>
+                    </div>
+                </div>
+                <div class="dict-arrow">›</div>
+            </div>
+        </div>
+    </section>
 
 </body>
 </html>
