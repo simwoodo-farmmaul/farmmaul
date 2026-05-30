@@ -278,14 +278,25 @@
         </div>
     </header>
 
-    <section class="hero">
+        <section class="hero">
         <div class="hero-title">우리동네 신선한 먹거리</div>
         <div class="hero-subtitle">생산자 직거래 HUB 수령까지</div>
         <div class="search-bar">
-            <input type="text" placeholder="어떤 상품을 찾으시나요?">
-            <button onclick="location.href='search_result.html'">🔍</button>
+            <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
+            <button onclick="executeSearch()">🔍</button>
         </div>
     </section>
+
+    <script>
+        function executeSearch() {
+            // 입력창에 적힌 글자를 가져옵니다.
+            const searchInput = document.getElementById('mainSearchInput');
+            const keyword = searchInput.value.trim(); // 앞뒤 불필요한 공백 제거
+            
+            // 주소 뒤에 '?keyword=입력한글자'를 붙여서 결과 페이지로 이동시킵니다.
+            location.href = 'search_result.html?keyword=' + encodeURIComponent(keyword);
+        }
+    </script>
 
     <div class="main-categories">
         <div class="category-box box-agri" onclick="location.href='search_result.html'"><span class="icon">🌱</span><span class="title">농산물</span></div>
@@ -300,105 +311,11 @@
             <a href="register.html" style="font-size: 0.85rem; background: var(--primary-orange); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none;">+ 상품 등록하기</a>
         </h2>
         <div class="product-grid" id="mainProductContainer">
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>무농약 찰토마토 2kg</h3>
-                    <div class="price">15,000원</div>
-                    <div class="producer">🧑‍🌾 평택시 비전동 생산자</div>
-                </div>
+            <!-- 진짜 서버(DB)에서 상품 목록을 불러와 이곳에 자동으로 채웁니다. -->
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888; font-weight: 800;">
+                서버에서 동네 상품 정보를 불러오는 중입니다... 🌱
             </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>반려동물용 친환경 수제 방석</h3>
-                    <div class="price">25,000원</div>
-                    <div class="producer">🧑‍🌾 평택시 고덕동 생산자</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>오늘 낳은 신선 유정란 10구</h3>
-                    <div class="price">6,500원</div>
-                    <div class="producer">🧑‍🌾 오산시 생산자 (HUB보관)</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>수제 관상어 사료 세트</h3>
-                    <div class="price">12,000원</div>
-                    <div class="producer">🧑‍🌾 수원시 생산자</div>
-                </div>
-            </div>
-
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>무농약 찰토마토 2kg</h3>
-                    <div class="price">15,000원</div>
-                    <div class="producer">🧑‍🌾 평택시 비전동 생산자</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>반려동물용 친환경 수제 방석</h3>
-                    <div class="price">25,000원</div>
-                    <div class="producer">🧑‍🌾 평택시 고덕동 생산자</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>오늘 낳은 신선 유정란 10구</h3>
-                    <div class="price">6,500원</div>
-                    <div class="producer">🧑‍🌾 오산시 생산자 (HUB보관)</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>수제 관상어 사료 세트</h3>
-                    <div class="price">12,000원</div>
-                    <div class="producer">🧑‍🌾 수원시 생산자</div>
-                </div>
-            </div>
-
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>무농약 찰토마토 2kg</h3>
-                    <div class="price">15,000원</div>
-                    <div class="producer">🧑‍🌾 평택시 비전동 생산자</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1583337130417-3346a1be7dee?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>반려동물용 친환경 수제 방석</h3>
-                    <div class="price">25,000원</div>
-                    <div class="producer">🧑‍🌾 평택시 고덕동 생산자</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1506976785307-8732e854ad03?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>오늘 낳은 신선 유정란 10구</h3>
-                    <div class="price">6,500원</div>
-                    <div class="producer">🧑‍🌾 오산시 생산자 (HUB보관)</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1524704654690-b56c05c78a00?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>수제 관상어 사료 세트</h3>
-                    <div class="price">12,000원</div>
-                    <div class="producer">🧑‍🌾 수원시 생산자</div>
-                </div>
-            </div>
-        </div>
+        </div>    
     </section>
 
     <section class="common-section">
@@ -599,7 +516,23 @@
         </div>
     </footer>
 
+    <!-- 어르신을 위한 글자 확대 스타일 추가 -->
+    <style>
+        /* 글자 확대 버튼 디자인 */
+        .floating-menu .float-zoom { background: var(--primary-blue); }
+        .floating-menu .float-zoom .icon { font-size: 1.4rem; margin-bottom: 2px; }
+        .floating-menu .float-zoom .text { font-size: 0.75rem; font-weight: 800; }
+        
+        /* 돋보기 모드 (글자 크기를 15% 확대) */
+        html.large-font { font-size: 115%; }
+    </style>
+
     <div class="floating-menu">
+        <!-- 글자 확대/축소 버튼 -->
+        <a href="#" class="float-btn float-zoom" onclick="toggleZoom(); return false;" id="zoomBtn">
+            <span class="icon">🔍</span>
+            <span class="text" id="zoomText">큰글씨</span>
+        </a>
         <a href="chat.html" class="float-btn float-chat">
             <span class="icon">💬</span>
             <span class="text">상담</span>
@@ -610,6 +543,24 @@
         </a>
     </div>
 
+    <!-- 글자 확대/축소 작동 스크립트 -->
+    <script>
+        function toggleZoom() {
+            const htmlTag = document.documentElement; // 문서 전체(html)를 선택
+            const zoomBtnText = document.getElementById('zoomText');
+            
+            // 만약 이미 큰 글씨 모드라면 원래대로 되돌립니다.
+            if (htmlTag.classList.contains('large-font')) {
+                htmlTag.classList.remove('large-font');
+                zoomBtnText.innerText = '큰글씨';
+            } 
+            // 원래 상태라면 큰 글씨 모드를 적용합니다.
+            else {
+                htmlTag.classList.add('large-font');
+                zoomBtnText.innerText = '원래대로';
+            }
+        }
+    </script>
     <div class="mobile-bottom-nav">
         <a href="index.html" class="nav-item active">
             <span class="icon">🏠</span><span class="text">홈</span>
@@ -719,21 +670,11 @@
             }
         });
 
-        window.addEventListener('appinstalled', () => {
+       window.addEventListener('appinstalled', () => {
             alert('팜마을 앱 설치가 성공적으로 완료되었습니다! 🎉');
         });
     </script>
-<script>
 
-
-<script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('서비스 워커 등록 성공! 이제 앱 설치가 가능합니다.', reg))
-                .catch(err => console.log('서비스 워커 등록 실패:', err));
-        });
-    }
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {

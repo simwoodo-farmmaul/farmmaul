@@ -236,9 +236,9 @@
                 </div>
             </div>
 
-            <div class="action-buttons">
+                <div class="action-buttons">
                 <button class="btn-icon" onclick="alert('찜 💖')">♥</button>
-                <button class="btn-cart" onclick="if(confirm('장바구니에 담았습니다! 장바구니로 이동하시겠습니까?')) location.href='cart.html';">장바구니 담기</button>
+                <button class="btn-cart" onclick="addToCart()">장바구니 담기</button>
                 <button class="btn-buy" onclick="processBuy()">바로 구매하기</button>
             </div>
         </div>
@@ -320,6 +320,32 @@
                 else mapAddr.innerText = '송탄역 2번 출구 앞 제일편의점';
             } else {
                 mapArea.style.display = 'none';
+            }
+        }
+
+        // ★ 장바구니에 진짜로 데이터를 저장하는 기능 ★
+        function addToCart() {
+            // 1. 화면에 있는 상품 이름과 선택한 수령 방식을 읽어옵니다.
+            const title = document.querySelector('.prod-title').innerText;
+            const option = document.querySelector('input[name="d_option"]:checked').value;
+            let hubDetail = '';
+            
+            // HUB 보관일 경우 어느 HUB인지도 기록합니다.
+            if(option === 'HUB보관') {
+                hubDetail = ' - ' + document.getElementById('selectedHub').value;
+            }
+
+            // 2. 브라우저의 메모리 창고(localStorage)에 정보를 예쁘게 포장해서 넣습니다.
+            const itemData = {
+                name: title,
+                price: 14000,
+                delivery: option + hubDetail
+            };
+            localStorage.setItem('myCartItem', JSON.stringify(itemData));
+
+            // 3. 안내창을 띄우고 장바구니로 보냅니다.
+            if(confirm('장바구니에 상품을 안전하게 담았습니다! 🛒\n장바구니 화면으로 이동하시겠습니까?')) {
+                location.href = 'cart.html';
             }
         }
 

@@ -264,7 +264,7 @@
             }
         }
 
-        function goToCheckout() {
+       function goToCheckout() {
             const total = document.getElementById('sumTotal').innerText;
             if(total === '0원') {
                 alert('주문할 상품을 선택해주세요.');
@@ -272,6 +272,32 @@
                 alert('주문서 작성 페이지로 이동합니다! 🚀');
             }
         }
+
+        // ★ 상세페이지에서 저장한 맞춤 정보를 불러와 장바구니에 그려주는 기능 ★
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. 브라우저 기억창고(localStorage)에서 저장된 상품 데이터를 꺼냅니다.
+            const savedItem = localStorage.getItem('myCartItem');
+            
+            if (savedItem) {
+                // 2. 글자 형태로 저장된 데이터를 컴퓨터가 읽을 수 있도록 변환합니다.
+                const itemData = JSON.parse(savedItem);
+                
+                // 3. 장바구니의 첫 번째 상품(item1) 영역을 찾습니다.
+                const item1 = document.getElementById('item1');
+                if (item1) {
+                    // 상세페이지에서 선택했던 진짜 상품명과 수령방식(HUB 위치 등)으로 글자를 바꿉니다.
+                    item1.querySelector('.item-title').innerText = itemData.name;
+                    item1.querySelector('.item-opt').innerText = '수령방식: ' + itemData.delivery;
+                    
+                    // 가격 데이터도 안전하게 연동합니다.
+                    item1.setAttribute('data-price', itemData.price);
+                    item1.querySelector('.price-val').innerText = itemData.price.toLocaleString();
+                }
+            }
+            
+            // 4. 정보가 새롭게 반영되었으므로 결제 예정 금액을 다시 한 번 계산합니다.
+            calcTotal();
+        });
     </script>
 </body>
 </html>
