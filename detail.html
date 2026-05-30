@@ -150,8 +150,9 @@
             <div class="main-image">
                 <img src="https://via.placeholder.com/800x800/87B32E/ffffff?text=Main+Product+Image" alt="메인 사진">
             </div>
-            <div class="youtube-box">
-                <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <!-- 유튜브 영상 주소가 없는 경우 보이지 않도록 기본 숨김 처리 -->
+            <div class="youtube-box" style="display: none;">
+                <iframe width="100%" height="100%" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
 
@@ -409,6 +410,15 @@
                         // 등록된 사진이 있다면 메인 사진도 교체합니다.
                         if (p.image) {
                             document.querySelector('.main-image img').src = p.image;
+                        }
+
+                        // 유튜브 주소가 있으면 보여주고, 없으면 숨깁니다.
+                        const youtubeBox = document.querySelector('.youtube-box');
+                        if (p.youtube_url) {
+                            youtubeBox.style.display = 'block';
+                            youtubeBox.querySelector('iframe').src = p.youtube_url;
+                        } else {
+                            youtubeBox.style.display = 'none';
                         }
                         
                         // 하단 회색 요약 박스의 등급과 날짜도 등록한 정보로 바꿉니다.

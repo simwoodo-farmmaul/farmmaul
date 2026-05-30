@@ -73,8 +73,10 @@
             .preview-section { position: static; height: auto; overflow-y: visible; margin-bottom: 30px; }
             .photo-grid { grid-template-columns: 1fr; }
             .header { padding: 15px; flex-direction: column; gap: 10px; text-align: center; }
-        }
-    </style>
+            /* 모바일에서 가격 및 수확 정보 칸을 1칸으로 넓게 쓰도록 추가 */
+            .mobile-col { grid-template-columns: 1fr !important; }
+        }    
+</style>
 </head>
 <body>
 
@@ -121,14 +123,14 @@
                 </div>
             </div>
 
-            <div class="form-section">
+           <div class="form-section">
                 <div class="form-title">💰 3. 가격 및 수확 정보</div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:20px;">
+                <div class="mobile-col" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-bottom:20px;">
                     <div><span class="label">정상 가격(원)</span><input type="number" id="orgPrice" oninput="sync()"></div>
                     <div><span class="label">할인 판매 가격(원)</span><input type="number" id="salePrice" oninput="sync()"></div>
                     <div><span class="label">판매 단위 (kg/박스)</span><input type="text" id="unit" oninput="sync()"></div>
                 </div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
+                <div class="mobile-col" style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px;">
                     <div><span class="label">상품 등급</span>
                         <select id="pGrade" onchange="sync()">
                             <option value="특급(최고품질)">특급 (최고품질)</option>
