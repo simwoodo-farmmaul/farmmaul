@@ -335,10 +335,13 @@
                 hubDetail = ' - ' + document.getElementById('selectedHub').value;
             }
 
+            // 화면에 표시된 진짜 숫자를 가져와 쉼표(,)를 떼어내고 계산용 숫자로 만듭니다.
+            const realPrice = parseInt(document.querySelector('.sale-price').innerText.replace(/,/g, ''));
+
             // 2. 브라우저의 메모리 창고(localStorage)에 정보를 예쁘게 포장해서 넣습니다.
             const itemData = {
                 name: title,
-                price: 14000,
+                price: realPrice,
                 delivery: option + hubDetail
             };
             localStorage.setItem('myCartItem', JSON.stringify(itemData));
@@ -363,6 +366,50 @@
 
         // 페이지 열릴 때 초기 지도 세팅
         updateMap();
+
+        // ★ 주소창의 번호(?id=)를 보고 진짜 서버에서 상품 정보를 가져와 화면을 덮어쓰는 기능 ★
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. 인터넷 주소창에서 상품 번호를 알아냅니다.
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            if (productId) {
+                // 2. 서버에 해당 상품 번호를 주고 진짜 정보를 달라고 요청합니다.
+                fetch('/api/products/' + productId)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        const p = result.data; // 서버가 꺼내준 진짜 상품 데이터
+                        
+                        // 3. 꿀토마토로 고정되어 있던 글자와 사진을 진짜 정보로 싹 바꿉니다.
+                        document.querySelector('.prod-title').innerText = p.title;
+                        document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
+                        document.querySelector('.farm-name').innerText = '🧑‍🌾 ' + p.farm_name;
+                        
+                        // 원가가 0원이면 숨기고, 입력했으면 할인 전 가격으로 보여줍니다.
+                        if (p.org_price && p.org_price > 0) {
+                            document.querySelector('.org-price').innerText = Number(p.org_price).toLocaleString() + '원';
+                        } else {
+                            document.querySelector('.org-price').style.display = 'none';
+                            document.querySelector('.discount').style.display = 'none'; // 원가가 없으면 % 세일 마크도 숨김
+                        }
+
+                        // 등록된 사진이 있다면 메인 사진도 교체합니다.
+                        if (p.image) {
+                            document.querySelector('.main-image img').src = p.image;
+                        }
+                        
+                        // 하단 회색 요약 박스의 등급과 날짜도 등록한 정보로 바꿉니다.
+                        const summaryValues = document.querySelectorAll('.s-value');
+                        if (summaryValues.length >= 3) {
+                            summaryValues[0].innerText = p.p_grade || '일반';
+                            summaryValues[2].innerText = p.p_date || '-';
+                        }
+                    }
+                })
+                .catch(error => console.error('상세페이지 데이터 불러오기 실패:', error));
+            }
+        });
     </script>
 </body>
 </html>
