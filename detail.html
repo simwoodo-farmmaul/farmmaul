@@ -156,10 +156,16 @@
         </div>
 
         <div class="info-area">
-            <div class="cat-farm-row">
-                <span class="category-badge">농산물</span>
-                <span class="farm-name">🧑‍🌾 지산동 영진농원</span>
+            <div class="cat-farm-row" style="justify-content: space-between;">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <span class="category-badge">농산물</span>
+                    <span class="farm-name">🧑‍🌾 지산동 영진농원</span>
                 </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="editProduct()" style="padding: 5px 12px; border: 1px solid #4B9AD2; background: #fff; color: #4B9AD2; border-radius: 6px; font-weight: 800; cursor: pointer;">수정</button>
+                    <button onclick="deleteProduct()" style="padding: 5px 12px; border: 1px solid #ff5e62; background: #fff; color: #ff5e62; border-radius: 6px; font-weight: 800; cursor: pointer;">삭제</button>
+                </div>
+            </div>
             
             <div class="certs">
                 <span class="cert-fixed">GAP인증</span>
@@ -410,6 +416,33 @@
                 .catch(error => console.error('상세페이지 데이터 불러오기 실패:', error));
             }
         });
+
+        // ★ 상품 삭제 기능 ★
+        function deleteProduct() {
+            if (confirm('정말 이 상품을 삭제하시겠습니까?\n삭제 후에는 복구할 수 없습니다.')) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const productId = urlParams.get('id');
+                
+                fetch('/api/products/' + productId, { method: 'DELETE' })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        alert('상품이 성공적으로 삭제되었습니다. 🗑️');
+                        location.href = 'index.html'; // 삭제 완료 후 메인 화면으로 이동
+                    } else {
+                        alert('삭제에 실패했습니다.');
+                    }
+                });
+            }
+        }
+
+        // ★ 상품 수정 기능 ★
+        function editProduct() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            // '수정 모드'로 상품 등록 페이지 열기
+            location.href = 'register.html?edit=' + productId;
+        }
     </script>
 </body>
 </html>

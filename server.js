@@ -252,6 +252,32 @@ app.get('/api/products/:id', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [상품 수정 창구] 
+// ==========================================
+app.put('/api/products/:id', (req, res) => {
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, image } = req.body;
+    const updateQuery = `
+        UPDATE farm_products 
+        SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, image=? 
+        WHERE id=?
+    `;
+    db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, req.params.id], (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
+        res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+    });
+});
+
+// ==========================================
+// 🌟 [상품 삭제 창구]
+// ==========================================
+app.delete('/api/products/:id', (req, res) => {
+    db.query(`DELETE FROM farm_products WHERE id = ?`, [req.params.id], (err, result) => {
+        if (err) return res.status(500).json({ success: false, message: '삭제 중 오류가 발생했습니다.' });
+        res.json({ success: true, message: '상품이 안전하게 삭제되었습니다.' });
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 
