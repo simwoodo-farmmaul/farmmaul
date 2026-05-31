@@ -1,8 +1,13 @@
-// 팜마을 앱 오프라인 작동을 위한 서비스 워커 (버전 2)
-self.addEventListener('install', (pEvent) => {
-  console.log('팜마을 서비스 워커 설치 완료!');
+// PC 앱 설치 규격(PWA) 완벽 통과를 위한 서비스 워커
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
 });
 
-self.addEventListener('fetch', (pEvent) => {
-  // 앱이 구동될 때 필요한 데이터를 주고받는 통로 역할을 합니다.
+self.addEventListener('fetch', (event) => {
+    // 통신에 실패했을 때만 작동하는 기본 안전장치
+    event.respondWith(
+        fetch(event.request).catch(() => {
+            return new Response('인터넷 연결이 끊겨 팜마을에 접속할 수 없습니다.');
+        })
+    );
 });

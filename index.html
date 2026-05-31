@@ -627,7 +627,7 @@
         });
     </script>
 
-    <script>
+   <script>
         let deferredPrompt;
         const installBtn = document.getElementById('pwaInstallBtn');
 
@@ -637,29 +637,27 @@
         });
 
         installBtn.addEventListener('click', async () => {
-            // 접속한 기기가 스마트폰인지 PC인지 확인합니다.
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // 📱 [모바일 접속] : 기존처럼 진짜 어플 설치 창 띄우기
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        alert('팜마을 어플 설치를 시작합니다. 바탕화면을 확인해 주세요! 🌱');
-                    }
-                    deferredPrompt = null;
-                } else {
-                    alert('아이폰(사파리) 사용자는 화면 하단의 [공유 버튼 ⬆️]을 누르신 후 [홈 화면에 추가 ➕]를 선택해 주시면 앱처럼 사용하실 수 있습니다! 🌱');
+            if (deferredPrompt) {
+                // 💻📱 [PC/모바일 공통] : 브라우저가 허용하면 진짜 어플 설치 창을 띄웁니다!
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    console.log('팜마을 앱 설치 동의 완료');
                 }
+                deferredPrompt = null;
             } else {
-                // 💻 [PC 접속] : 바탕화면 바로가기 및 즐겨찾기 수동 안내 창 띄우기
-                alert('💻 PC 바탕화면에 팜마을 바로가기 아이콘을 만드는 방법!\n\n1. 인터넷 창 오른쪽 위 [점 3개(⋮)] 메뉴 클릭\n2. [저장 및 공유] 클릭\n3. [바로가기 만들기] 클릭\n\n(또는 키보드의 Ctrl + D 를 눌러 즐겨찾기에 추가해 주세요) 🌱');
+                // 이미 설치가 되었거나, 애플 기기(아이폰/맥) 등 지원하지 않는 환경일 때의 안내
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                if (isMobile) {
+                    alert('아이폰(사파리) 사용자는 화면 하단의 [공유 버튼 ⬆️]을 누르신 후 [홈 화면에 추가 ➕]를 선택해 주시면 앱처럼 사용하실 수 있습니다! 🌱');
+                } else {
+                    alert('이미 팜마을 앱이 PC에 설치되어 있거나, 현재 브라우저가 자동 설치를 지원하지 않습니다.\n\n주소창 오른쪽 끝에 있는 [모니터 모양 아이콘]을 클릭하여 설치를 확인해 주세요! 🌱');
+                }
             }
         });
 
        window.addEventListener('appinstalled', () => {
-            alert('팜마을 앱 설치가 성공적으로 완료되었습니다! 🎉');
+            alert('팜마을 앱 설치가 성공적으로 완료되었습니다! 바탕화면을 확인해 보세요 🎉');
         });
     </script>
 
