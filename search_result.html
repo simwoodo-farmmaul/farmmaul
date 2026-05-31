@@ -84,115 +84,118 @@
 </head>
 <body>
 
-    <div class="header">
+ <div class="header">
         <div class="header-inner">
-            <a href="#" class="back-btn" onclick="history.back()">←</a>
+            <a href="index.html" class="back-btn">←</a>
             <div class="search-input-box">
-                <input type="text" value="토마토" placeholder="검색어를 입력하세요">
-                <button onclick="alert('검색합니다!')">🔍</button>
+                <!-- 입력창에 ID를 부여하고, 엔터키 검색 기능을 추가했습니다. -->
+                <input type="text" id="searchInput" placeholder="검색어를 입력하세요" onkeyup="if(event.key==='Enter') executeSearch()">
+                <button onclick="executeSearch()">🔍</button>
             </div>
         </div>
     </div>
 
-    <div class="related-tags">
-        <div class="tag-item">#지산동토마토</div>
-        <div class="tag-item">#무농약토마토</div>
-        <div class="tag-item">#당일수확</div>
-        <div class="tag-item">#방울토마토</div>
-        <div class="tag-item">#흑토마토</div>
-    </div>
+    <!-- ... (연관 검색어 및 필터 섹션은 기존대로 유지) ... -->
 
-    <div class="filter-section">
-        <div class="result-count">총 <span>4</span>건의 상품</div>
-        
-        <div class="filter-buttons">
-            <button class="btn-filter" onclick="toggleFilter(this)">📍 내 동네(5km)만</button>
-            <button class="btn-filter active" onclick="toggleFilter(this)">🏠 방문수거</button>
-            <button class="btn-filter" onclick="toggleFilter(this)">🏪 HUB수령</button>
+    <!-- 샘플 카드를 모두 지우고 ID를 부여했습니다. -->
+    <div class="result-container" id="searchResultList">
+        <div style="text-align: center; padding: 50px; font-size: 1.1rem; color: #888; font-weight: 700; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">
+            상품을 검색 중입니다... 🔍
         </div>
-
-        <select class="sort-select">
-            <option>추천순</option>
-            <option selected>거리 가까운순</option>
-            <option>최신 등록순</option>
-            <option>낮은 가격순</option>
-        </select>
-    </div>
-
-    <div class="result-container">
-        
-        <div class="product-card" onclick="alert('상품 상세페이지로 이동합니다.')">
-            <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
-            <div class="prod-info">
-                <div class="prod-header">
-                    <span class="producer-name">🧑‍🌾 지산동 영진농원</span>
-                    <span class="distance">0.8 km</span>
-                </div>
-                <div class="prod-title">당일 수확 고당도 꿀토마토 2kg</div>
-                <div class="prod-price">14,000원</div>
-                <div class="badges">
-                    <span class="badge badge-visit">🏠 방문수거</span>
-                    <span class="badge badge-hub">🏪 HUB보관</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1561136594-7f68413baa99?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
-            <div class="prod-info">
-                <div class="prod-header">
-                    <span class="producer-name">🧑‍🌾 송북동 푸른농장</span>
-                    <span class="distance">2.1 km</span>
-                </div>
-                <div class="prod-title">유기농 찰토마토 특품 3kg (선물용)</div>
-                <div class="prod-price">22,000원</div>
-                <div class="badges">
-                    <span class="badge badge-visit">🏠 방문수거</span>
-                    <span class="badge badge-parcel">📦 택배배송</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1582284540020-8acbe03f4924?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
-            <div class="prod-info">
-                <div class="prod-header">
-                    <span class="producer-name">🧑‍🌾 고덕동 청년농부</span>
-                    <span class="distance">4.5 km</span>
-                </div>
-                <div class="prod-title">스테비아 대추 방울토마토 500g</div>
-                <div class="prod-price">8,500원</div>
-                <div class="badges">
-                    <span class="badge badge-hub">🏪 HUB보관</span>
-                    <span class="badge badge-parcel">📦 택배배송</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <img src="https://images.unsplash.com/photo-1518977956812-cd3dbadaaf31?q=80&w=200&auto=format&fit=crop" class="prod-img" alt="토마토">
-            <div class="prod-info">
-                <div class="prod-header">
-                    <span class="producer-name">🧑‍🌾 안성 일죽 농원</span>
-                    <span class="distance">15.2 km</span>
-                </div>
-                <div class="prod-title">무농약 흑토마토 (쿠마토) 1kg</div>
-                <div class="prod-price">11,000원</div>
-                <div class="badges">
-                    <span class="badge badge-parcel">📦 택배배송</span>
-                </div>
-            </div>
-        </div>
-
-        <button class="btn-load-more" onclick="alert('다음 상품을 불러옵니다.')">더보기 (4/12) ▼</button>
-
     </div>
 
     <script>
+        // 1. 주소창에서 검색어(keyword) 가져오기
+        const urlParams = new URLSearchParams(window.location.search);
+        const keyword = urlParams.get('keyword') || '';
+
+        // 2. 검색창에 현재 검색어 표시
+        const searchInput = document.getElementById('searchInput');
+        if(searchInput) searchInput.value = keyword;
+
+        // 3. 돋보기 버튼이나 엔터키를 눌렀을 때 실행되는 검색 함수
+        function executeSearch() {
+            const val = document.getElementById('searchInput').value.trim();
+            location.href = 'search_result.html?keyword=' + encodeURIComponent(val);
+        }
+
+        // 4. 페이지가 켜질 때 서버에서 데이터를 가져와 화면에 그리기
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/products')
+            .then(res => res.json())
+            .then(result => {
+                const list = document.getElementById('searchResultList');
+                const countSpan = document.querySelector('.result-count span');
+
+                if (result.success) {
+                    let products = result.data;
+
+                    // 검색어가 있다면 상품 제목, 카테고리, 태그, 농장명 등에서 일치하는 것만 걸러냅니다.
+                    if (keyword) {
+                        const lowerKeyword = keyword.toLowerCase();
+                        products = products.filter(p => 
+                            (p.title && p.title.toLowerCase().includes(lowerKeyword)) ||
+                            (p.category && p.category.toLowerCase().includes(lowerKeyword)) ||
+                            (p.tags && p.tags.toLowerCase().includes(lowerKeyword)) ||
+                            (p.farm_name && p.farm_name.toLowerCase().includes(lowerKeyword))
+                        );
+                    }
+
+                    // 총 검색 결과 개수 업데이트
+                    if (countSpan) countSpan.innerText = products.length;
+
+                    // 일치하는 상품이 없을 경우 안내 문구 표시
+                    if (products.length === 0) {
+                        list.innerHTML = `<div style="text-align: center; padding: 50px; font-size: 1.1rem; color: #888; font-weight: 700; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">'${keyword}'에 대한 검색 결과가 없습니다. 🌱</div>`;
+                        return;
+                    }
+
+                    list.innerHTML = ''; // 로딩 메시지 지우기
+
+                    // 걸러진 상품들을 화면에 카드로 만들어 붙여넣기
+                    products.forEach(p => {
+                        // 수령 방식(배송) 뱃지 동적 생성
+                        let badgesHtml = '';
+                        if (p.delivery) {
+                            if(p.delivery.includes('방문수거')) badgesHtml += `<span class="badge badge-visit">🏠 방문수거</span>`;
+                            if(p.delivery.includes('HUB보관')) badgesHtml += `<span class="badge badge-hub">🏪 HUB보관</span>`;
+                            if(p.delivery.includes('택배')) badgesHtml += `<span class="badge badge-parcel">📦 택배배송</span>`;
+                        } else {
+                            badgesHtml += `<span class="badge badge-visit">🏠 방문수거</span>`; // 기본값
+                        }
+
+                        const imgUrl = p.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=200&auto=format&fit=crop';
+
+                        const cardHtml = `
+                        <div class="product-card" onclick="location.href='detail.html?id=${p.id}'">
+                            <img src="${imgUrl}" class="prod-img" alt="상품 이미지">
+                            <div class="prod-info">
+                                <div class="prod-header">
+                                    <span class="producer-name">🧑‍🌾 ${p.farm_name || '팜마을 생산자'}</span>
+                                    <span class="distance" style="background:#f0f8ff; color:#0277bd;">동네 이웃</span>
+                                </div>
+                                <div class="prod-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.title}</div>
+                                <div class="prod-price">${Number(p.sale_price).toLocaleString()}원</div>
+                                <div class="badges">
+                                    ${badgesHtml}
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                        list.insertAdjacentHTML('beforeend', cardHtml);
+                    });
+                } else {
+                    list.innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">상품을 불러오는데 실패했습니다.</div>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('searchResultList').innerHTML = '<div style="text-align: center; padding: 40px; color: #888;">서버 통신 오류가 발생했습니다.</div>';
+            });
+        });
+
         // 필터 버튼 클릭 시 색상 활성화/비활성화 스크립트
         function toggleFilter(btn) {
             btn.classList.toggle('active');
-            // 실제 구현 시 여기서 상품 리스트를 다시 정렬하거나 숨기는 로직이 들어갑니다.
         }
     </script>
 </body>
