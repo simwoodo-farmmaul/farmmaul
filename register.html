@@ -109,15 +109,15 @@
                 <input type="text" id="title" placeholder="상품 제목을 적어주세요" oninput="sync()" style="margin-bottom:20px;">
                 <span class="label">품질 인증 선택 (중복 가능)</span>
                 <div class="chip-group">
-                    <input type="checkbox" id="c1" value="GAP인증" onchange="sync()"><label for="c1">GAP인증</label>
-                    <input type="checkbox" id="c2" value="무농약" onchange="sync()"><label for="c2">무농약</label>
-                    <input type="checkbox" id="c3" value="유기농" onchange="sync()"><label for="c3">유기농</label>
+                    <input type="checkbox" id="c1" class="cert-chk" value="GAP인증" onchange="sync()"><label for="c1">GAP인증</label>
+                    <input type="checkbox" id="c2" class="cert-chk" value="무농약" onchange="sync()"><label for="c2">무농약</label>
+                    <input type="checkbox" id="c3" class="cert-chk" value="유기농" onchange="sync()"><label for="c3">유기농</label>
                 </div>
                 <div style="background:#f9f9f9; padding:15px; border-radius:12px; margin-top:10px;">
                     <span class="label" style="font-size:0.85rem; color:var(--primary-blue);">자체 인증 직접 입력</span>
                     <div style="display:flex; gap:10px;">
-                        <input type="text" id="customCertIn" placeholder="인증 명칭 입력">
-                        <button onclick="addCert()" style="background:var(--primary-blue); color:#fff; border:none; width:70px; border-radius:10px; font-weight:800; cursor:pointer;">추가</button>
+                        <input type="text" id="customCertIn" placeholder="인증 명칭 입력" onkeypress="if(event.keyCode==13) { addCert(); event.preventDefault(); }">
+                        <button type="button" onclick="addCert()" style="background:var(--primary-blue); color:#fff; border:none; width:70px; border-radius:10px; font-weight:800; cursor:pointer;">추가</button>
                     </div>
                     <div id="certList" class="chip-group blue" style="margin-top:10px;"></div>
                 </div>
@@ -353,7 +353,7 @@
                 const catEl = document.querySelector('input[name="p_cat"]:checked');
                 if(catEl) document.getElementById('pvCategory').innerText = catEl.value;
 
-                const certs = Array.from(document.querySelectorAll('.register-form input[id^="c"]:checked')).map(c => `<span style="background:var(--primary-green); color:#fff; padding:4px 8px; border-radius:5px; font-size:0.75rem; font-weight:800;">${c.value}</span>`);
+                const certs = Array.from(document.querySelectorAll('.cert-chk:checked')).map(c => `<span style="background:var(--primary-green); color:#fff; padding:4px 8px; border-radius:5px; font-size:0.75rem; font-weight:800;">${c.value}</span>`);
                 const cCerts = customCerts.map(c => `<span style="background:var(--primary-blue); color:#fff; padding:4px 8px; border-radius:5px; font-size:0.75rem; font-weight:800;">${c}</span>`);
                 document.getElementById('pvCerts').innerHTML = certs.join('') + cCerts.join('');
 
@@ -559,7 +559,21 @@
                     document.getElementById('salePrice').value = p.sale_price || '';
                     if (p.p_date) document.getElementById('pDate').value = p.p_date;
                     if (p.p_grade) document.getElementById('pGrade').value = p.p_grade;
+                    if (p.p_size) document.getElementById('pSize').value = p.p_size;
                     
+                    if (p.certs) {
+                        const certArr = p.certs.split(',');
+                        document.querySelectorAll('.cert-chk').forEach(chk => {
+                            if (certArr.includes(chk.value)) chk.checked = true;
+                        });
+                        certArr.forEach(c => {
+                            if (c && !['GAP인증', '무농약', '유기농'].includes(c) && !customCerts.includes(c)) {
+                                customCerts.push(c);
+                            }
+                        });
+                        renderCerts();
+                    }
+
                     const catRadios = document.getElementsByName('p_cat');
                     for(let i=0; i<catRadios.length; i++) {
                         if(catRadios[i].value === p.category) catRadios[i].checked = true;
@@ -612,6 +626,8 @@
             
             const catEl = document.querySelector('input[name="p_cat"]:checked');
             const category = catEl ? catEl.value : "농산물";
+            const pSize = document.getElementById('pSize').value;
+            const certsArr = Array.from(document.querySelectorAll('.cert-chk:checked')).map(c => c.value).concat(customCerts);
 
             if (!title || !salePrice) {
                 alert("상품 제목과 할인 판매 가격은 꼭 입력해 주세요!");
@@ -632,6 +648,8 @@
                 salePrice: Number(salePrice),
                 pDate: pDate,
                 pGrade: pGrade,
+                pSize: pSize,
+                certs: certsArr.join(','),
                 image: mainImageBase64,
                 delivery: deliveryOptions.join(','),
                 tags: activeTags.join(','), // 서버로 태그 전송

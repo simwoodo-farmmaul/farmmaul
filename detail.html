@@ -465,9 +465,24 @@
                         }
                         
                         // 하단 회색 요약 박스의 등급과 날짜도 등록한 정보로 바꿉니다.
-                        const summaryValues = document.querySelectorAll('.s-value');                        if (summaryValues.length >= 3) {
+                        const summaryValues = document.querySelectorAll('.s-value');
+                        if (summaryValues.length >= 3) {
                             summaryValues[0].innerText = p.p_grade || '일반';
+                            summaryValues[1].innerText = p.p_size || '정보없음';
                             summaryValues[2].innerText = p.p_date || '-';
+                        }
+
+                        // 품질 인증 뱃지 표시
+                        const certsContainer = document.querySelector('.certs');
+                        if (certsContainer && p.certs) {
+                            const certsHtml = p.certs.split(',').filter(c => c).map(c => {
+                                if (['GAP인증', '무농약', '유기농'].includes(c)) {
+                                    return `<span class="cert-fixed">${c}</span>`;
+                                } else {
+                                    return `<span class="cert-custom">${c} (자체)</span>`;
+                                }
+                            }).join('');
+                            certsContainer.innerHTML = certsHtml;
                         }
 
                         // ★ 허용되지 않은 수령 방식(라디오 버튼) 숨기기 ★

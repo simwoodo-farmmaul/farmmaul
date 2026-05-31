@@ -192,7 +192,7 @@ app.delete('/api/board/:id', (req, res) => {
 // 🌟 [상품 등록 창구] 화면에서 보낸 데이터를 DB에 저장 (사진 포함)
 // ==========================================
 app.post('/api/products', (req, res) => {
-    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery, tags, contentData } = req.body;
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData } = req.body;
     
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS farm_products (
@@ -204,6 +204,8 @@ app.post('/api/products', (req, res) => {
             sale_price INT DEFAULT 0,
             p_date VARCHAR(50),
             p_grade VARCHAR(50),
+            p_size VARCHAR(50),
+            certs VARCHAR(255),
             image LONGTEXT,
             delivery VARCHAR(255) DEFAULT '방문수거',
             tags VARCHAR(255),
@@ -216,22 +218,25 @@ app.post('/api/products', (req, res) => {
         db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
             db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {
                 db.query(`ALTER TABLE farm_products ADD COLUMN content_data LONGTEXT`, () => {
-                    const insertQuery = `
-                        INSERT INTO farm_products 
-                        (farm_name, category, title, org_price, sale_price, p_date, p_grade, image, delivery, tags, content_data) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    `;
-                            
-                    db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery || '방문수거', tags || '', contentData || '[]'], (insertErr, result) => {
-                        if (insertErr) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
-                        res.json({ success: true, message: '상품 등록 완료!' });
+                    db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {
+                        db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {
+                            const insertQuery = `
+                                INSERT INTO farm_products 
+                                (farm_name, category, title, org_price, sale_price, p_date, p_grade, p_size, certs, image, delivery, tags, content_data) 
+                                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                            `;
+                                    
+                            db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]'], (insertErr, result) => {
+                                if (insertErr) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+                                res.json({ success: true, message: '상품 등록 완료!' });
+                            });
+                        });
                     });
                 });
             });
         });
     });
 });
-
 // ==========================================
 // 🌟 [상품 목록 조회 창구] 
 // ==========================================
@@ -257,19 +262,23 @@ app.get('/api/products/:id', (req, res) => {
 // 🌟 [상품 수정 창구] 
 // ==========================================
 app.put('/api/products/:id', (req, res) => {
-    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery, tags, contentData } = req.body;
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData } = req.body;
     
     db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
         db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {
             db.query(`ALTER TABLE farm_products ADD COLUMN content_data LONGTEXT`, () => {
-                const updateQuery = `
-                    UPDATE farm_products 
-                    SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, image=?, delivery=?, tags=?, content_data=? 
-                    WHERE id=?
-                `;
-                db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, image, delivery || '방문수거', tags || '', contentData || '[]', req.params.id], (err, result) => {
-                    if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
-                    res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+                db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {
+                    db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {
+                        const updateQuery = `
+                            UPDATE farm_products 
+                            SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, p_size=?, certs=?, image=?, delivery=?, tags=?, content_data=? 
+                            WHERE id=?
+                        `;
+                        db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', req.params.id], (err, result) => {
+                            if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
+                            res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+                        });
+                    });
                 });
             });
         });
