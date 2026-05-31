@@ -213,7 +213,7 @@
                 <button class="btn-search">검색하기</button>
             </div>
 
-            <div class="card order-table" style="padding: 0; overflow: hidden;">
+           <div class="card order-table" style="padding: 0; overflow: hidden;">
                 <table>
                     <thead>
                         <tr>
@@ -226,85 +226,14 @@
                             <th>관리</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>2026-05-08 11:30</td>
-                            <td><b>김철수</b><br><span style="font-size:0.85rem; color:#666;">010-1234-5678</span></td>
-                            <td>꿀토마토 2kg 외 1건</td>
-                            <td><span class="badge badge-visit">🏠 방문수거</span><br><small style="color:#888;">15:30 방문예정</small></td>
-                            <td style="color:var(--master-orange);"><b>28,000원</b></td>
-                            <td>
-                                <select class="status-select" onchange="statusChange()">
-                                    <option>결제 완료</option>
-                                    <option selected>상품 준비 중</option>
-                                    <option>방문/픽업 완료</option>
-                                </select>
-                            </td>
-                            <td><button class="btn-sm profile">상세</button></td>
-                        </tr>
-                        <tr>
-                            <td>2026-05-08 10:15</td>
-                            <td><b>이영희</b><br><span style="font-size:0.85rem; color:#666;">010-9999-8888</span></td>
-                            <td>수제 된장 1kg</td>
-                            <td><span class="badge badge-hub">🏪 HUB보관</span><br><small style="color:#888;">지산동 1호 카페</small></td>
-                            <td style="color:var(--master-orange);"><b>16,000원</b></td>
-                            <td>
-                                <select class="status-select">
-                                    <option selected>결제 완료</option>
-                                    <option>HUB 입고 완료</option>
-                                    <option>수령 완료</option>
-                                </select>
-                            </td>
-                            <td><button class="btn-sm profile">상세</button></td>
-                        </tr>
-                        <tr>
-                            <td>2026-05-07 21:00</td>
-                            <td><b>박지민</b><br><span style="font-size:0.85rem; color:#666;">010-5555-4444</span></td>
-                            <td>참기름 300ml</td>
-                            <td><span class="badge badge-parcel">📦 택배배송</span><br><small style="color:#888;">무료배송</small></td>
-                            <td style="color:var(--master-orange);"><b>27,000원</b></td>
-                            <td>
-                                <select class="status-select">
-                                    <option>결제 완료</option>
-                                    <option>배송 준비 중</option>
-                                    <option selected>배송 중</option>
-                                    <option>배송 완료</option>
-                                </select>
-                            </td>
-                            <td><button class="btn-sm profile">상세</button></td>
-                        </tr>
+                    <tbody id="orderTableBody">
+                        <tr><td colspan="7" style="text-align:center; padding:30px;">주문 데이터를 불러오는 중입니다...</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <div class="mobile-order-list">
-                <div class="order-card visit">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <div><div style="font-size:0.8rem; color:#888;">2026-05-08 11:30</div><div style="font-weight:900; font-size:1.1rem;">김철수 님</div></div>
-                        <span class="badge badge-visit">🏠 방문수거</span>
-                    </div>
-                    <div class="card-body">
-                        상품: 꿀토마토 2kg 외 1건<br>결제금액: 28,000원<br><span style="color:var(--master-orange); font-weight:800;">⏰ 방문 예정: 15:30</span>
-                    </div>
-                    <div class="card-footer">
-                        <select class="status-select" style="flex:1; margin-right:10px;"><option>상품 준비 중</option><option>방문/픽업 완료</option></select>
-                        <button class="btn-sm profile" style="padding:10px 15px;">상세보기</button>
-                    </div>
-                </div>
-
-                <div class="order-card hub">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                        <div><div style="font-size:0.8rem; color:#888;">2026-05-08 10:15</div><div style="font-weight:900; font-size:1.1rem;">이영희 님</div></div>
-                        <span class="badge badge-hub">🏪 HUB보관</span>
-                    </div>
-                    <div class="card-body">
-                        상품: 수제 된장 1kg<br>결제금액: 16,000원<br><b>위치: 지산동 1호 카페 HUB</b>
-                    </div>
-                    <div class="card-footer">
-                        <select class="status-select" style="flex:1; margin-right:10px;"><option>결제 완료</option><option>HUB 입고 완료</option></select>
-                        <button class="btn-sm profile" style="padding:10px 15px;">상세보기</button>
-                    </div>
-                </div>
+           <div class="mobile-order-list" id="mobileOrderList">
+                <div style="text-align:center; padding:30px; color:#888; background:#fff; border-radius:15px; border:1px solid #ccc;">주문 데이터를 불러오는 중입니다...</div>
             </div>
         </div>
         
@@ -406,10 +335,82 @@
             })
             .catch(err => console.error(err));
             
-            // 허브 및 생산자(상품) 데이터 로딩 시작
+            // 데이터 로딩 시작
             loadHubList();
-            loadFarmProducts(); // 🌟 추가된 함수 호출
+            loadFarmProducts(); 
+            loadOrderList(); // 🌟 주문 내역 로딩 함수 호출
         });
+        
+        // ==========================================
+        // 🌟 [추가] 실제 주문 내역 리스트 불러오기
+        // ==========================================
+        function loadOrderList() {
+            fetch('/api/orders') // 주의: 아직 server.js에 해당 API가 구현되어 있지 않으므로 임시로 에러 처리됩니다.
+            .then(res => res.json())
+            .then(result => {
+                const tbody = document.getElementById('orderTableBody');
+                const mobileList = document.getElementById('mobileOrderList');
+                
+                if (result.success && result.data && result.data.length > 0) {
+                    tbody.innerHTML = '';
+                    mobileList.innerHTML = '';
+                    
+                    result.data.forEach(order => {
+                        const date = new Date(order.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                        
+                        // 1. PC 테이블 행 생성
+                        const row = `
+                            <tr>
+                                <td>${date}</td>
+                                <td><b>${order.buyer_name}</b><br><span style="font-size:0.85rem; color:#666;">${order.buyer_phone}</span></td>
+                                <td>${order.product_name}</td>
+                                <td><span class="badge ${order.delivery_type.includes('방문') ? 'badge-visit' : order.delivery_type.includes('HUB') ? 'badge-hub' : 'badge-parcel'}">${order.delivery_type}</span></td>
+                                <td style="color:var(--master-orange);"><b>${Number(order.total_price).toLocaleString()}원</b></td>
+                                <td>
+                                    <select class="status-select" onchange="statusChange()">
+                                        <option value="결제완료" ${order.status === '결제완료' ? 'selected' : ''}>결제완료</option>
+                                        <option value="상품준비중" ${order.status === '상품준비중' ? 'selected' : ''}>상품준비중</option>
+                                        <option value="배송/픽업완료" ${order.status === '배송/픽업완료' ? 'selected' : ''}>배송/픽업완료</option>
+                                    </select>
+                                </td>
+                                <td><button class="btn-sm profile">상세</button></td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                        
+                        // 2. 모바일 리스트 카드 생성
+                        const mobileCard = `
+                            <div class="order-card ${order.delivery_type.includes('방문') ? 'visit' : order.delivery_type.includes('HUB') ? 'hub' : 'parcel'}">
+                                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                                    <div><div style="font-size:0.8rem; color:#888;">${date}</div><div style="font-weight:900; font-size:1.1rem;">${order.buyer_name} 님</div></div>
+                                    <span class="badge ${order.delivery_type.includes('방문') ? 'badge-visit' : order.delivery_type.includes('HUB') ? 'badge-hub' : 'badge-parcel'}">${order.delivery_type}</span>
+                                </div>
+                                <div class="card-body">
+                                    상품: ${order.product_name}<br>결제금액: ${Number(order.total_price).toLocaleString()}원
+                                </div>
+                                <div class="card-footer">
+                                    <select class="status-select" style="flex:1; margin-right:10px;">
+                                        <option value="결제완료" ${order.status === '결제완료' ? 'selected' : ''}>결제완료</option>
+                                        <option value="상품준비중" ${order.status === '상품준비중' ? 'selected' : ''}>상품준비중</option>
+                                        <option value="배송/픽업완료" ${order.status === '배송/픽업완료' ? 'selected' : ''}>배송/픽업완료</option>
+                                    </select>
+                                    <button class="btn-sm profile" style="padding:10px 15px;">상세보기</button>
+                                </div>
+                            </div>
+                        `;
+                        mobileList.insertAdjacentHTML('beforeend', mobileCard);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#888;">아직 접수된 실제 주문 내역이 없습니다.</td></tr>';
+                    mobileList.innerHTML = '<div style="text-align:center; padding:30px; color:#888; background:#fff; border-radius:15px; border:1px solid #ccc;">아직 접수된 실제 주문 내역이 없습니다.</div>';
+                }
+            })
+            .catch(err => {
+                console.error('주문 목록 로딩 실패:', err);
+                document.getElementById('orderTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px; color:#888;">아직 접수된 실제 주문 내역이 없습니다.</td></tr>';
+                document.getElementById('mobileOrderList').innerHTML = '<div style="text-align:center; padding:30px; color:#888; background:#fff; border-radius:15px; border:1px solid #ccc;">아직 접수된 실제 주문 내역이 없습니다.</div>';
+            });
+        }
 
         // ==========================================
         // 🌟 [추가] 생산자(농가) 상품 리스트 불러오기
