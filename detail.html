@@ -14,9 +14,13 @@
         .header .btn { font-size: 1.2rem; text-decoration: none; color: #333; font-weight: 900; cursor: pointer; }
         .header .title { font-weight: 900; font-size: 1.3rem; color: var(--primary-green); }
 
-        /* 반응형 레이아웃 뼈대 */
-        .top-section { max-width: 1200px; margin: 0 auto; display: flex; gap: 50px; padding: 40px 20px; align-items: flex-start; }
-        .img-area { flex: 1; width: 100%; display: flex; flex-direction: column; gap: 20px; }
+        /* 반응형 레이아웃 뼈대 (대형 쇼핑몰 PC 레이아웃 적용) */
+        .top-section { max-width: 1200px; margin: 0 auto; display: flex; gap: 60px; padding: 50px 20px; align-items: flex-start; }
+        
+        /* PC에서 사진 크기 고정 및 스크롤 따라다니기 (Sticky) */
+        .img-area { width: 500px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 100px; }
+        
+        /* PC에서 오른쪽 정보 영역은 남은 공간 꽉 채우기 */
         .info-area { flex: 1; display: flex; flex-direction: column; width: 100%; }
         .bottom-section { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; border-top: 1px solid #eee; padding-top: 40px; }
 
@@ -117,6 +121,8 @@
         /* 모바일 반응형 */
         @media (max-width: 768px) {
             .top-section { flex-direction: column; gap: 20px; padding: 20px; }
+            /* 모바일에서는 사진 고정 해제 및 전체 너비 사용 */
+            .img-area { width: 100%; position: static; }
             .bottom-section { padding: 20px 20px 100px; }
             .prod-title { font-size: 1.6rem; }
             .price-wrap { flex-wrap: wrap; gap: 10px; }
@@ -133,6 +139,7 @@
             .ai-chat-window { width: calc(100% - 40px); right: 20px; bottom: 90px; height: 70vh; }
             .ai-fab { bottom: 85px; right: 15px; width: 60px; height: 60px; }
         }
+
     </style>
 </head>
 <body>
