@@ -338,6 +338,71 @@ app.delete('/api/products/:id', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [추가] 1:1 문의(채팅) 저장 및 조회 API
+// ==========================================
+
+// 1. 채팅 메시지 전송 및 저장
+app.post('/api/chat', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const sender = req.session.user.nickname;
+    const { receiver, message } = req.body;
+    
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_chats (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            sender VARCHAR(100) NOT NULL,
+            receiver VARCHAR(100) NOT NULL,
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    
+    db.query(createTableQuery, (err) => {
+        const insertQuery = `INSERT INTO farm_chats (sender, receiver, message) VALUES (?, ?, ?)`;
+        // 생산자가 답변할 때나 고객이 문의할 때 모두 저장됨
+        db.query(insertQuery, [sender, receiver || '지산동 영진농원', message], (err, result) => {
+            if (err) return res.status(500).json({ success: false });
+            res.json({ success: true, message: '전송 완료' });
+        });
+    });
+});
+
+// 2. 관리자용: 고객별 최신 1:1 문의 목록 불러오기
+app.get('/api/admin/chats', (req, res) => {
+    const adminList = "('김영진', '김영진(지산)', '지산', '관리자')";
+    
+    // 관리자가 아닌 고객(발신자) 기준으로 가장 최근에 보낸 메시지를 그룹화하여 불러옵니다.
+    const query = `
+        SELECT c1.* FROM farm_chats c1
+        INNER JOIN (
+            SELECT sender, MAX(created_at) as max_time 
+            FROM farm_chats 
+            WHERE sender NOT IN ${adminList}
+            GROUP BY sender
+        ) c2 ON c1.sender = c2.sender AND c1.created_at = c2.max_time
+        ORDER BY c1.created_at DESC
+    `;
+    db.query(query, (err, results) => {
+        if (err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
+
+// 3. 특정 고객과의 1:1 전체 대화 내역 불러오기
+app.get('/api/chat/history/:targetUser', (req, res) => {
+    const targetUser = req.params.targetUser;
+    const query = `
+        SELECT * FROM farm_chats 
+        WHERE sender = ? OR receiver = ? 
+        ORDER BY created_at ASC
+    `;
+    db.query(query, [targetUser, targetUser], (err, results) => {
+        if (err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 
