@@ -189,14 +189,19 @@ app.delete('/api/board/:id', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [상품 등록 창구] 화면에서 보낸 데이터를 DB에 저장 (사진 포함)
+// 🌟 [상품 등록 창구] 세션 기반 소유권(owner_nickname) 추가 및 로그인 보호
 // ==========================================
 app.post('/api/products', (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
+    }
+    const ownerNickname = req.session.user.nickname;
     const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData } = req.body;
     
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS farm_products (
             id INT AUTO_INCREMENT PRIMARY KEY,
+            owner_nickname VARCHAR(100),
             farm_name VARCHAR(255),
             category VARCHAR(100),
             title VARCHAR(255) NOT NULL,
@@ -216,21 +221,23 @@ app.post('/api/products', (req, res) => {
     `;
     
     db.query(createTableQuery, (err) => {
-        db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
-            db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {
-                db.query(`ALTER TABLE farm_products ADD COLUMN content_data LONGTEXT`, () => {
-                    db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {
-                        db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {
-                            db.query(`ALTER TABLE farm_products ADD COLUMN faqs LONGTEXT`, () => {
-                                const insertQuery = `
-                                    INSERT INTO farm_products 
-                                    (farm_name, category, title, org_price, sale_price, p_date, p_grade, p_size, certs, image, delivery, tags, content_data, faqs) 
-                                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                                `;
-                                        
-                                db.query(insertQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]'], (insertErr, result) => {
-                                    if (insertErr) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
-                                    res.json({ success: true, message: '상품 등록 완료!' });
+        db.query(`ALTER TABLE farm_products ADD COLUMN owner_nickname VARCHAR(100)`, () => {
+            db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
+                db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {
+                    db.query(`ALTER TABLE farm_products ADD COLUMN content_data LONGTEXT`, () => {
+                        db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {
+                            db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {
+                                db.query(`ALTER TABLE farm_products ADD COLUMN faqs LONGTEXT`, () => {
+                                    const insertQuery = `
+                                        INSERT INTO farm_products 
+                                        (owner_nickname, farm_name, category, title, org_price, sale_price, p_date, p_grade, p_size, certs, image, delivery, tags, content_data, faqs) 
+                                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    `;
+                                            
+                                    db.query(insertQuery, [ownerNickname, farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]'], (insertErr, result) => {
+                                        if (insertErr) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+                                        res.json({ success: true, message: '상품 등록 완료!' });
+                                    });
                                 });
                             });
                         });
@@ -252,36 +259,53 @@ app.get('/api/products', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [상품 상세 조회 창구]
+// 🌟 [상품 상세 조회 창구] 현재 접속자 세션 판별 데이터 함께 반환
 // ==========================================
 app.get('/api/products/:id', (req, res) => {
     db.query(`SELECT * FROM farm_products WHERE id = ?`, [req.params.id], (err, result) => {
         if(err) return res.status(500).json({ success: false });
-        if(result.length > 0) res.json({ success: true, data: result[0] });
-        else res.json({ success: false, message: '상품을 찾을 수 없습니다.' });
+        if(result.length > 0) {
+            const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
+            const isAdmin = adminNames.includes(currentUser); 
+            res.json({ success: true, data: result[0], currentUser: currentUser, isAdmin: isAdmin });
+        } else {
+            res.json({ success: false, message: '상품을 찾을 수 없습니다.' });
+        }
     });
 });
 
 // ==========================================
-// 🌟 [상품 수정 창구] 
+// 🌟 [상품 수정 창구] 본인 소유권 철저 검증 (관리자 예외 허용)
 // ==========================================
 app.put('/api/products/:id', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    const nickname = req.session.user.nickname;
+    const isAdmin = adminNames.includes(nickname);
     const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData } = req.body;
     
-    db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
-        db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {
-            db.query(`ALTER TABLE farm_products ADD COLUMN content_data LONGTEXT`, () => {
-                db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {
-                    db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {
-                        db.query(`ALTER TABLE farm_products ADD COLUMN faqs LONGTEXT`, () => {
-                            const updateQuery = `
-                                UPDATE farm_products 
-                                SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, p_size=?, certs=?, image=?, delivery=?, tags=?, content_data=?, faqs=? 
-                                WHERE id=?
-                            `;
-                            db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]', req.params.id], (err, result) => {
-                                if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
-                                res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+    db.query(`SELECT owner_nickname FROM farm_products WHERE id = ?`, [req.params.id], (err, rows) => {
+        if (!rows || rows.length === 0) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다.' });
+        
+        // 본인이 등록한 상품이 아니면서 최고관리자도 아니면 차단
+        if (rows[0].owner_nickname !== nickname && !isAdmin) {
+            return res.status(403).json({ success: false, message: '본인이 등록한 상품만 수정할 수 있습니다.' });
+        }
+
+        db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {
+            db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {
+                db.query(`ALTER TABLE farm_products ADD COLUMN content_data LONGTEXT`, () => {
+                    db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {
+                        db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {
+                            db.query(`ALTER TABLE farm_products ADD COLUMN faqs LONGTEXT`, () => {
+                                const updateQuery = `
+                                    UPDATE farm_products 
+                                    SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, p_size=?, certs=?, image=?, delivery=?, tags=?, content_data=?, faqs=? 
+                                    WHERE id=?
+                                `;
+                                db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]', req.params.id], (err, result) => {
+                                    if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
+                                    res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
+                                });
                             });
                         });
                     });
@@ -292,12 +316,25 @@ app.put('/api/products/:id', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [상품 삭제 창구]
+// 🌟 [상품 삭제 창구] 본인 소유권 철저 검증 (관리자 예외 허용)
 // ==========================================
 app.delete('/api/products/:id', (req, res) => {
-    db.query(`DELETE FROM farm_products WHERE id = ?`, [req.params.id], (err, result) => {
-        if (err) return res.status(500).json({ success: false, message: '삭제 중 오류가 발생했습니다.' });
-        res.json({ success: true, message: '상품이 안전하게 삭제되었습니다.' });
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    const nickname = req.session.user.nickname;
+    const isAdmin = adminNames.includes(nickname);
+
+    db.query(`SELECT owner_nickname FROM farm_products WHERE id = ?`, [req.params.id], (err, rows) => {
+        if (!rows || rows.length === 0) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다.' });
+        
+        // 본인이 등록한 상품이 아니면서 최고관리자도 아니면 차단
+        if (rows[0].owner_nickname !== nickname && !isAdmin) {
+            return res.status(403).json({ success: false, message: '본인이 등록한 상품만 삭제할 수 있습니다.' });
+        }
+
+        db.query(`DELETE FROM farm_products WHERE id = ?`, [req.params.id], (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: '삭제 중 오류가 발생했습니다.' });
+            res.json({ success: true, message: '상품이 안전하게 삭제되었습니다.' });
+        });
     });
 });
 

@@ -169,7 +169,7 @@
                     <span class="category-badge">농산물</span>
                     <span class="farm-name">🧑‍🌾 지산동 영진농원</span>
                 </div>
-                <div style="display: flex; gap: 8px;">
+                <div id="ownerActionBtns" style="display: none; gap: 8px;">
                     <button onclick="editProduct()" style="padding: 5px 12px; border: 1px solid #4B9AD2; background: #fff; color: #4B9AD2; border-radius: 6px; font-weight: 800; cursor: pointer;">수정</button>
                     <button onclick="deleteProduct()" style="padding: 5px 12px; border: 1px solid #ff5e62; background: #fff; color: #ff5e62; border-radius: 6px; font-weight: 800; cursor: pointer;">삭제</button>
                 </div>
@@ -404,6 +404,12 @@
                     if (result.success) {
                         const p = result.data; // 서버가 꺼내준 진짜 상품 데이터
                         
+                        // [추가] 서버에서 확인한 접속 유저와 상품 등록자가 동일하거나, 관리자인 경우 버튼 노출
+                        const btnArea = document.getElementById('ownerActionBtns');
+                        if (btnArea && (result.isAdmin || (result.currentUser && p.owner_nickname === result.currentUser))) {
+                            btnArea.style.display = 'flex';
+                        }
+
                         // 3. 꿀토마토로 고정되어 있던 글자와 사진을 진짜 정보로 싹 바꿉니다.
                         document.querySelector('.prod-title').innerText = p.title;
                         document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
