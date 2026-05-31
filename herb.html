@@ -170,50 +170,15 @@
     <section class="common-section">
         <h2 class="section-title">
             <span>방금 캐온 신선 약초 장터</span>
-            <a href="register.html" style="font-size: 0.85rem; background: var(--herb-dark); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; cursor: pointer;">+ 약초 등록</a>
+            <a href="register.html?herb=true" style="font-size: 0.85rem; background: var(--herb-dark); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; cursor: pointer;">+ 약초 등록</a>
         </h2>
-        <div class="product-grid">
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1596547609652-9cb5d8d736a6?q=80&w=400&auto=format&fit=crop');">
-                    <span class="badge-wild">자연산</span>
-                </div>
-                <div class="product-info">
-                    <h3>야생 참당귀 뿌리 (생물) 500g</h3>
-                    <div class="price">35,000원</div>
-                    <div class="producer">🧑‍🌾 지리산 털보 심마니</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1611078813735-bc324fcce199?q=80&w=400&auto=format&fit=crop');"></div>
-                <div class="product-info">
-                    <h3>햇 구기자 도라지 건강즙 30포</h3>
-                    <div class="price">42,000원</div>
-                    <div class="producer">🧑‍🌾 약초 짓는 할매 (HUB보관)</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1582210928929-e88df6eecc84?q=80&w=400&auto=format&fit=crop');">
-                    <span class="badge-wild">특품</span>
-                </div>
-                <div class="product-info">
-                    <h3>자연 건조 산수유 열매 1kg</h3>
-                    <div class="price">28,000원</div>
-                    <div class="producer">🧑‍🌾 자연애 약초방</div>
-                </div>
-            </div>
-            <div class="product-card" onclick="location.href='detail.html'">
-                <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1555519808-16e537d97b39?q=80&w=400&auto=format&fit=crop');">
-                    <span class="badge-wild">자연산</span>
-                </div>
-                <div class="product-info">
-                    <h3>자연산 상황버섯 300g</h3>
-                    <div class="price">85,000원</div>
-                    <div class="producer">🧑‍🌾 강원도 약초마을</div>
-                </div>
+        <div class="product-grid" id="herbProductList">
+            <!-- 서버에서 약초 상품을 불러와 여기에 그립니다 -->
+            <div style="grid-column: 1 / -1; text-align: center; padding: 50px; font-size: 1.1rem; color: #888; font-weight: 700; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">
+                약초 상품을 불러오는 중입니다...🌿
             </div>
         </div>
     </section>
-
     <!-- 약초 도감 지식 섹션 -->
     <section class="common-section">
         <h2 class="section-title">팜마을 약초 도감 & 비법</h2>
@@ -250,6 +215,52 @@
             </div>
         </div>
     </section>
+<script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/products')
+            .then(res => res.json())
+            .then(result => {
+                const list = document.getElementById('herbProductList');
+                if (result.success) {
+                    // 서버 전체 상품 중 '#약초' 태그가 포함된 상품만 필터링합니다.
+                    const herbs = result.data.filter(p => p.tags && p.tags.includes('약초'));
+                    
+                    if (herbs.length === 0) {
+                        list.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 50px; font-size: 1.1rem; color: #888; font-weight: 700; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">아직 등록된 약초 상품이 없습니다.<br>첫 번째 약초를 등록해 보세요! 🌿</div>';
+                        return;
+                    }
+                    
+                    list.innerHTML = ''; // 로딩 메시지 지우기
+                    
+                    // 최신순으로 4개만 메인 화면에 보여줍니다.
+                    herbs.slice(0, 4).forEach(p => {
+                        let priceHtml = '';
+                        if (p.org_price && p.org_price > p.sale_price) {
+                            priceHtml += `<span style="text-decoration:line-through; color:#aaa; font-size:0.95rem; margin-right:6px;">${Number(p.org_price).toLocaleString()}원</span>`;
+                        }
+                        priceHtml += `${Number(p.sale_price).toLocaleString()}원`;
 
+                        list.innerHTML += `
+                        <div class="product-card" onclick="location.href='detail.html?id=${p.id}'">
+                            <div class="product-image" style="background-image: url('${p.image || ''}'); background-color: #eee;">
+                                <span class="badge-wild">${p.category}</span>
+                            </div>
+                            <div class="product-info">
+                                <h3 style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.title}</h3>
+                                <div class="price">${priceHtml}</div>
+                                <div class="producer">🧑‍🌾 ${p.farm_name || '명인 약초꾼'}</div>
+                            </div>
+                        </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #888;">상품을 불러오는데 실패했습니다.</div>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('herbProductList').innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 50px; color: #888;">서버 통신 오류가 발생했습니다.</div>';
+            });
+        });
+    </script>
 </body>
 </html>
