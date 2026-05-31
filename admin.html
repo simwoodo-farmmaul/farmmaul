@@ -148,18 +148,36 @@
         </header>
 
         <div id="view-dash" class="view-section active">
-            <div class="master-stats">
-                <div class="stat-box"><span class="stat-label">오늘 총 거래액</span><span class="stat-value">2,450,000원</span></div>
-                <div class="stat-box"><span class="stat-label">오늘 신규 주문</span><span class="stat-value">42건</span></div>
-                <div class="stat-box"><span class="stat-label">승인 대기 건수</span><span class="stat-value" style="color:var(--master-blue)">3건</span></div>
-                <div class="stat-box"><span class="stat-label">누적 회원수</span><span class="stat-value">1,208명</span></div>
-            </div>
-            <div class="card"><h2 class="card-title">주간 거래 차트</h2><p style="color:#888; margin-top:20px;">차트 준비 중입니다.</p></div>
+            <!-- ... (대시보드 내용 유지) ... -->
         </div>
 
-        <div id="view-farm" class="view-section"><div class="card"><h2 class="card-title">생산자 관리 내역</h2></div></div>
+        <!-- 🌟 생산자(농가) 관리 탭: 승인 과정 없이 등록된 상품/생산자를 즉시 보여줌 -->
+        <div id="view-farm" class="view-section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">🧑‍🌾 생산자(농가) 등록 상품 목록</h2>
+                </div>
+                <p style="font-size: 0.9rem; color: #666; margin-bottom: 15px;">* 상품을 등록한 회원은 별도의 승인 절차 없이 자동으로 생산자로 활동 중입니다.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>농장/생산자명</th>
+                            <th>분류</th>
+                            <th>등록 상품명</th>
+                            <th>판매가</th>
+                            <th>등록일시</th>
+                            <th>관리 (보기/삭제)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="farmProductTableBody">
+                        <tr><td colspan="6" style="text-align:center; padding:30px;">생산자 데이터를 불러오는 중입니다...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         
         <div id="view-hub" class="view-section">
+            <!-- ... -->
             <div class="card">
                 <div class="card-header"><h2 class="card-title">등록된 마을 HUB(거점) 목록</h2></div>
                 <table>
@@ -388,9 +406,68 @@
             })
             .catch(err => console.error(err));
             
-            // 허브 데이터 로딩 시작
+            // 허브 및 생산자(상품) 데이터 로딩 시작
             loadHubList();
+            loadFarmProducts(); // 🌟 추가된 함수 호출
         });
+
+        // ==========================================
+        // 🌟 [추가] 생산자(농가) 상품 리스트 불러오기
+        // ==========================================
+        function loadFarmProducts() {
+            fetch('/api/products')
+            .then(res => res.json())
+            .then(result => {
+                const tbody = document.getElementById('farmProductTableBody');
+                tbody.innerHTML = '';
+                
+                if (result.success) {
+                    const products = result.data;
+                    if (products.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">아직 등록된 생산자 상품이 없습니다.</td></tr>';
+                        return;
+                    }
+
+                    products.forEach(p => {
+                        const date = new Date(p.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                        const row = `
+                            <tr>
+                                <td style="color:var(--master-blue); font-weight:800;">${p.farm_name || '농장명 없음'}<br><span style="font-size:0.8rem; color:#888;">(등록자: ${p.owner_nickname || '알수없음'})</span></td>
+                                <td><span class="badge" style="background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9;">${p.category || '농산물'}</span></td>
+                                <td style="font-weight:700; color:#222;">${p.title}</td>
+                                <td><b style="color:var(--master-orange);">${Number(p.sale_price).toLocaleString()}원</b></td>
+                                <td style="font-size:0.85rem; color:#666;">${date}</td>
+                                <td class="action-btns">
+                                    <button class="btn-sm profile" onclick="window.open('detail.html?id=${p.id}', '_blank')">보기</button>
+                                    <button class="btn-sm" style="color:#ff5e62; border-color:#ffcdd2;" onclick="deleteAdminProduct(${p.id})">삭제</button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                    });
+                }
+            })
+            .catch(err => console.error('생산자 상품 목록 로딩 실패:', err));
+        }
+
+        // ==========================================
+        // 🌟 [추가] 관리자 권한으로 상품(생산자 내역) 강제 삭제
+        // ==========================================
+        function deleteAdminProduct(id) {
+            if(confirm("이 상품을 삭제하시겠습니까?\n최고 관리자 권한으로 즉시 삭제됩니다.")) {
+                fetch('/api/products/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        alert("성공적으로 삭제되었습니다.");
+                        loadFarmProducts(); // 목록 새로고침
+                    } else {
+                        alert("삭제 실패: " + data.message);
+                    }
+                })
+                .catch(err => alert("서버 오류가 발생했습니다."));
+            }
+        }
 
         // 2. 왼쪽 메뉴 탭 전환 기능
         function switchView(viewId, element, titleText) {
