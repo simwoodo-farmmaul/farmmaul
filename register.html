@@ -598,6 +598,14 @@
                             renderContents();
                         } catch(e) {}
                     }
+
+                    // ★ FAQ 데이터 복구 ★
+                    if(p.faqs) {
+                        try {
+                            faqs = JSON.parse(p.faqs);
+                            renderFaqs();
+                        } catch(e) {}
+                    }
                     
                     if(p.delivery) {
                         document.getElementById('chk_p').checked = p.delivery.includes('방문수거');
@@ -640,7 +648,7 @@
             if(document.getElementById('chk_d').checked) deliveryOptions.push("택배배송");
             if(deliveryOptions.length === 0) deliveryOptions.push("방문수거"); 
 
-            const productData = {
+          const productData = {
                 farmName: farmName,
                 category: category,
                 title: title,
@@ -653,7 +661,8 @@
                 image: mainImageBase64,
                 delivery: deliveryOptions.join(','),
                 tags: activeTags.join(','), // 서버로 태그 전송
-                contentData: JSON.stringify(contents) // 서버로 10장 사진/글 전송
+                contentData: JSON.stringify(contents), // 서버로 10장 사진/글 전송
+                faqsData: JSON.stringify(faqs) // ★ 서버로 FAQ 전송
             };
 
             const fetchUrl = editId ? '/api/products/' + editId : '/api/products';

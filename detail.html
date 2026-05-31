@@ -485,6 +485,33 @@
                             certsContainer.innerHTML = certsHtml;
                         }
 
+                        // ★ FAQ 데이터 표시 ★
+                        if (p.faqs) {
+                            try {
+                                const faqsData = JSON.parse(p.faqs);
+                                // 사용자가 작성한 유효한 FAQ만 걸러내기 (질문이나 답변 중 하나라도 적혀있는 경우)
+                                const validFaqs = faqsData.filter(f => f.q.trim() !== '' || f.a.trim() !== '');
+                                
+                                if (validFaqs.length > 0) {
+                                    // 기존 화면에 있던 샘플(가짜) FAQ 박스들을 싹 지워줍니다.
+                                    const faqItems = document.querySelectorAll('.faq-item');
+                                    faqItems.forEach(item => item.remove());
+                                    
+                                    // 상세 설명 영역(bottom-section) 맨 끝에 직접 작성하신 FAQ를 차례대로 붙여줍니다.
+                                    const bottomSection = document.querySelector('.bottom-section');
+                                    validFaqs.forEach(f => {
+                                        const faqBlock = document.createElement('div');
+                                        faqBlock.className = 'faq-item';
+                                        faqBlock.innerHTML = `
+                                            <div class="faq-q">${f.q}</div>
+                                            <div class="faq-a">${f.a.replace(/\n/g, '<br>')}</div>
+                                        `;
+                                        bottomSection.appendChild(faqBlock);
+                                    });
+                                }
+                            } catch(e) {}
+                        }
+
                         // ★ 허용되지 않은 수령 방식(라디오 버튼) 숨기기 ★
                         const delOptions = p.delivery || '방문수거,HUB보관,택배배송'; 
                         
