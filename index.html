@@ -615,12 +615,37 @@
                 .then(data => {
                     const authZone = document.getElementById('auth-zone');
                     if (data.loggedIn) {
+                        // 🌟 관리자 명단 확인 (서버 시스템과 동일한 명단 적용)
+                        const adminNames = ['김영진', '김영진(지산)', '지산'];
+                        const isAdmin = adminNames.includes(data.user.nickname);
+                        
+                        // 🌟 관리자일 경우에만 상단 메뉴 구석에 나타나는 버튼 HTML
+                        const adminBtnHtml = isAdmin ? `<a href="admin.html" style="padding: 5px 10px; background-color: #2e7d32; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; margin-right: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">⚙️ 통합 관리자</a>` : '';
+
+                        // 상단 메뉴 업데이트
                         authZone.innerHTML = `
                             <span style="color: #333; font-weight: bold; margin-right: 8px; font-size:13px; white-space: nowrap;">
                                 👤 ${data.user.nickname}님 환영합니다
                             </span>
+                            ${adminBtnHtml}
                             <a href="/auth/logout" style="padding: 5px 10px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap;">로그아웃</a>
                         `;
+
+                        // 🌟 관리자일 경우 모바일 화면 하단 메뉴에도 조용히 추가
+                        if (isAdmin) {
+                            const mobileNav = document.querySelector('.mobile-bottom-nav');
+                            if (mobileNav) {
+                                const adminNav = document.createElement('a');
+                                adminNav.href = 'admin.html';
+                                adminNav.className = 'nav-item';
+                                adminNav.innerHTML = `<span class="icon" style="color:#2e7d32;">⚙️</span><span class="text" style="color:#2e7d32; font-weight:800;">관리자</span>`;
+                                mobileNav.appendChild(adminNav);
+                                
+                                // 메뉴 개수가 늘어났으므로 간격 자동 재조정
+                                const navItems = mobileNav.querySelectorAll('.nav-item');
+                                navItems.forEach(item => item.style.width = (100 / navItems.length) + '%');
+                            }
+                        }
                     }
                 })
                 .catch(err => console.error('사용자 정보 조회 실패:', err));
