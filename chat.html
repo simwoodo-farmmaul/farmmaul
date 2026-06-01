@@ -82,39 +82,15 @@
             <button style="padding:8px 12px; background:var(--bg-chat); border:1px solid #ddd; border-radius:8px; font-weight:800; font-size:0.8rem; cursor:pointer;">상품보기</button>
         </div>
 
-        <div class="chat-messages" id="chatWindow">
+   <div class="chat-messages" id="chatWindow">
             
             <div class="system-msg">
-                <span>2026년 5월 8일 금요일</span>
+                <span>오늘의 대화</span>
             </div>
             
             <div class="warm-notice">
                 🌱 이웃과 나누는 따뜻한 대화, <b>오늘톡</b>입니다.<br>
                 서로를 존중하는 배려의 한마디가 좋은 직거래를 만듭니다.
-            </div>
-
-            <div class="msg-row msg-other">
-                <div class="profile-pic">🧑‍🌾</div>
-                <div class="msg-bubble">
-                    안녕하세요! 평택 지산동 영진농원입니다. 😊<br>
-                    문의하신 꿀토마토에 대해 궁금하신 점을 편하게 남겨주시면 정성껏 답변해 드리겠습니다.
-                </div>
-                <span class="msg-time">오전 10:00</span>
-            </div>
-
-            <div class="msg-row msg-me">
-                <span class="msg-time">오전 10:05</span>
-                <div class="msg-bubble">
-                    안녕하세요~ 방문 수거를 하려고 하는데요, 혹시 내일 퇴근하고 오후 6시쯤 가도 싱싱한 토마토가 남아있을까요?
-                </div>
-            </div>
-
-            <div class="msg-row msg-other">
-                <div class="profile-pic">🧑‍🌾</div>
-                <div class="msg-bubble">
-                    네, 그럼요! 내일 오후 6시에 오신다고 메모해 두겠습니다. 방금 딴 가장 신선하고 예쁜 토마토들로 따로 상자에 잘 담아두겠습니다. 오시는 길 조심해서 오세요! 🍅
-                </div>
-                <span class="msg-time">오전 10:12</span>
             </div>
 
             <div id="scrollTarget"></div>
@@ -130,10 +106,29 @@
 
     </div>
 
-    <script>
+<script>
         const chatWindow = document.getElementById('chatWindow');
         const msgInput = document.getElementById('msgInput');
         const scrollTarget = document.getElementById('scrollTarget');
+        let currentUser = "";
+
+        // 페이지가 열리면 현재 로그인된 유저 정보를 가져오고 채팅 내역을 불러옵니다.
+        document.addEventListener("DOMContentLoaded", () => {
+            fetch('/api/user')
+            .then(res => res.json())
+            .then(data => {
+                if (!data.loggedIn) {
+                    alert("로그인 후 상담 기능을 이용하실 수 있습니다.");
+                    location.href = "login.html";
+                    return;
+                }
+                currentUser = data.user.nickname;
+                loadChatHistory();
+                
+                // 3초마다 새로운 메시지가 왔는지 서버를 확인합니다.
+                setInterval(loadChatHistory, 3000); 
+            });
+        });
 
         // 엔터키 입력 처리
         function handleEnter(event) {
@@ -142,40 +137,80 @@
             }
         }
 
-        // 메시지 전송 로직
+        // 서버에서 실제 대화 내역 불러오기
+        function loadChatHistory() {
+            if (!currentUser) return;
+
+            fetch('/api/chat/history/' + currentUser)
+            .then(res => res.json())
+            .then(result => {
+                if (result.success) {
+                    // 화면에 있던 기존 말풍선들을 지우고 새로 그립니다 (중복 방지)
+                    const existingMsgs = chatWindow.querySelectorAll('.msg-row');
+                    existingMsgs.forEach(msg => msg.remove());
+                    
+                    result.data.forEach(msg => {
+                        const date = new Date(msg.created_at);
+                        let hours = date.getHours();
+                        let minutes = date.getMinutes();
+                        const ampm = hours >= 12 ? '오후' : '오전';
+                        hours = hours % 12;
+                        hours = hours ? hours : 12;
+                        minutes = minutes < 10 ? '0' + minutes : minutes;
+                        const timeString = `${ampm} ${hours}:${minutes}`;
+
+                        let msgHtml = '';
+                        if (msg.sender === currentUser) {
+                            // 내가 보낸 메시지
+                            msgHtml = `
+                                <div class="msg-row msg-me">
+                                    <span class="msg-time">${timeString}</span>
+                                    <div class="msg-bubble">${msg.message}</div>
+                                </div>
+                            `;
+                        } else {
+                            // 농장(관리자)이 보낸 메시지
+                            msgHtml = `
+                                <div class="msg-row msg-other">
+                                    <div class="profile-pic">🧑‍🌾</div>
+                                    <div class="msg-bubble">${msg.message}</div>
+                                    <span class="msg-time">${timeString}</span>
+                                </div>
+                            `;
+                        }
+                        // scrollTarget(가장 아래 보이지 않는 점) 바로 위에 메시지를 차례대로 붙입니다.
+                        chatWindow.insertBefore(document.createRange().createContextualFragment(msgHtml), scrollTarget);
+                    });
+                    
+                    // 스크롤 맨 아래로 부드럽게 이동
+                    scrollTarget.scrollIntoView();
+                }
+            });
+        }
+
+        // 실제 서버로 메시지 전송하기
         function sendMessage() {
             const text = msgInput.value.trim();
             if(text === '') return;
 
-            // 현재 시간 구하기 (오전/오후 H:MM 형식)
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            const ampm = hours >= 12 ? '오후' : '오전';
-            hours = hours % 12;
-            hours = hours ? hours : 12; // 0시는 12시로 표시
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            const timeString = `${ampm} ${hours}:${minutes}`;
-
-            // 말풍선 HTML 생성 (나의 메시지)
-            const msgHtml = `
-                <div class="msg-row msg-me">
-                    <span class="msg-time">${timeString}</span>
-                    <div class="msg-bubble">${text}</div>
-                </div>
-            `;
-
-            // 채팅창에 추가
-            chatWindow.insertAdjacentHTML('beforeend', msgHtml);
-            
-            // 입력창 비우기 및 스크롤 맨 아래로 이동
-            msgInput.value = '';
-            scrollTarget.scrollIntoView({ behavior: "smooth" });
-        }
-
-        // 페이지 열릴 때 가장 아래로 스크롤
-        window.onload = function() {
-            scrollTarget.scrollIntoView();
+            fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    receiver: '지산동 영진농원', // 기본 수신자를 농장으로 설정
+                    message: text
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    msgInput.value = ''; // 전송 성공 시 입력창 비우기
+                    loadChatHistory();   // 내역 즉시 새로고침
+                } else {
+                    alert('전송 실패: ' + data.message);
+                }
+            })
+            .catch(err => alert('서버 통신 오류가 발생했습니다.'));
         }
     </script>
 </body>
