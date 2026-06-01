@@ -403,6 +403,35 @@ app.get('/api/chat/history/:targetUser', (req, res) => {
         res.json({ success: true, data: results });
     });
 });
+// ==========================================
+// 🌟 [추가] 비회원도 가능한 AI 고객센터 문의 저장 API
+// ==========================================
+app.post('/api/ai-chat', (req, res) => {
+    const { productId, message } = req.body;
+    
+    // 비회원의 AI 문의를 따로 저장하는 전용 테이블 생성
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_ai_inquiries (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            product_id VARCHAR(50),
+            message TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    
+    db.query(createTableQuery, (err) => {
+        const insertQuery = `INSERT INTO farm_ai_inquiries (product_id, message) VALUES (?, ?)`;
+        db.query(insertQuery, [productId || '알수없음', message], (err, result) => {
+            if (err) return res.status(500).json({ success: false });
+            
+            // DB에 성공적으로 등록되면 AI가 화면에 띄워줄 자동 응답을 보냅니다.
+            res.json({ 
+                success: true, 
+                reply: "질문이 성공적으로 등록되었습니다! 🌿<br>현재 AI 상담원이 학습 중이므로, 남겨주신 소중한 문의는 농장 생산자님께 바로 전달해 드리겠습니다." 
+            });
+        });
+    });
+});
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 

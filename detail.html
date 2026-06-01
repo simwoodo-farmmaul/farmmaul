@@ -295,8 +295,8 @@
             <div class="ai-msg" style="background:#e3f2fd; border-color:#bbdefb;">지금 주문하시면 내일 아침에 수확하여 오후에 HUB로 배달될 예정입니다!</div>
         </div>
         <div class="ai-chat-footer">
-            <input type="text" class="ai-chat-input" placeholder="궁금한 점을 물어보세요...">
-            <button class="ai-chat-send" onclick="alert('준비 중인 기능입니다.')">전송</button>
+            <input type="text" id="aiChatInput" class="ai-chat-input" placeholder="궁금한 점을 물어보세요..." onkeypress="if(event.key==='Enter') sendAiChat()">
+            <button class="ai-chat-send" onclick="sendAiChat()">전송</button>
         </div>
     </div>
 
@@ -576,6 +576,50 @@
             const productId = urlParams.get('id');
             // '수정 모드'로 상품 등록 페이지 열기
             location.href = 'register.html?edit=' + productId;
+        }
+// ★ 비회원도 가능한 AI 채팅 전송 기능 ★
+        function sendAiChat() {
+            const input = document.getElementById('aiChatInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const chatBody = document.querySelector('.ai-chat-body');
+            
+            // 1. 내가 보낸 질문 말풍선을 화면에 그리기 (우측 정렬)
+            const myMsg = document.createElement('div');
+            myMsg.className = 'ai-msg';
+            myMsg.style.cssText = 'background:#e8f5e9; border-color:#c8e6c9; align-self:flex-end; border-radius:15px 15px 0 15px; margin-bottom:10px;';
+            myMsg.innerText = text;
+            chatBody.appendChild(myMsg);
+            
+            input.value = ''; // 입력창 비우기
+            chatBody.scrollTop = chatBody.scrollHeight; // 스크롤 맨 아래로
+
+            // 주소창에서 현재 보고 있는 상품 번호 가져오기
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+
+            // 2. 서버로 질문 전송 (비회원/손님 모두 가능)
+            fetch('/api/ai-chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: productId, message: text })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    // 3. 서버에 질문이 잘 저장되면 AI의 답변을 화면에 보여줌 (0.5초 딜레이)
+                    setTimeout(() => {
+                        const aiReply = document.createElement('div');
+                        aiReply.className = 'ai-msg';
+                        aiReply.style.cssText = 'background:#e3f2fd; border-color:#bbdefb; margin-bottom:10px;';
+                        aiReply.innerHTML = data.reply;
+                        chatBody.appendChild(aiReply);
+                        chatBody.scrollTop = chatBody.scrollHeight;
+                    }, 500); 
+                }
+            })
+            .catch(err => console.error(err));
         }
     </script>
 </body>
