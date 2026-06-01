@@ -290,8 +290,10 @@
             <h3>🤖 팜마을 AI 고객센터</h3>
             <span onclick="toggleAIChat()" style="cursor:pointer; font-size: 1.5rem;">×</span>
         </div>
-        <div class="ai-chat-body">
-            <div class="ai-msg">안녕하세요! 팜마을 AI 상담원입니다. 🌿<br>지산동 영진농원 꿀토마토에 대해 궁금하신 점이 있으신가요?</div>
+       <div class="ai-msg">
+            안녕하세요! 팜마을 AI 상담원입니다. 🌿<br>
+            <b id="aiGreetingTarget">상품 정보를 불러오는 중...</b>에 대해 궁금하신 점이 있으신가요?
+        </div>
             <div class="ai-msg" style="background:#e3f2fd; border-color:#bbdefb;">지금 주문하시면 내일 아침에 수확하여 오후에 HUB로 배달될 예정입니다!</div>
         </div>
         <div class="ai-chat-footer">
@@ -410,11 +412,19 @@
                             btnArea.style.display = 'flex';
                         }
 
-                        // 3. 꿀토마토로 고정되어 있던 글자와 사진을 진짜 정보로 싹 바꿉니다.
+                       // 3. 꿀토마토로 고정되어 있던 글자와 사진을 진짜 정보로 싹 바꿉니다.
                         document.querySelector('.prod-title').innerText = p.title;
                         document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
                         document.querySelector('.farm-name').innerText = '🧑‍🌾 ' + (p.farm_name || '지산동 영진농원');
                         
+                        // ★ [추가] AI 고객센터 환영 메시지에 '농장 이름' + '상품 제목'을 나란히 붙여서 넣기 ★
+                        const greetingTarget = document.getElementById('aiGreetingTarget');
+                        if (greetingTarget) {
+                            const farmName = p.farm_name || '팜마을 생산자';
+                            const prodTitle = p.title || '상품';
+                            greetingTarget.innerText = farmName + ' ' + prodTitle;
+                        }
+
                         // 원가가 0원이면 숨기고, 입력했으면 할인율(%)과 원래 가격을 계산해서 보여줍니다.
                         if (p.org_price && p.org_price > 0 && p.org_price > p.sale_price) {
                             document.querySelector('.org-price').innerText = Number(p.org_price).toLocaleString() + '원';
