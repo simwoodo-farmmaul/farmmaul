@@ -433,6 +433,23 @@ app.post('/api/ai-chat', (req, res) => {
     });
 });
 const PORT = process.env.PORT || 3000;
+// ==========================================
+// 🌟 [추가] 관리자용: AI 고객센터 문의 내역 불러오기 API
+// ==========================================
+app.get('/api/admin/ai-inquiries', (req, res) => {
+    // farm_ai_inquiries 테이블과 farm_products 테이블을 연결(JOIN)하여 
+    // 어떤 상품에 대한 문의인지 제목과 농장 이름을 함께 가져옵니다.
+    const query = `
+        SELECT a.id, a.message, a.created_at, p.title, p.farm_name, p.owner_nickname 
+        FROM farm_ai_inquiries a
+        LEFT JOIN farm_products p ON a.product_id = p.id
+        ORDER BY a.created_at DESC
+    `;
+    db.query(query, (err, results) => {
+        if (err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 
 // ==========================================
