@@ -475,11 +475,10 @@
         <p class="section-subtitle">내가 사는 곳을 기준으로, 내 주변의 가까운 HUB 위치를 확인하세요.</p>
         <div class="hub-search-ui">
         <div class="region-selects">
-            <!-- 전국 공공데이터를 불러오기 위해 속성을 변경했습니다 -->
-            <select id="sidoSelect" onchange="onSidoChange()">
+            <select id="sidoSelect" onchange="changeSido()">
                 <option value="">시/도 전체</option>
             </select>
-            <select id="sigunguSelect" onchange="onSigunguChange()">
+            <select id="sigunguSelect" onchange="changeSigungu()">
                 <option value="">시/군/구 전체</option>
             </select>
             <select id="dongSelect" onchange="updateHubFilter()">
@@ -694,23 +693,110 @@
     </div>
 
 <script>
-        // 🌟 서버에서 전국 허브 데이터를 한 번에 가져와 보관하는 공간입니다.
-        let allHubs = [];
+        // 공공데이터 법정동 API 주소
+        const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
+        let allHubs = []; // 서버에서 불러온 허브 목록을 저장할 공간
 
-        // 1. 웹페이지가 켜질 때 전국 허브 목록을 실시간으로 가져옵니다.
         document.addEventListener("DOMContentLoaded", function() {
+            // 1. 전국 시/도 데이터 API로 불러오기
+            fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
+                .then(response => response.json())
+                .then(data => {
+                    const sidoSelect = document.getElementById('sidoSelect');
+                    data.regcodes.forEach(function(item) {
+                        let option = document.createElement('option');
+                        option.value = item.name; // 값: "경기도"
+                        option.text = item.name;  // 보이는 글자: "경기도"
+                        option.dataset.code = item.code.substring(0, 2); // 숨겨진 행정코드: "41"
+                        sidoSelect.add(option);
+                    });
+                });
+
+            // 2. 팜마을 허브 리스트 가져오기
             fetch('/api/hubs')
-            .then(response => response.json())
-            .then(result => {
-                if(result.success) {
-                    allHubs = result.data; // 전국 데이터를 allHubs에 저장
-                    updateHubFilter(); // 저장 후 즉시 화면에 맞게 분류 시작!
-                }
-            })
-            .catch(error => console.error('허브 리스트를 불러오는데 실패했습니다:', error));
+                .then(response => response.json())
+                .then(result => {
+                    if(result.success) {
+                        allHubs = result.data;
+                        updateHubFilter(); 
+                    }
+                })
+                .catch(error => console.error('허브 리스트 불러오기 실패:', error));
         });
 
-        // 2. 지역 선택(시/도, 시/군/구, 동)을 바꿀 때마다 실행되는 필터링 기능입니다.
+        // 🌟 3. 시/도를 선택했을 때 -> 시/군/구 API 불러오기
+        function changeSido() {
+            const sidoSelect = document.getElementById('sidoSelect');
+            const sigunguSelect = document.getElementById('sigunguSelect');
+            const dongSelect = document.getElementById('dongSelect');
+            
+            // 하위 메뉴 초기화
+            sigunguSelect.options.length = 1;
+            dongSelect.options.length = 1;
+
+            if (sidoSelect.selectedIndex === 0) {
+                updateHubFilter();
+                return;
+            }
+
+            // 선택된 시/도의 고유 코드 추출 (예: 경기도 = 41)
+            const sidoCode = sidoSelect.options[sidoSelect.selectedIndex].dataset.code;
+
+            // 시/군/구 API 호출
+            fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
+                .then(response => response.json())
+                .then(data => {
+                    data.regcodes.forEach(function(item) {
+                        let nameArray = item.name.split(" ");
+                        if (nameArray.length > 1) { 
+                            // "경기도 수원시 권선구" 처럼 나오는 결과에서 시/도 이름 떼어내기
+                            let sigunguName = nameArray.slice(1).join(" ");
+                            let option = document.createElement('option');
+                            option.value = sigunguName;
+                            option.text = sigunguName;
+                            option.dataset.code = item.code.substring(0, 5); // 시군구 고유코드
+                            sigunguSelect.add(option);
+                        }
+                    });
+                });
+            updateHubFilter();
+        }
+
+        // 🌟 4. 시/군/구를 선택했을 때 -> 읍/면/동 API 불러오기
+        function changeSigungu() {
+            const sigunguSelect = document.getElementById('sigunguSelect');
+            const dongSelect = document.getElementById('dongSelect');
+            
+            // 동 메뉴 초기화
+            dongSelect.options.length = 1;
+
+            if (sigunguSelect.selectedIndex === 0) {
+                updateHubFilter();
+                return;
+            }
+
+            // 선택된 시/군/구의 고유 코드 추출
+            const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex].dataset.code;
+
+            // 읍/면/동 API 호출 (is_ignore_zero=true 속성으로 껍데기 지역 제거)
+            fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
+                .then(response => response.json())
+                .then(data => {
+                    data.regcodes.forEach(function(item) {
+                        let nameArray = item.name.split(" ");
+                        if (nameArray.length > 2) {
+                            let dongName = nameArray[nameArray.length - 1]; // 배열 마지막의 동 이름만 추출
+                            let option = document.createElement('option');
+                            option.value = dongName;
+                            option.text = dongName;
+                            dongSelect.add(option);
+                        }
+                    });
+                });
+            updateHubFilter();
+        }
+
+        // 🌟 5. 실제 허브 지도 및 리스트 출력
         function updateHubFilter() {
             const sido = document.getElementById('sidoSelect').value;
             const sigungu = document.getElementById('sigunguSelect').value;
@@ -719,33 +805,35 @@
             const container = document.getElementById('mainHubListContainer');
             container.innerHTML = ''; 
 
-            // 선택한 지역에 맞는 허브만 골라냅니다.
             const filteredHubs = allHubs.filter(hub => {
                 let match = true;
                 if (sido && !hub.hub_address.includes(sido)) match = false;
-                if (sigungu && !hub.hub_address.includes(sigungu)) match = false;
+                
+                // 시/군/구 값이 존재할 때, 주소 비교 (예: "수원시 권선구" 포함 여부 확인)
+                if (sigungu) {
+                    // 띄어쓰기로 분리된 복합 구(수원시 권선구)를 안전하게 검색하기 위해 분리하여 확인
+                    const sigunguParts = sigungu.split(" ");
+                    sigunguParts.forEach(part => {
+                        if (!hub.hub_address.includes(part)) match = false;
+                    });
+                }
+                
                 if (dong && !hub.hub_address.includes(dong)) match = false;
                 return match;
             });
 
-            // 🌿 검색 결과가 없을 때의 화면 처리
             if(filteredHubs.length === 0) {
                 container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">선택하신 지역에 아직 승인된 우리동네 HUB 거점이 없습니다.</div>';
-                
-                // 검색 결과가 없으면 선택한 지역을 넓게 지도로 비춰줍니다.
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기도 평택시 지산동';
                 document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(fallbackAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 return;
             }
 
-            // 🌿 검색 결과가 있을 경우, 첫 번째 허브 위치로 지도를 이동시킵니다.
             const firstHubAddr = filteredHubs[0].hub_address.replace(/\[\d+\]\s*/, '');
             document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
-            // 검색된 허브 리스트를 화면에 보여줍니다. (최대 3개)
             filteredHubs.slice(0, 3).forEach(hub => {
                 const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
-                
                 const itemHtml = `
                     <div class="hub-list-item" 
                          onclick="location.href='hub.html?id=${hub.id}'"
@@ -758,7 +846,6 @@
             });
         }
 
-        // 3. 목록에 마우스를 올리면 지도가 그 위치로 부드럽게 이동하는 함수입니다.
         function updateMainMap(address) {
             const iframe = document.getElementById('mainMapIframe');
             const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
@@ -766,8 +853,7 @@
                 iframe.src = newSrc;
             }
         }
-    </script>
-    <script>
+    </script>    <script>
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/user')
                 .then(response => response.json())
