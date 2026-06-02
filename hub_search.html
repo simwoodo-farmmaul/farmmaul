@@ -132,9 +132,15 @@
         const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
         let allHubs = []; 
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // 1. 전국 시/도 API 불러오기
-            fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
+        document.addEventListener("DOMContentLoaded", async function() {
+            // 🌟 1. 메인 페이지 주소창에서 전달받은 '동네 정보'를 읽어냅니다.
+            const urlParams = new URLSearchParams(window.location.search);
+            const pSido = urlParams.get('sido');
+            const pSigungu = urlParams.get('sigungu');
+            const pDong = urlParams.get('dong');
+
+            // 🌟 2. 우선 전국 시/도 목록을 API로 불러와 채웁니다 (완료될 때까지 기다림)
+            await fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
                 .then(response => response.json())
                 .then(data => {
                     const sidoSelect = document.getElementById('sidoSelect');
@@ -147,13 +153,19 @@
                     });
                 });
 
-            // 2. 허브 데이터 불러오기
+            // 🌟 3. 만약 메인에서 전달받은 지역(sido)이 있다면, 자동으로 세팅을 시작합니다.
+            if (pSido) {
+                document.getElementById('sidoSelect').value = pSido;
+                await executeAutoSet(pSigungu, pDong); // 하위 지역(시군구, 동) 자동 설정 기능 호출
+            }
+
+            // 🌟 4. 허브 데이터 불러오기 및 최종 화면 출력
             fetch('/api/hubs')
             .then(response => response.json())
             .then(result => {
                 if(result.success) {
                     allHubs = result.data;
-                    filterHubsByRegion(); // 초기 화면에서 전체 리스트를 한 번 보여줍니다.
+                    filterHubsByRegion(); 
                 }
             })
             .catch(error => {
@@ -162,7 +174,62 @@
             });
         });
 
-        // 🌟 시/도를 선택했을 때 -> 시/군/구 목록 자동 생성
+        // ==================================================
+        // 🚀 초기 로딩 시 지역을 자동으로 맞춰주는 전용 마법사 함수
+        // ==================================================
+        async function executeAutoSet(pSigungu, pDong) {
+            const sidoSelect = document.getElementById('sidoSelect');
+            const sigunguSelect = document.getElementById('sigunguSelect');
+            const dongSelect = document.getElementById('dongSelect');
+            
+            const sidoCode = sidoSelect.options[sidoSelect.selectedIndex]?.dataset.code;
+            if(!sidoCode) return;
+
+            // 시/군/구 데이터 가져오기
+            await fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
+                .then(res => res.json())
+                .then(data => {
+                    data.regcodes.forEach(item => {
+                        let nameArray = item.name.split(" ");
+                        if (nameArray.length > 1) { 
+                            let sigunguName = nameArray.slice(1).join(" ");
+                            let option = document.createElement('option');
+                            option.value = sigunguName; option.text = sigunguName; option.dataset.code = item.code.substring(0, 5);
+                            sigunguSelect.add(option);
+                        }
+                    });
+                });
+
+            // 전달받은 시군구가 있다면 세팅
+            if (pSigungu && Array.from(sigunguSelect.options).some(opt => opt.value === pSigungu)) {
+                sigunguSelect.value = pSigungu;
+                const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex]?.dataset.code;
+                
+                // 읍/면/동 데이터 가져오기
+                await fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.regcodes.forEach(item => {
+                            let nameArray = item.name.split(" ");
+                            if (nameArray.length > 2) {
+                                let dongName = nameArray[nameArray.length - 1];
+                                let option = document.createElement('option');
+                                option.value = dongName; option.text = dongName;
+                                dongSelect.add(option);
+                            }
+                        });
+                    });
+
+                // 전달받은 동이 있다면 세팅
+                if (pDong && Array.from(dongSelect.options).some(opt => opt.value === pDong)) {
+                    dongSelect.value = pDong;
+                }
+            }
+        }
+
+        // ==================================================
+        // 🌟 아래는 검색 화면에서 사용자가 직접 바꿀 때 쓰이는 기본 함수 (유지)
+        // ==================================================
         function changeSido() {
             const sidoSelect = document.getElementById('sidoSelect');
             const sigunguSelect = document.getElementById('sigunguSelect');
@@ -170,9 +237,7 @@
             
             sigunguSelect.options.length = 1;
             dongSelect.options.length = 1;
-
             if (sidoSelect.selectedIndex === 0) return;
-
             const sidoCode = sidoSelect.options[sidoSelect.selectedIndex].dataset.code;
 
             fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
@@ -183,24 +248,19 @@
                         if (nameArray.length > 1) { 
                             let sigunguName = nameArray.slice(1).join(" ");
                             let option = document.createElement('option');
-                            option.value = sigunguName;
-                            option.text = sigunguName;
-                            option.dataset.code = item.code.substring(0, 5);
+                            option.value = sigunguName; option.text = sigunguName; option.dataset.code = item.code.substring(0, 5);
                             sigunguSelect.add(option);
                         }
                     });
                 });
         }
 
-        // 🌟 시/군/구를 선택했을 때 -> 읍/면/동 목록 자동 생성
         function changeSigungu() {
             const sigunguSelect = document.getElementById('sigunguSelect');
             const dongSelect = document.getElementById('dongSelect');
             
             dongSelect.options.length = 1;
-
             if (sigunguSelect.selectedIndex === 0) return;
-
             const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex].dataset.code;
 
             fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
@@ -211,15 +271,13 @@
                         if (nameArray.length > 2) {
                             let dongName = nameArray[nameArray.length - 1];
                             let option = document.createElement('option');
-                            option.value = dongName;
-                            option.text = dongName;
+                            option.value = dongName; option.text = dongName;
                             dongSelect.add(option);
                         }
                     });
                 });
         }
 
-        // 🌟 검색하기 버튼을 눌렀을 때 실행되는 필터 기능
         function filterHubsByRegion() {
             const sido = document.getElementById('sidoSelect').value;
             const sigungu = document.getElementById('sigunguSelect').value;
@@ -248,7 +306,6 @@
             renderHubs(filtered);
         }
 
-        // 🌟 검색된 허브 리스트와 지도를 화면에 예쁘게 그려주는 기능
         function renderHubs(dataList) {
             const container = document.getElementById('searchHubListContainer');
             document.getElementById('hubCountText').innerText = dataList.length;
@@ -260,18 +317,14 @@
 
             if(dataList.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">선택하신 동네와 일치하는 마을 HUB 거점이 없습니다.</div>';
-                
-                // 검색 결과가 없으면 선택한 지역 지도를 보여줍니다. (지도 URL 오류 수정 완료)
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기 평택시 지산동';
                 document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(fallbackAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
                 return;
             }
 
-            // 검색 결과가 있으면 첫 번째 허브 위치로 지도를 이동시킵니다. (지도 URL 오류 수정 완료)
             const firstHubAddr = dataList[0].hub_address.replace(/\[\d+\]\s*/, '');
             document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
-            // 허브 리스트 카드 생성
             dataList.forEach(hub => {
                 const imgUrl = hub.hub_image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop";
                 
@@ -300,7 +353,6 @@
             });
         }
 
-        // 리스트에 마우스를 올리면 지도 화면이 그 위치로 바뀌는 기능 (지도 URL 오류 수정 완료)
         function updateSearchMap(address) {
             const iframe = document.getElementById('searchMapIframe');
             const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
@@ -308,5 +360,6 @@
                 iframe.src = newSrc;
             }
         }
-    </script></body>
+    </script>
+</body>
 </html>

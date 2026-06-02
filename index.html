@@ -485,7 +485,18 @@
                 <option value="">읍/면/동 전체</option>
             </select>
             <div class="hub-btn-group">
-                <button class="btn-search-hub" onclick="location.href='hub_search.html'">전국 검색</button>
+                <button class="btn-search-hub" onclick="goToHubSearch()">전국 검색</button>
+                <script>
+                    // 🌟 선택된 지역을 검색 페이지로 전달하는 연결 기능
+                    function goToHubSearch() {
+                        const sido = document.getElementById('sidoSelect').value || '';
+                        const sigungu = document.getElementById('sigunguSelect').value || '';
+                        const dong = document.getElementById('dongSelect').value || '';
+                        
+                        // hub_search.html 주소 뒤에 '?sido=경기도&sigungu=평택시...' 형태로 달아서 보냅니다.
+                        location.href = `hub_search.html?sido=${encodeURIComponent(sido)}&sigungu=${encodeURIComponent(sigungu)}&dong=${encodeURIComponent(dong)}`;
+                    }
+                </script>
                 <button class="btn-hub-apply" onclick="location.href='hub_apply.html'">허브등록신청</button>
             </div>
         </div>            <div class="hub-display-area">
