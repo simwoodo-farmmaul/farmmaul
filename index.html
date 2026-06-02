@@ -302,17 +302,20 @@
     </div>
 
 <header>
-    <div class="header-container">
+       <div class="header-container">
         
         <a href="index.html" class="logo-text">
             <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
         </a>
         
+        <!-- 👇 검색창을 auth-zone 구역 밖으로 분리했습니다 -->
+        <div class="search-bar header-search-bar">
+            <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
+            <button onclick="executeSearch()">🔍</button>
+        </div>
+        <!-- 👆 분리 완료 -->
+
         <div class="auth-zone-flex" id="auth-zone">
-            <div class="search-bar header-search-bar">
-                <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
-                <button onclick="executeSearch()">🔍</button>
-            </div>
             <a href="login.html" class="btn-login">로그인</a>  
             <a href="join.html" class="btn-register-trigger">회원가입</a>
         </div>

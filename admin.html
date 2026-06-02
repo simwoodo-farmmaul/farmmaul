@@ -114,6 +114,29 @@
             .master-stats, .stat-grid { grid-template-columns: 1fr 1fr; }
             .filter-bar { flex-direction: column; align-items: stretch; }
         }
+
+        /* 👇 새로 추가된 모바일 화면 최적화 시작 */
+        @media (max-width: 768px) {
+            body { flex-direction: column; overflow: auto; } /* 화면을 세로로 배치하고 전체 스크롤 허용 */
+            
+            /* 왼쪽 메뉴바를 상단 가로 메뉴로 변경 */
+            .sidebar { width: 100%; height: auto; border-bottom: 2px solid var(--master-green); }
+            .sidebar-header { padding: 15px; font-size: 1.5rem; }
+            .menu-list { display: flex; overflow-x: auto; white-space: nowrap; padding: 0; }
+            
+            /* 메뉴 항목 디자인 수정 */
+            .menu-item { border-left: none; border-bottom: 4px solid transparent; padding: 12px 15px; font-size: 0.95rem; }
+            .menu-item:hover, .menu-item.active { background: #2d2f39; border-left-color: transparent; border-bottom-color: var(--master-green); }
+            .menu-item.herb:hover, .menu-item.herb.active { border-left-color: transparent; border-bottom-color: var(--herb-dark); }
+            
+            /* 메인 화면 영역 넓히기 */
+            .main-content { overflow-y: visible; }
+            .top-bar { padding: 15px; flex-direction: column; gap: 10px; align-items: flex-start; }
+            .view-section { padding: 15px; }
+            .card { padding: 15px; }
+            .stat-grid { grid-template-columns: 1fr; } /* 통계 박스를 1줄로 정렬 */
+        }
+        /* 👆 새로 추가된 모바일 화면 최적화 끝 */
     </style>
 </head>
 <body>
