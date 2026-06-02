@@ -245,12 +245,50 @@
             .logo-text { font-size: 1.5rem !important; gap: 2px !important; letter-spacing: -1.5px !important; }
             .logo-icon { height: 2.0rem !important; }
             
-            /* 3. 환영인사 글씨를 살짝 줄여 로그아웃 버튼을 좌측으로 당김 */
-            #auth-zone { gap: 4px !important; }
-            #auth-zone span { font-size: 12px !important; margin-right: 3px !important; letter-spacing: -0.5px; }
-            #auth-zone a[href="/auth/logout"] { padding: 5px 8px !important; font-size: 12px !important; }
+        /* 3. 환영인사 글씨를 살짝 줄여 로그아웃 버튼을 좌측으로 당김 */
+        #auth-zone { gap: 4px !important; }
+        #auth-zone span { font-size: 12px !important; margin-right: 3px !important; letter-spacing: -0.5px; }
+        #auth-zone a[href="/auth/logout"] { padding: 5px 8px !important; font-size: 12px !important; }
+    }
+
+    /* 👇 새로 추가된 부분 시작 */
+    /* 헤더 내부 검색창 스타일 (PC용) */
+    .header-search-bar {
+        max-width: 280px;
+        height: 36px;
+        margin-right: 15px;
+        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #eaeaea;
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        background: #fff;
+    }
+
+    .header-search-bar input {
+        flex: 1;
+        border: none;
+        outline: none;
+        padding: 0 15px;
+        font-size: 0.9rem;
+    }
+    
+    .header-search-bar button {
+        width: 40px;
+        border: none;
+        background: var(--primary-orange);
+        color: #fff;
+        cursor: pointer;
+    }
+
+    /* 모바일 화면에서 상단 검색창 숨기기 */
+    @media (max-width: 768px) {
+        .header-search-bar {
+            display: none !important;
         }
-    </style>
+    }
+    /* 👆 새로 추가된 부분 끝 */
+</style>
 </head>
 <body>
 
@@ -264,27 +302,27 @@
     </div>
 
 <header>
-        <div class="header-container">
-            
-            <a href="index.html" class="logo-text">
-                <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
-            </a>
-            
-            <div class="auth-zone-flex" id="auth-zone">
-                <a href="login.html" class="btn-login">로그인</a>  
-                <a href="join.html" class="btn-register-trigger">회원가입</a>
+    <div class="header-container">
+        
+        <a href="index.html" class="logo-text">
+            <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
+        </a>
+        
+        <div class="auth-zone-flex" id="auth-zone">
+            <div class="search-bar header-search-bar">
+                <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
+                <button onclick="executeSearch()">🔍</button>
             </div>
-
+            <a href="login.html" class="btn-login">로그인</a>  
+            <a href="join.html" class="btn-register-trigger">회원가입</a>
         </div>
-    </header>
 
-        <section class="hero">
+    </div>
+</header>
+
+    <section class="hero">
         <div class="hero-title">우리동네 신선한 먹거리</div>
         <div class="hero-subtitle">생산자 직거래 HUB 수령까지</div>
-        <div class="search-bar">
-            <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
-            <button onclick="executeSearch()">🔍</button>
-        </div>
     </section>
 
     <script>
