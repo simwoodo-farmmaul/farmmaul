@@ -46,8 +46,8 @@
     </div>
 
     <div class="container">
-        <div class="info-box">
-            🧑‍🌾 팜마을 생산자가 되어 이웃에게 건강한 먹거리를 직거래로 제공해 보세요! 입력하신 정보는 심사 후 농장 프로필에 공개됩니다.
+    <div class="info-box">
+            🧑‍🌾 팜마을 생산자가 되어 이웃에게 건강한 먹거리를 직거래로 제공해 보세요! 가입 회원이라면 별도의 승인 심사 없이 즉시 자동으로 등록되어 프로필이 공개됩니다.
         </div>
 
         <form id="producerForm">
@@ -98,12 +98,30 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn-submit">생산자 등록 심사 요청하기</button>
+            <button type="submit" class="btn-submit">생산자 즉시 등록하기</button>
         </form>
     </div>
 
-    <script>
-        // 사진 미리보기 기능
+   <script>
+        // 사진 데이터를 안전하게 담아둘 주머니 변수
+        let profileBase64 = "";
+        let coverBase64 = "";
+
+        // 🌟 1. 페이지가 켜질 때 가입 및 로그인한 회원이 맞는지 실시간 체크합니다.
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/user')
+                .then(response => response.json())
+                .then(data => {
+                    // 비회원이거나 로그인이 안 되어 있다면 경고 후 로그인창으로 돌려보냅니다.
+                    if (!data.loggedIn) {
+                        alert("생산자 등록은 팜마을 가입 및 로그인 회원만 가능합니다. 로그인 페이지로 이동합니다. 🌱");
+                        location.href = 'login.html';
+                    }
+                })
+                .catch(err => console.error('회원 정보 확인 실패:', err));
+        });
+
+        // 2. 사진 미리보기 및 글자 코드(Base64) 변환 기능
         function previewImage(input, previewId) {
             const preview = document.getElementById(previewId);
             if (input.files && input.files[0]) {
@@ -111,25 +129,59 @@
                 reader.onload = function(e) {
                     preview.src = e.target.result;
                     preview.style.display = 'block';
+                    
+                    // 업로드한 사진 종류에 맞게 변수에 저장합니다.
+                    if (previewId === 'previewProfile') {
+                        profileBase64 = e.target.result;
+                    } else if (previewId === 'previewCover') {
+                        coverBase64 = e.target.result;
+                    }
                 }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // 폼 제출 (서버 DB 연동 준비)
+        // 🌟 3. 심사 대기 없이 서버에 즉시 자동 등록을 요청하는 제출 기능
         document.getElementById('producerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // 입력된 데이터 수집
             const farmName = document.getElementById('farmName').value;
             const farmShort = document.getElementById('farmShort').value;
-            const profileImgSrc = document.getElementById('previewProfile').src;
+            const farmDesc = document.getElementById('farmDesc').value;
+            const bankName = document.getElementById('bankName').value;
+            const accountNum = document.getElementById('accountNum').value;
             
-            // 아직 서버 연결 코드가 없으므로 임시 성공 처리 알림
-            alert(`🎉 [${farmName}] 농장으로 생산자 등록 신청이 완료되었습니다!\n\n관리자 심사 후 메인 화면과 생산자 이야기에 반영됩니다.`);
-            
-            // 신청 완료 후 메인 화면으로 돌아가기
-            location.href = 'index.html';
+            // 데이터 상자 조립
+            const data = {
+                farm_name: farmName,
+                farm_short: farmShort,
+                farm_desc: farmDesc,
+                profile_image: profileBase64,
+                cover_image: coverBase64,
+                bank_name: bankName,
+                account_num: accountNum
+            };
+
+            // 서버의 생산자 저장 API 구역으로 즉시 전송 (POST)
+            fetch('/api/producers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if(result.success) {
+                    // 심사 대기 멘트를 지우고 즉시 완료 알림창을 띄웁니다.
+                    alert(`🎉 [${farmName}] 농장 등록이 성공적으로 완료되었습니다!\n메인 화면과 생산자 이야기에서 즉시 확인하실 수 있습니다.`);
+                    location.href = 'index.html';
+                } else {
+                    alert(result.message || '등록 중 오류가 발생했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('생산자 즉시 등록 실패:', error);
+                alert('서버와 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');
+            });
         });
     </script>
 </body>
