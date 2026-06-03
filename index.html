@@ -437,8 +437,8 @@
                 producers.forEach(producer => {
                     const profileImg = producer.profile_image || 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop';
                     
-                    const itemHtml = `
-                        <div class="producer-card" onclick="location.href='producer_story.html?id=${producer.id}'">
+                   const itemHtml = `
+                        <div class="producer-card" onclick="window.open('producer_story.html?id=${producer.id}', '_blank')">
                             <div class="producer-img-box">
                                 <img src="${profileImg}" alt="생산자" class="producer-img">
                             </div>
@@ -466,41 +466,39 @@
 </div>
 
 <script>
-    // 🌟 브라우저 저장소에서 진짜 생산자 목록을 가져와 메인 화면에 그리는 기능
-    document.addEventListener("DOMContentLoaded", function() {
-        const container = document.getElementById('mainProducerGridContainer');
-        if(!container) return;
-        
-        container.innerHTML = ''; // 로딩 문구 청소
-        
-        // 저장소에서 명단을 꺼내옵니다
-        let producers = JSON.parse(localStorage.getItem('farmmaul_producers')) || [];
-        
-        if (producers.length > 0) {
-            producers.forEach(producer => {
-                // 프로필 사진이 없으면 기본 이미지를 사용합니다.
-                const profileImg = producer.profile_image || 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop';
+        document.addEventListener("DOMContentLoaded", function() {
+            const container = document.getElementById('mainProducerGridContainer');
+            if(!container) return;
+            
+            // 저장소에서 명단을 꺼내옵니다
+            let producers = JSON.parse(localStorage.getItem('farmmaul_producers')) || [];
+            
+            if (producers.length > 0) {
+                container.innerHTML = ''; // 로딩 문구 청소
                 
-                const itemHtml = `
-                    <div class="producer-card" onclick="location.href='producer_story.html?id=${producer.id}'">
-                        <div class="producer-img-box">
-                            <img src="${profileImg}" alt="생산자" class="producer-img">
+                producers.forEach(producer => {
+                    const profileImg = producer.profile_image || 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop';
+                    
+                    const itemHtml = `
+                        <div class="producer-card" onclick="window.open('producer_story.html?id=${producer.id}', '_blank')">
+                            <div class="producer-img-box">
+                                <img src="${profileImg}" alt="생산자" class="producer-img">
+                            </div>
+                            <div class="producer-info-wrap">
+                                <h3 class="producer-name">${producer.farm_name}</h3>
+                                <p class="producer-desc">${producer.farm_short}</p>
+                                <div><span class="producer-rating">⭐ 5.0 (신규 단골 농장)</span></div>
+                                <button class="btn-follow">농장 구경하기</button>
+                            </div>
                         </div>
-                        <div class="producer-info-wrap">
-                            <h3 class="producer-name">${producer.farm_name}</h3>
-                            <p class="producer-desc">${producer.farm_short}</p>
-                            <div><span class="producer-rating">⭐ 5.0 (신규 단골 농장)</span></div>
-                            <button class="btn-follow">농장 구경하기</button>
-                        </div>
-                    </div>
-                `;
-                container.insertAdjacentHTML('beforeend', itemHtml);
-            });
-        } else {
-            container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888; font-weight: 800; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">아직 등록된 우리 동네 생산자가 없습니다. 첫 생산자로 신청해 보세요! 🌿</div>';
-        }
-    });
-</script>
+                    `;
+                    container.insertAdjacentHTML('beforeend', itemHtml);
+                });
+            } else {
+                container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888; font-weight: 800; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">아직 등록된 우리 동네 생산자가 없습니다. 첫 생산자로 신청해 보세요! 🌿</div>';
+            }
+        });
+    </script>
 </div>    
 </section>
 
