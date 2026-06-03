@@ -60,12 +60,12 @@
     </div>
 
     <div class="container">
-        <img src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?q=80&w=800&auto=format&fit=crop" class="cover-img">
+        <img id="storyCoverImg" src="" class="cover-img" style="display: none;">
         <div class="profile-section">
-            <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=200&auto=format&fit=crop" class="profile-img">
-            <h1 class="producer-name">김평택 농부님 🌿</h1>
-            <p class="producer-short">"우리가 먹는다는 생각으로, 농약 없이 정직하게 키웁니다."</p>
-            <div class="stats"><div>단골 <span>128</span>명</div><div>게시물 <span>3</span>개</div></div>
+            <img id="storyProfileImg" src="" class="profile-img" style="display: none;">
+            <h1 class="producer-name" id="storyProducerName">로딩 중... 🌿</h1>
+            <p class="producer-short" id="storyProducerShort">생산자 정보를 가져오는 중입니다.</p>
+            <div class="stats"><div>단골 <span>0</span>명</div><div>게시물 <span id="postCount">0</span>개</div></div>
         </div>
 
         <div class="tabs">
@@ -73,16 +73,76 @@
             <div class="tab" onclick="alert('판매 상품 목록으로 이동합니다.')">판매 상품</div>
         </div>
 
-        <div class="blog-content">
-            <div class="post-card">
-                <span class="post-date">2026년 5월 12일</span>
-                <h2 class="post-title">아침 이슬을 머금은 찰토마토 수확 현장! 🍅</h2>
-                <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=800&auto=format&fit=crop" class="post-img">
-                <p class="post-text">오늘 새벽 5시부터 밭에 나와 찰토마토들을 수확했습니다. 화학 비료를 쓰지 않아서 못생겼지만 맛은 최고입니다!</p>
-                <div class="post-tags"><span>#찰토마토</span><span>#농장일기</span></div>
-            </div>
+        <div class="blog-content" id="storyBlogContainer">
+            <div style="text-align:center; padding:30px; color:#999;">작성된 농장 일기가 아직 없습니다.</div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 주소창 파라미터(?id=3)에서 고유 ID를 분리해 추출합니다
+            const urlParams = new URLSearchParams(window.location.search);
+            const producerId = urlParams.get('id');
+
+            if (!producerId) {
+                alert("올바르지 않은 접근입니다.");
+                location.href = "index.html";
+                return;
+            }
+
+            // 🌟 해당 ID를 가진 생산자 단 한 명의 세부 데이터 요청 API
+            fetch(`/api/producers/${producerId}`)
+            .then(response => response.json())
+            .then(result => {
+                if(result.success && result.data) {
+                    const producer = result.data;
+
+                    // 1. 이름 및 소개글 연동
+                    document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
+                    document.getElementById('storyProducerShort').innerText = producer.farm_short;
+
+                    // 2. 프로필 이미지 세팅
+                    if(producer.profile_image) {
+                        const pImg = document.getElementById('storyProfileImg');
+                        pImg.src = producer.profile_image;
+                        pImg.style.display = 'block';
+                    } else {
+                        document.getElementById('storyProfileImg').style.display = 'block';
+                    }
+
+                    // 3. 커버 이미지 세팅
+                    if(producer.cover_image) {
+                        const cImg = document.getElementById('storyCoverImg');
+                        cImg.src = producer.cover_image;
+                        cImg.style.display = 'block';
+                    }
+
+                    // 4. 농장 일기(게시글) 연동 (서버 설계 규격에 맞춤)
+                    if(producer.posts && producer.posts.length > 0) {
+                        const blogContainer = document.getElementById('storyBlogContainer');
+                        document.getElementById('postCount').innerText = producer.posts.length;
+                        blogContainer.innerHTML = ''; // 빈 상태로 초기화
+
+                        producer.posts.forEach(post => {
+                            const postHtml = `
+                                <div class="post-card">
+                                    <span class="post-date">${post.created_at || '최근 작성'}</span>
+                                    <h2 class="post-title">${post.title}</h2>
+                                    ${post.image ? `<img src="${post.image}" class="post-img">` : ''}
+                                    <p class="post-text">${post.content}</p>
+                                </div>
+                            `;
+                            blogContainer.insertAdjacentHTML('beforeend', postHtml);
+                        });
+                    }
+                } else {
+                    alert("해당 생산자를 찾을 수 없습니다.");
+                    location.href = "index.html";
+                }
+            })
+            .catch(error => console.error('생산자 세부 데이터 조회 실패:', error));
+        });
+    </script>
 
     <div class="btn-write-float" onclick="location.href='story_write.html'">✏️</div>
 </body>
