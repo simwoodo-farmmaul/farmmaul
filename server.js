@@ -453,7 +453,8 @@ app.get('/api/admin/ai-inquiries', (req, res) => {
 // ==========================================
 // 🌟 [추가] 생산자(농장) 등록 및 조회 API
 // ==========================================
-app.post('/api/producers', (req, res) => {
+```javascript
+    app.post('/api/producers', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     
     const ownerNickname = req.session.user.nickname;
@@ -475,7 +476,6 @@ app.post('/api/producers', (req, res) => {
     `;
     
     db.query(createTableQuery, (err) => {
-        // 이미 'id'만 존재하는 껍데기 테이블이 있을 경우를 대비하여 누락된 컬럼들을 추가합니다.
         db.query(`ALTER TABLE farm_producers ADD COLUMN owner_nickname VARCHAR(100)`, () => {
         db.query(`ALTER TABLE farm_producers ADD COLUMN farm_name VARCHAR(255)`, () => {
         db.query(`ALTER TABLE farm_producers ADD COLUMN farm_short VARCHAR(255)`, () => {
@@ -484,6 +484,8 @@ app.post('/api/producers', (req, res) => {
         db.query(`ALTER TABLE farm_producers ADD COLUMN cover_image LONGTEXT`, () => {
         db.query(`ALTER TABLE farm_producers ADD COLUMN bank_name VARCHAR(100)`, () => {
         db.query(`ALTER TABLE farm_producers ADD COLUMN account_num VARCHAR(100)`, () => {
+        // ✨ 아래 1줄이 새롭게 추가된 핵심 코드입니다! (생성일자 누락 방지)
+        db.query(`ALTER TABLE farm_producers ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`, () => {
             
             const insertQuery = `INSERT INTO farm_producers (owner_nickname, farm_name, farm_short, farm_desc, profile_image, cover_image, bank_name, account_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
             db.query(insertQuery, [ownerNickname, farm_name, farm_short, farm_desc, profile_image || '', cover_image || '', bank_name || '', account_num || ''], (err, result) => {
@@ -494,7 +496,7 @@ app.post('/api/producers', (req, res) => {
                 res.json({ success: true, message: '생산자 등록 완료!' });
             });
             
-        }); }); }); }); }); }); }); }); // ALTER TABLE 닫기
+        }); }); }); }); }); }); }); }); }); // 👈 ALTER TABLE 닫는 괄호가 9개로 늘어났습니다.
     });
 });
 
