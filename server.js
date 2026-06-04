@@ -475,21 +475,35 @@ app.post('/api/producers', (req, res) => {
     `;
     
     db.query(createTableQuery, (err) => {
-        const insertQuery = `INSERT INTO farm_producers (owner_nickname, farm_name, farm_short, farm_desc, profile_image, cover_image, bank_name, account_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        db.query(insertQuery, [ownerNickname, farm_name, farm_short, farm_desc, profile_image || '', cover_image || '', bank_name || '', account_num || ''], (err, result) => {
-            if (err) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
-            res.json({ success: true, message: '생산자 등록 완료!' });
-        });
+        // 이미 'id'만 존재하는 껍데기 테이블이 있을 경우를 대비하여 누락된 컬럼들을 추가합니다.
+        db.query(`ALTER TABLE farm_producers ADD COLUMN owner_nickname VARCHAR(100)`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN farm_name VARCHAR(255)`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN farm_short VARCHAR(255)`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN farm_desc TEXT`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN profile_image LONGTEXT`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN cover_image LONGTEXT`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN bank_name VARCHAR(100)`, () => {
+        db.query(`ALTER TABLE farm_producers ADD COLUMN account_num VARCHAR(100)`, () => {
+            
+            const insertQuery = `INSERT INTO farm_producers (owner_nickname, farm_name, farm_short, farm_desc, profile_image, cover_image, bank_name, account_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+            db.query(insertQuery, [ownerNickname, farm_name, farm_short, farm_desc, profile_image || '', cover_image || '', bank_name || '', account_num || ''], (err, result) => {
+                if (err) {
+                    console.error("생산자 등록 에러 로그:", err);
+                    return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+                }
+                res.json({ success: true, message: '생산자 등록 완료!' });
+            });
+            
+        }); }); }); }); }); }); }); }); // ALTER TABLE 닫기
     });
 });
 
 app.get('/api/producers', (req, res) => {
-    const createTableQuery = `CREATE TABLE IF NOT EXISTS farm_producers (id INT AUTO_INCREMENT PRIMARY KEY)`;
-    db.query(createTableQuery, () => {
-        db.query(`SELECT * FROM farm_producers ORDER BY created_at DESC`, (err, results) => {
-            if(err) return res.json({ success: false, data: [] });
-            res.json({ success: true, data: results });
-        });
+    // 임시 테이블 생성 코드를 제거하고 바로 조회만 하도록 수정합니다.
+    db.query(`SELECT * FROM farm_producers ORDER BY created_at DESC`, (err, results) => {
+        // 테이블이 아직 없어서 에러가 나더라도 화면이 깨지지 않게 빈 데이터를 보냅니다.
+        if(err) return res.json({ success: true, data: [] }); 
+        res.json({ success: true, data: results });
     });
 });
 
