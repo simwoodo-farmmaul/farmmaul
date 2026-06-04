@@ -178,18 +178,6 @@
     <div class="btn-write-float" onclick="location.href='story_write.html'">✏️</div>
 
     <script>
-        // 🌟 탭 전환 기능
-        function switchTab(tabName) {
-            // 모든 탭 버튼과 콘텐츠 비활성화
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-            
-            // 클릭한 탭만 활성화
-            event.currentTarget.classList.add('active');
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-        }
-
-        // 🌟 브라우저 저장소에서 데이터 연동 (기존 로직 유지 및 확장)
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const producerId = urlParams.get('id');
@@ -200,42 +188,34 @@
                 return;
             }
 
-            let producers = JSON.parse(localStorage.getItem('farmmaul_producers')) || [];
-            const producer = producers.find(p => p.id === producerId);
+            // 🌟 서버 DB에서 해당 ID를 가진 생산자 정보 요청
+            fetch(`/api/producers/${producerId}`)
+            .then(response => response.json())
+            .then(result => {
+                if(result.success && result.data) {
+                    const producer = result.data;
 
-            if(producer) {
-                // 기본 정보 세팅
-                document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
-                document.getElementById('storyProducerShort').innerText = producer.farm_short;
-                
-                // 상세 소개글 세팅 (입력 안 했으면 기본 멘트)
-                if (producer.farm_desc) {
-                    document.getElementById('storyProducerDesc').innerText = producer.farm_desc;
+                    // 화면 데이터 연동
+                    document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
+                    document.getElementById('storyProducerShort').innerText = producer.farm_short;
+                    
+                    const descEl = document.getElementById('storyProducerDesc');
+                    if(descEl) descEl.innerText = producer.farm_desc || '등록된 소개글이 없습니다.';
+
+                    if(producer.profile_image) {
+                        const pImg = document.getElementById('storyProfileImg');
+                        if(pImg) { pImg.src = producer.profile_image; pImg.style.display = 'block'; }
+                    }
+                    if(producer.cover_image) {
+                        const cImg = document.getElementById('storyCoverImg');
+                        if(cImg) { cImg.src = producer.cover_image; cImg.style.display = 'block'; }
+                    }
+                } else {
+                    alert("해당 생산자를 찾을 수 없습니다.");
+                    location.href = "index.html";
                 }
-
-                // 이미지 세팅
-                if(producer.profile_image) document.getElementById('storyProfileImg').src = producer.profile_image;
-                if(producer.cover_image) document.getElementById('storyCoverImg').src = producer.cover_image;
-
-                // 농장 일기(포스트) 세팅
-                const blogContainer = document.getElementById('storyBlogContainer');
-                if(producer.posts && producer.posts.length > 0) {
-                    document.getElementById('postCount').innerText = producer.posts.length;
-                    blogContainer.innerHTML = ''; 
-
-                    producer.posts.forEach(post => {
-                        const postHtml = `
-                            <div class="post-card">
-                                <span class="post-date">${post.created_at || '최근 작성'}</span>
-                                <h2 class="post-title">${post.title}</h2>
-                                ${post.image ? `<img src="${post.image}" class="post-img">` : ''}
-                                <p class="post-text">${post.content}</p>
-                            </div>
-                        `;
-                        blogContainer.insertAdjacentHTML('beforeend', postHtml);
-                    });
-                }
-            }
+            })
+            .catch(error => console.error('생산자 데이터 조회 실패:', error));
         });
     </script>
 </body>

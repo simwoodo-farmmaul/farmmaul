@@ -175,37 +175,41 @@
             
             const farmName = document.getElementById('farmName').value;
             const farmShort = document.getElementById('farmShort').value;
-            const farmDesc = document.getElementById('farmDesc').value || ""; // 빈칸이어도 오류 안 나게 처리
-            
-            // 겹치지 않는 고유 번호 만들기
-            const uniqueId = Date.now().toString();
+            const farmDesc = document.getElementById('farmDesc').value || ""; 
+            const bankName = document.getElementById('bankName').value || ""; 
+            const accountNum = document.getElementById('accountNum').value || ""; 
 
-            // 데이터 상자 조립
-            const newProducer = {
-                id: uniqueId,
+            // 데이터 상자 조립 (압축된 사진 변수를 그대로 사용합니다)
+            const data = {
                 farm_name: farmName,
                 farm_short: farmShort,
                 farm_desc: farmDesc,
                 profile_image: profileBase64,
                 cover_image: coverBase64,
-                posts: [] // 작성한 일기를 담을 빈 바구니
+                bank_name: bankName,
+                account_num: accountNum
             };
 
-            try {
-                // 브라우저 저장소에서 기존 명단을 가져와서 새 사람을 추가
-                let producers = JSON.parse(localStorage.getItem('farmmaul_producers')) || [];
-                producers.push(newProducer);
-                localStorage.setItem('farmmaul_producers', JSON.stringify(producers));
-
-                // 완료 알림창을 띄우고 메인 화면으로 이동
-                alert(`🎉 [${farmName}] 농장 등록이 성공적으로 완료되었습니다!\n메인 화면에서 즉시 확인하실 수 있습니다.`);
-                location.href = 'index.html';
-                
-            } catch (error) {
-                // 혹시라도 또 용량이 꽉 찼을 경우를 대비한 안전장치
-                alert("❌ 앗! 기기의 저장 공간이 꽉 찼습니다. 기존 생산자 등록 데이터를 지우거나 더 작은 사진을 사용해 주세요.");
-                console.error(error);
-            }
+            // 진짜 서버 API로 쏘기
+            fetch('/api/producers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(result => {
+                if(result.success) {
+                    alert(`🎉 [${farmName}] 농장 등록이 성공적으로 완료되었습니다!\n메인 화면에서 즉시 확인하실 수 있습니다.`);
+                    location.href = 'index.html';
+                } else {
+                    alert(result.message || '로그인 후 등록을 진행해 주세요.');
+                    if(!result.success && result.message === '로그인이 필요합니다.') location.href = 'login.html';
+                }
+            })
+            .catch(error => {
+                console.error('생산자 등록 실패:', error);
+                alert('서버와 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.');
+            });
         });
     </script>
 </body>

@@ -450,6 +450,55 @@ app.get('/api/admin/ai-inquiries', (req, res) => {
         res.json({ success: true, data: results });
     });
 });
+// ==========================================
+// 🌟 [추가] 생산자(농장) 등록 및 조회 API
+// ==========================================
+app.post('/api/producers', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const ownerNickname = req.session.user.nickname;
+    const { farm_name, farm_short, farm_desc, profile_image, cover_image, bank_name, account_num } = req.body;
+    
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_producers (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            owner_nickname VARCHAR(100),
+            farm_name VARCHAR(255) NOT NULL,
+            farm_short VARCHAR(255) NOT NULL,
+            farm_desc TEXT,
+            profile_image LONGTEXT,
+            cover_image LONGTEXT,
+            bank_name VARCHAR(100),
+            account_num VARCHAR(100),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    
+    db.query(createTableQuery, (err) => {
+        const insertQuery = `INSERT INTO farm_producers (owner_nickname, farm_name, farm_short, farm_desc, profile_image, cover_image, bank_name, account_num) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        db.query(insertQuery, [ownerNickname, farm_name, farm_short, farm_desc, profile_image || '', cover_image || '', bank_name || '', account_num || ''], (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
+            res.json({ success: true, message: '생산자 등록 완료!' });
+        });
+    });
+});
+
+app.get('/api/producers', (req, res) => {
+    const createTableQuery = `CREATE TABLE IF NOT EXISTS farm_producers (id INT AUTO_INCREMENT PRIMARY KEY)`;
+    db.query(createTableQuery, () => {
+        db.query(`SELECT * FROM farm_producers ORDER BY created_at DESC`, (err, results) => {
+            if(err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    });
+});
+
+app.get('/api/producers/:id', (req, res) => {
+    db.query(`SELECT * FROM farm_producers WHERE id = ?`, [req.params.id], (err, result) => {
+        if(err || result.length === 0) return res.status(404).json({ success: false, message: '생산자를 찾을 수 없습니다.' });
+        res.json({ success: true, data: result[0] });
+    });
+});
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 
 // ==========================================
