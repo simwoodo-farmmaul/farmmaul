@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>팜마을 - 생산자 미니 홈페이지</title>
+    <title>팜마을 - 생산자 브랜드 홈페이지</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         
@@ -20,73 +20,90 @@
         body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
 
-        /* 상단 헤더 */
+        /* 상단 헤더 (1200px 확장) */
         .header { background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .btn-icon { font-size: 1.2rem; cursor: pointer; font-weight: 900; }
         .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); }
 
-        .container { max-width: 800px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        /* 컨테이너 메인 (1200px 확장) */
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
 
-        /* 농장 커버 및 프로필 (히어로 섹션) */
+        /* 농장 커버 및 프로필 (히어로 섹션 규모업) */
         .hero-section { position: relative; border-bottom: 1px solid #eee; }
-        .cover-img { width: 100%; height: 250px; object-fit: cover; background: #e0e0e0; display: block; }
+        .cover-img { width: 100%; height: 350px; object-fit: cover; background: #e0e0e0; display: block; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6)); }
         
-        .profile-wrap { position: relative; padding: 0 20px 25px; margin-top: -60px; z-index: 10; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .profile-img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 4px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.15); background: #fff; }
+        /* 프로필 사진 및 정보 확대 */
+        .profile-wrap { position: relative; padding: 0 20px 35px; margin-top: -80px; z-index: 10; display: flex; flex-direction: column; align-items: center; text-align: center; }
+        .profile-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 5px solid #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); background: #fff; }
         
-        .producer-name { font-size: 1.6rem; font-weight: 900; margin: 15px 0 5px; color: #222; }
-        .producer-short { font-size: 1rem; color: #555; margin-bottom: 15px; font-weight: 600; }
+        .producer-name { font-size: 2rem; font-weight: 900; margin: 20px 0 10px; color: #222; }
+        .producer-short { font-size: 1.15rem; color: #555; margin-bottom: 20px; font-weight: 600; }
         
-        .stats-box { display: flex; justify-content: center; gap: 30px; background: #f8f9fa; padding: 15px 30px; border-radius: 15px; border: 1px solid #eaeaea; }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .stat-val { font-size: 1.2rem; font-weight: 900; color: var(--primary-orange); }
-        .stat-label { font-size: 0.85rem; color: #777; font-weight: 700; }
+        .stats-box { display: flex; justify-content: center; gap: 40px; background: #f8f9fa; padding: 20px 40px; border-radius: 20px; border: 1px solid #eaeaea; }
+        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--primary-orange); }
+        .stat-label { font-size: 0.95rem; color: #777; font-weight: 700; }
 
         /* 탭 메뉴 */
         .tabs { display: flex; border-bottom: 1px solid #eee; position: sticky; top: 54px; background: #fff; z-index: 99; }
-        .tab-btn { flex: 1; text-align: center; padding: 16px; font-weight: 800; cursor: pointer; color: #999; font-size: 1.05rem; transition: 0.2s; position: relative; }
+        .tab-btn { flex: 1; text-align: center; padding: 18px; font-weight: 800; cursor: pointer; color: #999; font-size: 1.1rem; transition: 0.2s; position: relative; }
         .tab-btn.active { color: var(--primary-green); }
-        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 3px; background: var(--primary-green); }
+        .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 4px; background: var(--primary-green); }
 
         /* 탭 콘텐츠 공통 */
-        .tab-content { display: none; padding: 30px 20px; animation: fadeIn 0.3s ease; }
+        .tab-content { display: none; padding: 40px 30px; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* 1. 소개 탭 */
-        .intro-box { font-size: 1.05rem; line-height: 1.8; color: #444; white-space: pre-wrap; background: #fdfdfd; padding: 25px; border-radius: 15px; border: 1px solid #f0f0f0; }
-        .cert-badges { display: flex; gap: 10px; margin-bottom: 20px; }
-        .cert-badge { background: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; }
+        .intro-box { font-size: 1.1rem; line-height: 1.8; color: #444; white-space: pre-wrap; background: #fdfdfd; padding: 35px; border-radius: 15px; border: 1px solid #f0f0f0; }
+        .cert-badges { display: flex; gap: 10px; margin-bottom: 25px; }
+        .cert-badge { background: #e8f5e9; color: #2e7d32; padding: 8px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; }
 
-        /* 2. 판매 상품 탭 */
-        .product-add-banner { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border: 1px dashed #ffb74d; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; cursor: pointer; transition: 0.2s; }
-        .product-add-banner:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(230,145,56,0.15); }
-        .product-add-banner h3 { color: #e65100; font-size: 1.1rem; margin-bottom: 5px; }
-        .product-add-banner p { color: #f57c00; font-size: 0.9rem; font-weight: 700; }
+        /* 2. 판매 상품 탭 (4칸 배열로 업그레이드) */
+        .product-add-banner { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border: 2px dashed #ffb74d; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 30px; cursor: pointer; transition: 0.2s; }
+        .product-add-banner:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(230,145,56,0.15); border-style: solid; }
+        .product-add-banner h3 { color: #e65100; font-size: 1.2rem; margin-bottom: 8px; font-weight: 900; }
+        .product-add-banner p { color: #f57c00; font-size: 1rem; font-weight: 700; }
 
-        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .product-card { border: 1px solid #eaeaea; border-radius: 12px; overflow: hidden; transition: 0.2s; cursor: pointer; }
-        .product-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.08); border-color: var(--primary-green); }
-        .product-img { width: 100%; height: 160px; object-fit: cover; background: #eee; }
-        .product-info { padding: 15px; }
-        .product-title { font-size: 1rem; font-weight: 800; margin-bottom: 8px; color: #222; }
-        .product-price { font-size: 1.15rem; font-weight: 900; color: var(--primary-orange); }
+        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .product-card { border: 1px solid #eaeaea; border-radius: 15px; overflow: hidden; transition: 0.2s; cursor: pointer; background: #fff; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: var(--primary-green); }
+        .product-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
+        .product-info { padding: 20px; }
+        .product-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: #222; }
+        .product-price { font-size: 1.25rem; font-weight: 900; color: var(--primary-orange); }
+
+        /* 모바일 및 태블릿 반응형 처리 */
+        @media (max-width: 1024px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+            .cover-img { height: 280px; }
+        }
+        @media (max-width: 768px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .product-img { height: 160px; }
+            .cover-img { height: 200px; }
+            .profile-img { width: 120px; height: 120px; }
+            .profile-wrap { margin-top: -60px; padding: 0 15px 20px; }
+            .producer-name { font-size: 1.6rem; }
+            .tab-content { padding: 25px 15px; }
+        }
 
         /* 3. 농장 소식(일기) 탭 */
         .post-card { margin-bottom: 35px; border-bottom: 1px solid #f1f3f5; padding-bottom: 30px; }
         .post-card:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .post-date { font-size: 0.85rem; font-weight: 700; color: #999; margin-bottom: 10px; display: block; }
-        .post-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 15px; color: #222; line-height: 1.4; }
-        .post-img { width: 100%; border-radius: 15px; margin-bottom: 15px; object-fit: cover; max-height: 350px; }
-        .post-text { font-size: 1rem; color: #555; line-height: 1.7; }
+        .post-date { font-size: 0.9rem; font-weight: 700; color: #999; margin-bottom: 10px; display: block; }
+        .post-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 15px; color: #222; line-height: 1.4; }
+        .post-img { width: 100%; border-radius: 15px; margin-bottom: 15px; object-fit: cover; max-height: 400px; }
+        .post-text { font-size: 1.05rem; color: #555; line-height: 1.7; }
         
         /* 플로팅 글쓰기 버튼 */
-        .btn-write-float { position: fixed; bottom: 30px; right: calc(50% - 370px); width: 60px; height: 60px; background: var(--primary-green); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 20px rgba(135,179,46,0.4); font-size: 1.5rem; cursor: pointer; z-index: 1000; transition: 0.2s; }
+        .btn-write-float { position: fixed; bottom: 30px; right: calc(50% - 570px); width: 65px; height: 65px; background: var(--primary-green); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 20px rgba(135,179,46,0.4); font-size: 1.8rem; cursor: pointer; z-index: 1000; transition: 0.2s; }
         .btn-write-float:hover { transform: scale(1.1); background: #719626; }
 
-        @media (max-width: 800px) {
+        @media (max-width: 1200px) {
             .btn-write-float { right: 20px; bottom: 20px; }
         }
     </style>
@@ -95,19 +112,19 @@
     <div class="header">
         <div class="header-inner">
             <a href="index.html" class="btn-icon">←</a>
-            <div class="title">농장 프로필</div>
+            <div class="title">브랜드 홈페이지</div>
             <div style="width: 24px;"></div>
         </div>
     </div>
 
     <div class="container">
         <div class="hero-section">
-            <img id="storyCoverImg" src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?q=80&w=800&auto=format&fit=crop" class="cover-img">
+            <img id="storyCoverImg" src="https://images.unsplash.com/photo-1595841696677-6489ff3f8cd1?q=80&w=1200&auto=format&fit=crop" class="cover-img">
             <div class="hero-overlay"></div>
         </div>
         
         <div class="profile-wrap">
-            <img id="storyProfileImg" src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=200&auto=format&fit=crop" class="profile-img">
+            <img id="storyProfileImg" src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop" class="profile-img">
             <h1 class="producer-name" id="storyProducerName">농장 이름 로딩중...</h1>
             <p class="producer-short" id="storyProducerShort">한 줄 소개를 불러오고 있습니다.</p>
             
@@ -138,7 +155,7 @@
                 <span class="cert-badge">🌱 팜마을 인증 농가</span>
                 <span class="cert-badge">🚚 산지 직배송</span>
             </div>
-            <h3 style="margin-bottom: 15px; font-weight: 900;">우리 농장을 소개합니다</h3>
+            <h3 style="margin-bottom: 20px; font-weight: 900; font-size: 1.3rem;">우리 농장을 소개합니다</h3>
             <div id="storyProducerDesc" class="intro-box">
                 생산자님이 작성하신 상세 소개글이 이곳에 예쁘게 표시됩니다. 어떻게 작물을 기르시는지, 어떤 마음으로 농장을 운영하시는지 이웃들에게 알려주세요!
             </div>
@@ -147,30 +164,18 @@
         <div id="tab-products" class="tab-content">
             <div class="product-add-banner" onclick="location.href='register.html'">
                 <h3>➕ 우리 농장 새 상품 등록하기</h3>
-                <p>수확한 신선한 작물을 이웃들에게 바로 판매해보세요!</p>
+                <p>수확한 작물을 등록하면 메인 화면 최신 상품에도 함께 보여집니다!</p>
             </div>
 
+            <!-- 자바스크립트를 통해 실제 상품이 이곳에 채워집니다 -->
             <div class="product-grid" id="storyProductContainer">
-                <div class="product-card" onclick="location.href='detail.html'">
-                    <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop" class="product-img">
-                    <div class="product-info">
-                        <div class="product-title">당일 수확 못난이 찰토마토 2kg</div>
-                        <div class="product-price">12,000원</div>
-                    </div>
-                </div>
-                <div class="product-card" onclick="location.href='detail.html'">
-                    <img src="https://images.unsplash.com/photo-1587049352847-81a56d773c1c?q=80&w=400&auto=format&fit=crop" class="product-img">
-                    <div class="product-info">
-                        <div class="product-title">무농약 햇감자 포슬포슬 3kg</div>
-                        <div class="product-price">15,000원</div>
-                    </div>
-                </div>
+                <div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: #888; font-weight: 700;">상품 정보를 불러오고 있습니다...</div>
             </div>
         </div>
 
         <div id="tab-diary" class="tab-content">
             <div id="storyBlogContainer">
-                <div style="text-align:center; padding:40px; color:#999; font-weight: 700;">아직 들려준 농장 소식이 없습니다.<br>오른쪽 아래 버튼을 눌러 첫 소식을 남겨보세요!</div>
+                <div style="text-align:center; padding:50px; color:#999; font-weight: 700; font-size: 1.1rem;">아직 들려준 농장 소식이 없습니다.<br>오른쪽 아래 버튼을 눌러 첫 소식을 남겨보세요!</div>
             </div>
         </div>
     </div>
@@ -178,6 +183,13 @@
     <div class="btn-write-float" onclick="location.href='story_write.html'">✏️</div>
 
     <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
             const producerId = urlParams.get('id');
@@ -188,14 +200,14 @@
                 return;
             }
 
-            // 🌟 서버 DB에서 해당 ID를 가진 생산자 정보 요청
+            // 🌟 1. 서버 DB에서 해당 ID를 가진 생산자 정보 요청
             fetch(`/api/producers/${producerId}`)
             .then(response => response.json())
             .then(result => {
                 if(result.success && result.data) {
                     const producer = result.data;
 
-                    // 화면 데이터 연동
+                    // 화면 프로필 데이터 연동
                     document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
                     document.getElementById('storyProducerShort').innerText = producer.farm_short;
                     
@@ -210,6 +222,42 @@
                         const cImg = document.getElementById('storyCoverImg');
                         if(cImg) { cImg.src = producer.cover_image; cImg.style.display = 'block'; }
                     }
+
+                    // 🌟 2. 해당 생산자가 등록한 진짜 상품 목록 불러오기
+                    fetch('/api/products')
+                    .then(res => res.json())
+                    .then(pResult => {
+                        if(pResult.success) {
+                            // 전체 상품 중 이 홈페이지 주인의 닉네임과 일치하는 상품만 골라냅니다.
+                            const myProducts = pResult.data.filter(p => p.owner_nickname === producer.owner_nickname);
+                            
+                            // 통계 숫자를 실제 상품 개수로 업데이트
+                            document.getElementById('productCount').innerText = myProducts.length;
+                            
+                            const pContainer = document.getElementById('storyProductContainer');
+                            
+                            if(myProducts.length > 0) {
+                                pContainer.innerHTML = ''; // 안내 문구 청소
+                                
+                                myProducts.forEach(p => {
+                                    const imgUrl = p.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
+                                    const itemHtml = `
+                                        <div class="product-card" onclick="location.href='detail.html?id=${p.id}'">
+                                            <img src="${imgUrl}" class="product-img">
+                                            <div class="product-info">
+                                                <div class="product-title">${p.title}</div>
+                                                <div class="product-price">${Number(p.sale_price).toLocaleString()}원</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                    pContainer.insertAdjacentHTML('beforeend', itemHtml);
+                                });
+                            } else {
+                                pContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding: 50px; color: #888; font-weight: 700; font-size: 1.05rem;">등록된 판매 상품이 없습니다.<br>상단의 상품 등록 배너를 통해 첫 상품을 올려보세요! 🌱</div>';
+                            }
+                        }
+                    });
+
                 } else {
                     alert("해당 생산자를 찾을 수 없습니다.");
                     location.href = "index.html";
