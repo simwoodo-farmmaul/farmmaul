@@ -453,7 +453,6 @@ app.get('/api/admin/ai-inquiries', (req, res) => {
 // ==========================================
 // 🌟 [추가] 생산자(농장) 등록 및 조회 API
 // ==========================================
-```javascript
     app.post('/api/producers', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     
