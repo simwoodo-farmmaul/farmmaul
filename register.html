@@ -445,23 +445,20 @@
             }
         }
 
-        // 사진 파일 업로드 및 자동 용량 압축 (Canvas 활용)
+       // 🌟 1. 메인 대표 사진 압축 업로드
         let mainImageBase64 = ""; 
-        
         document.getElementById('f_main').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
+                img.src = e.target.result;
                 img.onload = function() {
-                    const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
-                    let width = img.width; let height = img.height;
-                    if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                    else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-
                     const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800;
+                    let width = img.width; let height = img.height;
+                    if (width > MAX_WIDTH) { height = height * (MAX_WIDTH / width); width = MAX_WIDTH; }
                     canvas.width = width; canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
@@ -469,12 +466,11 @@
                     mainImageBase64 = canvas.toDataURL('image/jpeg', 0.7);
                     document.getElementById('pvMainArea').innerHTML = `<img src="${mainImageBase64}" style="width:100%; height:100%; object-fit:cover;">`;
                 };
-                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
 
-        // ★ 10장 추가 사진 + 설명글 등록 로직 ★
+        // 🌟 2. 추가 10장 사진 완벽 압축 업로드
         document.getElementById('f_sub').addEventListener('change', function(event) {
             const files = event.target.files;
             if(!files || files.length === 0) return;
@@ -488,13 +484,12 @@
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = new Image();
+                    img.src = e.target.result;
                     img.onload = function() {
-                        const MAX_WIDTH = 800; const MAX_HEIGHT = 800;
-                        let width = img.width; let height = img.height;
-                        if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
-                        else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
-                        
                         const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height = height * (MAX_WIDTH / width); width = MAX_WIDTH; }
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.drawImage(img, 0, 0, width, height);
@@ -502,7 +497,6 @@
                         contents.push({ img: canvas.toDataURL('image/jpeg', 0.7), text: '' });
                         renderContents();
                     };
-                    img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             });

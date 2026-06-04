@@ -107,49 +107,77 @@
         let profileBase64 = "";
         let coverBase64 = "";
 
-        // 🌟 1. 페이지가 켜질 때 가입 및 로그인한 회원이 맞는지 실시간 체크합니다.
+        // 🌟 1. 페이지가 켜질 때 가입 회원인지 체크
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/user')
                 .then(response => response.json())
                 .then(data => {
-                    // 비회원이거나 로그인이 안 되어 있다면 경고 후 로그인창으로 돌려보냅니다.
                     if (!data.loggedIn) {
-                        alert("생산자 등록은 팜마을 가입 및 로그인 회원만 가능합니다. 로그인 페이지로 이동합니다. 🌱");
+                        alert("생산자 등록은 팜마을 가입 및 로그인 회원만 가능합니다. 🌱");
                         location.href = 'login.html';
                     }
                 })
                 .catch(err => console.error('회원 정보 확인 실패:', err));
         });
 
-        // 2. 사진 미리보기 및 글자 코드(Base64) 변환 기능
+        // 🌟 2. 모바일 고화질 사진 자동 압축 기능 (용량 초과 오류 해결!)
         function previewImage(input, previewId) {
             const preview = document.getElementById(previewId);
             if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
+                
                 reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
+                    // 이미지를 메모리에 임시로 띄웁니다
+                    const img = new Image();
+                    img.src = e.target.result;
                     
-                    // 업로드한 사진 종류에 맞게 변수에 저장합니다.
-                    if (previewId === 'previewProfile') {
-                        profileBase64 = e.target.result;
-                    } else if (previewId === 'previewCover') {
-                        coverBase64 = e.target.result;
-                    }
-                }
-                reader.readAsDataURL(input.files[0]);
+                    img.onload = function() {
+                        // 사진 크기를 줄이기 위한 캔버스 생성 (최대 너비 800px로 제한)
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > MAX_WIDTH) {
+                            height = height * (MAX_WIDTH / width);
+                            width = MAX_WIDTH;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // 크기가 줄어든 사진을 텍스트 데이터(Base64)로 변환 (화질 70%)
+                        const compressedData = canvas.toDataURL('image/jpeg', 0.7);
+                        
+                        // 화면에 미리보기 띄우기
+                        preview.src = compressedData;
+                        preview.style.display = 'block';
+                        
+                        // 변환된 가벼운 데이터를 주머니에 저장
+                        if (previewId === 'previewProfile') {
+                            profileBase64 = compressedData;
+                        } else if (previewId === 'previewCover') {
+                            coverBase64 = compressedData;
+                        }
+                    };
+                };
+                reader.readAsDataURL(file);
             }
         }
 
-        // 🌟 3. 심사 대기 없이 서버에 즉시 자동 등록을 요청하는 제출 기능
+        // 🌟 3. 브라우저 저장소에 안전하게 등록하는 기능
         document.getElementById('producerForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
             const farmName = document.getElementById('farmName').value;
             const farmShort = document.getElementById('farmShort').value;
-            const farmDesc = document.getElementById('farmDesc').value;
+            const farmDesc = document.getElementById('farmDesc').value || ""; // 빈칸이어도 오류 안 나게 처리
             
-            // 겹치지 않는 고유 번호 만들기 (현재 시간 활용)
+            // 겹치지 않는 고유 번호 만들기
             const uniqueId = Date.now().toString();
 
             // 데이터 상자 조립
@@ -163,14 +191,21 @@
                 posts: [] // 작성한 일기를 담을 빈 바구니
             };
 
-            // 브라우저 저장소에서 기존 명단을 가져와서 새 사람을 추가하고 다시 넣습니다.
-            let producers = JSON.parse(localStorage.getItem('farmmaul_producers')) || [];
-            producers.push(newProducer);
-            localStorage.setItem('farmmaul_producers', JSON.stringify(producers));
+            try {
+                // 브라우저 저장소에서 기존 명단을 가져와서 새 사람을 추가
+                let producers = JSON.parse(localStorage.getItem('farmmaul_producers')) || [];
+                producers.push(newProducer);
+                localStorage.setItem('farmmaul_producers', JSON.stringify(producers));
 
-            // 완료 알림창을 띄우고 메인 화면으로 이동합니다.
-            alert(`🎉 [${farmName}] 농장 등록이 성공적으로 완료되었습니다!\n메인 화면과 생산자 이야기에서 즉시 확인하실 수 있습니다.`);
-            location.href = 'index.html';
+                // 완료 알림창을 띄우고 메인 화면으로 이동
+                alert(`🎉 [${farmName}] 농장 등록이 성공적으로 완료되었습니다!\n메인 화면에서 즉시 확인하실 수 있습니다.`);
+                location.href = 'index.html';
+                
+            } catch (error) {
+                // 혹시라도 또 용량이 꽉 찼을 경우를 대비한 안전장치
+                alert("❌ 앗! 기기의 저장 공간이 꽉 찼습니다. 기존 생산자 등록 데이터를 지우거나 더 작은 사진을 사용해 주세요.");
+                console.error(error);
+            }
         });
     </script>
 </body>

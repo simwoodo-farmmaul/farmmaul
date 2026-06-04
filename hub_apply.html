@@ -202,18 +202,34 @@
             .catch(error => alert('서버와 연결할 수 없습니다.'));
         });
 
+        // 🌟 모바일 고화질 사진 자동 압축 기능 (용량 10분의 1로 축소!)
         function previewMain(input) {
             if (input.files && input.files[0]) {
+                const file = input.files[0];
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    base64Image = e.target.result; // 사진 데이터를 글자 코드로 변환 완료!
-                    const area = document.getElementById('main_preview_area');
-                    let imgHtml = `<div class="edit-img-wrap" style="margin-bottom:10px;"><img src="${e.target.result}"></div>`;
-                    imgHtml += `<span class="label" style="font-weight: 800; font-size: 0.9rem; color: #555;">📝 대표 사진 설명</span>`;
-                    imgHtml += `<textarea id="hub_desc" class="form-input" placeholder="매장에 대한 간단한 소개를 적어주세요.">${document.getElementById('hub_desc').value}</textarea>`;
-                    area.innerHTML = imgHtml;
+                    const img = new Image();
+                    img.src = e.target.result;
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 800;
+                        let width = img.width; let height = img.height;
+                        if (width > MAX_WIDTH) { height = height * (MAX_WIDTH / width); width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        // 압축된 사진 데이터를 주머니에 저장
+                        base64Image = canvas.toDataURL('image/jpeg', 0.7); 
+                        
+                        const area = document.getElementById('main_preview_area');
+                        let imgHtml = `<div class="edit-img-wrap" style="margin-bottom:10px;"><img src="${base64Image}"></div>`;
+                        imgHtml += `<span class="label" style="font-weight: 800; font-size: 0.9rem; color: #555;">📝 대표 사진 설명</span>`;
+                        imgHtml += `<textarea id="hub_desc" class="form-input" placeholder="매장에 대한 간단한 소개를 적어주세요.">${document.getElementById('hub_desc').value}</textarea>`;
+                        area.innerHTML = imgHtml;
+                    }
                 }
-                reader.readAsDataURL(input.files[0]);
+                reader.readAsDataURL(file);
             }
         }
     </script>
