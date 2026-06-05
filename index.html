@@ -179,15 +179,10 @@
         .extra-menu-box .title { font-size: 1.15rem; font-weight: 900; color: var(--text-dark); }
 
         /* 2. 중앙 긴 배너 3개 */
-        .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; margin-top: 20px; }
-        .dimiga-box { cursor: pointer; flex: 1; background: linear-gradient(to right, #6b9122, #87B32E); border-radius: 15px; padding: 25px 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; gap: 10px; transition: transform 0.2s; }
-        .dimiga-box:hover { transform: translateY(-3px); }
-        .dimiga-box .d-title { color: #ffffff; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.5px; word-break: keep-all; }
-        .dimiga-box .d-sub { color: #ffffff; font-size: 1rem; font-weight: 700; letter-spacing: -0.5px; opacity: 0.9; word-break: keep-all; }
-
-        /* 3. 하단 메뉴 4개 (잘키우는법, 질문있어요, 잔디밭, 알림판) */
-        .sub-menus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; } 
-        .sub-menu-banner { color: white; padding: 20px 10px; border-radius: 12px; text-align: center; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; word-break: keep-all; }
+        .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; margin-top: 15px; }
+        /* 중간 생략 */
+        .sub-menus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; }
+        .sub-menu-banner { color: white; padding: 25px 15px; border-radius: 15px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; word-break: keep-all; height: 100%; box-sizing: border-box; }
         .sub-menu-banner:hover { transform: translateY(-3px); }
         .sub-menu-banner span.desc { font-size: 0.85rem; font-weight: 400; opacity: 0.9; }
         .banner-guide { background: var(--primary-green); }
@@ -507,7 +502,7 @@
         </div>
     </section>
 
-<section class="common-section" style="display: flex; flex-direction: column; gap: 30px;">
+<section class="common-section" style="display: flex; flex-direction: column; gap: 15px;">
         
        <div class="extra-menu-grid">
             <div class="extra-menu-box" onclick="location.href='shop.html'"><span class="icon">🛠️</span><span class="title">생산용품관</span></div>
