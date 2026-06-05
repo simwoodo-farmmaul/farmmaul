@@ -481,8 +481,58 @@ app.get('/api/producers/:id', (req, res) => {
     });
 });
 
-app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
+// ==========================================
+// 🌟 [추가] 알림판(공지사항) DB 연동 API
+// ==========================================
+app.get('/api/notices', (req, res) => {
+    // 1. 공지사항 전용 테이블 생성
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_notices (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            notice_type VARCHAR(50) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            content TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    
+    db.query(createTableQuery, (err) => {
+        // 2. 화면이 허전하지 않도록, 테이블이 비어있으면 초기 샘플 데이터를 자동 생성합니다.
+        db.query(`SELECT COUNT(*) as count FROM farm_notices`, (err, rows) => {
+            if (rows && rows[0].count === 0) {
+                const insertSample = `
+                    INSERT INTO farm_notices (notice_type, title) VALUES 
+                    ('중요공지', '팜마을 평택 비전동 제2허브 정식 오픈 및 이용 안내'),
+                    ('이벤트', '🎉 첫 생산자 등록 이벤트! 스마트 농업 키트 증정'),
+                    ('일반', '시스템 정기 점검에 따른 서비스 일시 중단 안내 (6/10 새벽)')
+                `;
+                db.query(insertSample, () => sendNotices(res));
+            } else {
+                sendNotices(res);
+            }
+        });
+    });
 
+    // 3. 최신순으로 공지사항 목록을 화면으로 보내줍니다.
+    function sendNotices(res) {
+        db.query(`SELECT * FROM farm_notices ORDER BY created_at DESC`, (err, results) => {
+            if (err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    }
+});
+
+// 관리자가 추후에 공지를 편하게 등록할 수 있도록 미리 만들어두는 창구
+app.post('/api/notices', (req, res) => {
+    const { notice_type, title, content } = req.body;
+    const query = `INSERT INTO farm_notices (notice_type, title, content) VALUES (?, ?, ?)`;
+    db.query(query, [notice_type || '일반', title, content || ''], (err, result) => {
+        if(err) return res.status(500).json({ success: false });
+        res.json({ success: true, message: '공지 등록 완료' });
+    });
+});
+
+app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 // ==========================================
 // [팜마을 관리자] 회사소개 및 약관 API
 // ==========================================
