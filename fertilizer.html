@@ -24,12 +24,12 @@
         body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
         
-        /* 1200px 확장 헤더 */
+        /* 1200px 확장 헤더 (약초 페이지와 동일하게 변경) */
         header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
         .header-container { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; }
-        .logo-leaf { font-size: 1.8rem; -webkit-text-fill-color: initial; }
-        .location-picker { font-size: 1.05rem; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 8px; background: #f1f3f5; margin-left: 20px; display: inline-block; }
+        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); }
+        .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
+        .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; }
         
         /* 카테고리 전용 상단 배너 (비료 테마: 브라운 계열) */
         .category-hero {
@@ -39,13 +39,13 @@
         .category-hero h1 { font-size: 2.6rem; margin-bottom: 15px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .category-hero p { font-size: 1.2rem; opacity: 0.95; font-weight: 600; }
 
-        /* ✨ 신규 추가: 비료 전용 서브 메뉴 */
+        /* 비료 전용 서브 메뉴 */
         .sub-menus { max-width: 1200px; margin: -60px auto 40px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; position: relative; z-index: 10; } 
         .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; }
         .sub-menu-banner:hover { transform: translateY(-5px); }
         .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 400; opacity: 0.9; }
 
-        /* ✨ 신규 추가: 비료 가이드 섹션 */
+        /* 비료 가이드 섹션 */
         .guide-section { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
         .guide-title { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 20px; border-left: 4px solid var(--primary-brown); padding-left: 10px; font-weight: 900; }
         .integrated-guide-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
@@ -55,7 +55,7 @@
         .guide-box .title { font-size: 1.15rem; font-weight: 900; color: #222; margin-bottom: 12px; }
         .guide-box .desc { font-size: 0.9rem; color: #666; line-height: 1.5; word-break: keep-all; }
 
-        /* 필터 및 등록 버튼 바 (1200px 중앙 정렬) */
+        /* 필터 및 등록 버튼 바 */
         .filter-bar {
             max-width: 1200px; margin: 0 auto 30px; padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
@@ -68,7 +68,7 @@
         .btn-register-herb:hover { background: #5d4037; transform: translateY(-2px); }
         .sort-select { padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; font-weight: 700; font-size: 0.95rem; outline: none; cursor: pointer; color: #444; }
 
-        /* 상품 그리드 (4칸 배열로 확장) */
+        /* 상품 그리드 */
         .product-grid { max-width: 1200px; margin: 0 auto 60px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
         .product-card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eaeaea; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-6px); box-shadow: 0 10px 25px rgba(121,85,72,0.15); border-color: var(--primary-brown); }
@@ -91,7 +91,6 @@
         }
         @media (max-width: 768px) {
             .header-container { flex-direction: row; justify-content: space-between; }
-            .location-picker { margin-left: 0; font-size: 0.9rem; padding: 6px 10px; }
             .category-hero { padding: 40px 20px 80px; margin-bottom: 25px; }
             .category-hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
             .category-hero p { font-size: 1rem; }
@@ -116,10 +115,12 @@
 
     <header>
         <div class="header-container">
-            <a href="index.html" class="logo-text">
-                <span class="logo-leaf">🌱</span>팜마을
-            </a>
-            <div class="location-picker">📍 평택시 지산동 ▾</div>
+            <div style="display: flex; align-items: center;">
+                <a href="index.html" class="header-back">←</a>
+                <a href="index.html" class="logo-text">
+                    <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
+                </a>
+            </div>
         </div>
     </header>
 
@@ -128,7 +129,6 @@
         <p>농작물을 튼튼하게 키워줄 믿을 수 있는 지역 생산 비료</p>
     </div>
 
-    <!-- ✨ 비료 전용 퀵 메뉴 (카테고리별 검색 연동) -->
     <div class="sub-menus">
         <div class="sub-menu-banner" style="background: #795548;" onclick="location.href='search_result.html?keyword=퇴비'">
             <div>🍂 [밑거름/퇴비]</div>
@@ -148,7 +148,6 @@
         </div>
     </div>
 
-    <!-- ✨ 비료 가이드 섹션 -->
     <section class="guide-section">
         <h2 class="guide-title">📖 팜마을 비료 종합 가이드</h2>
         <div class="integrated-guide-grid">
@@ -175,11 +174,9 @@
         </div>
     </section>
 
-    <!-- 상품 목록 상단 필터 -->
     <div class="filter-bar">
         <div class="item-count">등록된 비료상품 <span id="totalCount">0</span>개</div>
         <div class="filter-right">
-            <!-- 🌟 이 버튼을 누르면 비료 태그가 자동 입력된 상태로 상품 등록 화면으로 이동합니다 -->
             <a href="register.html?fertilizer=true" class="btn-register-herb">➕ 우리 농장 비료 등록하기</a>
             <select class="sort-select">
                 <option>최신등록순</option>
@@ -189,7 +186,6 @@
         </div>
     </div>
 
-    <!-- 🌟 자바스크립트를 통해 서버에서 비료 상품만 쏙쏙 뽑아와서 여기에 그립니다 -->
     <div class="product-grid" id="fertilizerContainer">
         <div class="empty-state">
             서버에서 비료 상품 정보를 불러오고 있습니다... 🍂
@@ -213,7 +209,6 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // 서버(DB)에서 모든 상품 목록을 가져옵니다.
             fetch('/api/products')
             .then(response => response.json())
             .then(result => {
@@ -221,21 +216,18 @@
                     const container = document.getElementById('fertilizerContainer');
                     const countEl = document.getElementById('totalCount');
                     
-                    // 전체 상품 중에서 카테고리가 '비료'이거나, 해시태그에 '비료'가 포함된 상품만 필터링합니다.
                     const fertilizerProducts = result.data.filter(p => {
                         const hasCategory = p.category && p.category.includes('비료');
                         const hasTag = p.tags && p.tags.includes('비료');
                         return hasCategory || hasTag;
                     });
                     
-                    // 필터링된 상품 개수를 상단에 표시
                     countEl.innerText = fertilizerProducts.length;
                     
                     if (fertilizerProducts.length > 0) {
-                        container.innerHTML = ''; // 안내 문구 지우기
+                        container.innerHTML = ''; 
                         
                         fertilizerProducts.forEach(product => {
-                            // 등록된 사진이 없으면 흙/퇴비 느낌의 기본 이미지를 사용합니다.
                             const imgUrl = product.image || 'https://images.unsplash.com/photo-1615811361523-6bd03d7748e7?q=80&w=400&auto=format&fit=crop';
                             
                             const itemHtml = `
@@ -251,7 +243,6 @@
                             container.insertAdjacentHTML('beforeend', itemHtml);
                         });
                     } else {
-                        // 비료 상품이 하나도 없을 경우 표시할 안내 화면
                         container.innerHTML = `
                             <div class="empty-state">
                                 아직 등록된 천연 비료 상품이 없습니다.<br><br>
