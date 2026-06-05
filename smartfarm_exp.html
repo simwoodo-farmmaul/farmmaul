@@ -20,12 +20,12 @@
         body { background-color: var(--bg-color); color: var(--text-dark); line-height: 1.6; }
         a { text-decoration: none; color: inherit; }
 
-        /* 공통 헤더 */
+        /* 공통 헤더 (팜마을 통합 디자인으로 변경) */
         .header { border-bottom: 1px solid #eee; position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); z-index: 100; }
-        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
-        .header .btn-back { font-size: 1.5rem; color: #333; font-weight: 900; cursor: pointer; border: none; background: none; }
-        .header .logo-text { font-family: 'Jua', sans-serif; font-size: 1.5rem; color: var(--primary-green); text-decoration: none; display: flex; align-items: center; gap: 5px; }
-        .header .btn-home { font-size: 1.2rem; cursor: pointer; border: none; background: none; }
+        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; align-items: center; padding: 15px 20px; }
+        .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; text-decoration: none; }
+        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); text-decoration: none; }
+        .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
 
         /* 히어로 배너 */
         .hero-section { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1592982537447-6f296d1136b4?q=80&w=1200&auto=format&fit=crop') center/cover; color: white; text-align: center; padding: 80px 20px; }
@@ -74,6 +74,8 @@
 
         /* 모바일 반응형 */
         @media (max-width: 768px) {
+            .logo-text { font-size: 1.8rem; }
+            .logo-icon { height: 2.5rem; }
             .hero-section { padding: 60px 20px; }
             .hero-title { font-size: 1.8rem; }
             .feature-grid { grid-template-columns: 1fr; gap: 15px; }
@@ -93,9 +95,12 @@
     <!-- 헤더 -->
     <div class="header">
         <div class="header-inner">
-            <button class="btn-back" onclick="history.back()">←</button>
-            <a href="index.html" class="logo-text">🌱 팜마을</a>
-            <button class="btn-home" onclick="location.href='index.html'">🏠</button>
+            <div style="display: flex; align-items: center;">
+                <a href="index.html" class="header-back">←</a>
+                <a href="index.html" class="logo-text">
+                    <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
+                </a>
+            </div>
         </div>
     </div>
 

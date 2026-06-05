@@ -17,10 +17,12 @@
         
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; padding-bottom: 80px; }
 
-        /* 헤더 */
+        /* 공통 헤더 (팜마을 통합 디자인으로 변경) */
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .header .btn { font-size: 1.2rem; text-decoration: none; color: #333; font-weight: 900; cursor: pointer; }
+        .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; text-decoration: none; }
+        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); text-decoration: none; }
+        .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
         .header .title { font-weight: 900; font-size: 1.2rem; color: #222; }
 
         /* 메인 비주얼 배너 */
@@ -66,6 +68,12 @@
         /* 하단 고정 신청 버튼 */
         .btn-bottom-fixed { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; background: var(--dimiga-green); color: #fff; border: none; font-size: 1.25rem; font-weight: 900; cursor: pointer; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; gap: 10px; }
 
+        @media (max-width: 768px) {
+            .logo-text { font-size: 1.8rem; }
+            .logo-icon { height: 2.5rem; }
+            .header .title { font-size: 1rem; }
+        }
+
         @media (max-width: 480px) {
             .hero-section { padding: 40px 20px; }
             .hero-title { font-size: 1.8rem; }
@@ -78,9 +86,13 @@
 
     <div class="header">
         <div class="header-inner">
-            <a href="#" class="btn" onclick="history.back()">←</a>
-            <div class="title">도시농업대학 디미가(주)</div>
-            <div style="width: 20px;"></div>
+            <div style="display: flex; align-items: center;">
+                <a href="index.html" class="header-back">←</a>
+                <a href="index.html" class="logo-text">
+                    <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
+                </a>
+            </div>
+            <div class="title">디미가 안산본부</div>
         </div>
     </div>
 
