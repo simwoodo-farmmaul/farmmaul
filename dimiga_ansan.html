@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>팜마을 - 도시농업대학 디미가</title>
+    <title>팜마을 - 도시농업대학 디미가 안산본부</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         
@@ -17,68 +17,78 @@
         
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; padding-bottom: 80px; }
 
-        /* 공통 헤더 (팜마을 통합 디자인으로 변경) */
+        /* 헤더 (1200px) */
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; text-decoration: none; }
         .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); text-decoration: none; }
         .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
-        .header .title { font-weight: 900; font-size: 1.2rem; color: #222; }
+        .header .title { font-weight: 900; font-size: 1.3rem; color: #222; }
 
-        /* 메인 비주얼 배너 */
-        .hero-section { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1595841696650-6f296316f391?q=80&w=800&auto=format&fit=crop') no-repeat center; background-size: cover; color: #fff; text-align: center; padding: 50px 20px; }
-        .hero-badge { display: inline-block; background: var(--primary-orange); color: #fff; padding: 5px 12px; border-radius: 20px; font-weight: 900; font-size: 0.9rem; margin-bottom: 15px; }
-        .hero-title { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0 0 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); line-height: 1.3; }
-        .hero-desc { font-size: 1.05rem; font-weight: 600; line-height: 1.5; opacity: 0.9; }
+        /* 메인 비주얼 배너 (웅장하게) */
+        .hero-section { background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1595841696650-6f296316f391?q=80&w=1200&auto=format&fit=crop') no-repeat center; background-size: cover; color: #fff; text-align: center; padding: 80px 20px 100px; }
+        .hero-badge { display: inline-block; background: var(--primary-orange); color: #fff; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 1rem; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .hero-title { font-family: 'Jua', sans-serif; font-size: 3rem; margin: 0 0 15px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); line-height: 1.3; }
+        .hero-desc { font-size: 1.2rem; font-weight: 600; line-height: 1.6; opacity: 0.95; }
 
-        /* 컨텐츠 뼈대 */
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
-        .section-card { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.04); }
-        .sec-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 20px; color: #222; display: flex; align-items: center; gap: 8px; border-left: 5px solid var(--dimiga-green); padding-left: 12px; }
+        /* ✨ 안산본부 전용 퀵 메뉴 */
+        .sub-menus { max-width: 1200px; margin: -50px auto 40px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; position: relative; z-index: 10; } 
+        .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 15px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; border: 2px solid rgba(255,255,255,0.1); }
+        .sub-menu-banner:hover { transform: translateY(-5px); }
+        .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
+
+        /* 컨텐츠 뼈대 (1200px 확장 및 그리드 적용) */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .grid-map { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+        .section-card { background: #fff; border-radius: 20px; padding: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.04); height: 100%; box-sizing: border-box; }
+        .sec-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 25px; color: #222; display: flex; align-items: center; gap: 8px; border-left: 5px solid var(--dimiga-green); padding-left: 15px; }
 
         /* 소개 텍스트 */
-        .intro-text { font-size: 1.05rem; color: #444; line-height: 1.7; word-break: keep-all; font-weight: 500; margin-bottom: 20px; }
-        .highlight { color: var(--dimiga-green); font-weight: 800; }
-        .role-list { background: #f4f9ea; padding: 20px; border-radius: 12px; border: 1px solid #dcedc8; }
-        .role-list h4 { margin: 0 0 10px; color: #2e7d32; font-size: 1.1rem; }
-        .role-list ul { margin: 0; padding-left: 20px; color: #555; font-size: 0.95rem; line-height: 1.8; font-weight: 600; }
+        .intro-text { font-size: 1.1rem; color: #444; line-height: 1.8; word-break: keep-all; font-weight: 500; margin-bottom: 25px; }
+        .highlight { color: var(--dimiga-green); font-weight: 900; }
+        .role-list { background: #f4f9ea; padding: 25px; border-radius: 15px; border: 1px solid #dcedc8; }
+        .role-list h4 { margin: 0 0 15px; color: #2e7d32; font-size: 1.2rem; }
+        .role-list ul { margin: 0; padding-left: 20px; color: #555; font-size: 1.05rem; line-height: 1.8; font-weight: 600; }
 
         /* 모집 요강 (테이블 형태) */
         .info-table { width: 100%; border-collapse: collapse; }
-        .info-table th { width: 85px; text-align: left; font-size: 0.95rem; font-weight: 800; color: #888; padding: 12px 0; vertical-align: top; }
-        .info-table td { font-size: 1rem; color: #222; font-weight: 700; padding: 12px 0; line-height: 1.5; word-break: keep-all; border-bottom: 1px dashed #eee; }
+        .info-table th { width: 120px; text-align: left; font-size: 1.05rem; font-weight: 800; color: #888; padding: 15px 0; vertical-align: top; }
+        .info-table td { font-size: 1.05rem; color: #222; font-weight: 700; padding: 15px 0; line-height: 1.6; word-break: keep-all; border-bottom: 1px dashed #eee; }
         .info-table tr:last-child td { border-bottom: none; }
-        .badge-point { background: #ffebee; color: #c62828; font-size: 0.8rem; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+        .badge-point { background: #ffebee; color: #c62828; font-size: 0.85rem; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 8px; }
 
         /* 특전 박스 */
-        .benefit-box { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 15px; padding: 25px; margin-top: 15px; }
-        .benefit-title { font-weight: 900; color: #2e7d32; font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
-        .benefit-list { margin: 0; padding-left: 20px; font-weight: 700; color: #333; line-height: 1.6; font-size: 0.95rem; }
-
-        /* 갤러리 */
-        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .gallery-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; }
+        .benefit-box { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-radius: 15px; padding: 30px; margin-top: 20px; }
+        .benefit-title { font-weight: 900; color: #2e7d32; font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .benefit-list { margin: 0; padding-left: 20px; font-weight: 700; color: #333; line-height: 1.7; font-size: 1.05rem; }
 
         /* 오시는 길 */
-        .map-area { width: 100%; height: 200px; background: #e9ecef; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #888; font-weight: 700; margin-bottom: 15px; overflow: hidden; }
-        .map-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .contact-box { background: #fff8eb; border: 1px solid #ffe0b2; padding: 15px; border-radius: 10px; text-align: center; margin-top: 15px; }
-        .contact-num { font-size: 1.4rem; font-weight: 900; color: var(--primary-orange); letter-spacing: 1px; margin: 5px 0; }
+        .map-area { width: 100%; height: 300px; background: #e9ecef; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #888; font-weight: 700; margin-bottom: 0; overflow: hidden; }
+        .map-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        .contact-box { background: #fff8eb; border: 1px solid #ffe0b2; padding: 30px 20px; border-radius: 15px; text-align: center; display: flex; flex-direction: column; justify-content: center; height: 100%; box-sizing: border-box; }
+        .contact-num { font-size: 1.8rem; font-weight: 900; color: var(--primary-orange); letter-spacing: 1px; margin: 10px 0; }
 
         /* 하단 고정 신청 버튼 */
-        .btn-bottom-fixed { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; background: var(--dimiga-green); color: #fff; border: none; font-size: 1.25rem; font-weight: 900; cursor: pointer; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; gap: 10px; }
+        .btn-bottom-fixed { position: fixed; bottom: 0; left: 0; width: 100%; padding: 25px; background: var(--dimiga-green); color: #fff; border: none; font-size: 1.4rem; font-weight: 900; cursor: pointer; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; }
+        .btn-bottom-fixed:hover { background: #2e7d32; }
 
-        @media (max-width: 768px) {
-            .logo-text { font-size: 1.8rem; }
-            .logo-icon { height: 2.5rem; }
-            .header .title { font-size: 1rem; }
+        @media (max-width: 1024px) {
+            .grid-2col, .grid-map { grid-template-columns: 1fr; gap: 20px; }
+            .section-card { height: auto; }
+            .sub-menus { grid-template-columns: repeat(2, 1fr); margin-top: -30px; }
+            .hero-title { font-size: 2.5rem; }
         }
-
-        @media (max-width: 480px) {
-            .hero-section { padding: 40px 20px; }
-            .hero-title { font-size: 1.8rem; }
-            .section-card { padding: 20px; }
-            .info-table th { width: 70px; }
+        @media (max-width: 768px) {
+            .header .title { font-size: 1.1rem; }
+            .hero-section { padding: 60px 20px 80px; }
+            .hero-title { font-size: 2rem; }
+            .section-card { padding: 25px; }
+            .info-table th { width: 80px; font-size: 0.95rem; }
+            .info-table td { font-size: 0.95rem; }
+            .sub-menu-banner { padding: 15px 10px; font-size: 1.1rem; }
+            .contact-num { font-size: 1.4rem; }
         }
     </style>
 </head>
@@ -98,27 +108,53 @@
 
     <div class="hero-section">
         <span class="hero-badge">제20기 교육생 모집</span>
-        <h1 class="hero-title">국가자격<br>도시농업관리사 과정</h1>
+        <h1 class="hero-title">국가자격 도시농업관리사 과정</h1>
         <p class="hero-desc">"도시농업"을 선도하는 전문 인력 양성!<br>자연치유대학 디미가와 함께하세요.</p>
+    </div>
+
+    <!-- ✨ 안산본부 전용 퀵 메뉴 추가 -->
+    <div class="sub-menus">
+        <div class="sub-menu-banner" style="background: #2e7d32;" onclick="location.href='#'">
+            <div>📖 [교육과정 안내]</div>
+            <span class="desc">도시농업관리사 상세 커리큘럼</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #43a047;" onclick="location.href='#'">
+            <div>👨‍🏫 [최고 강사진 소개]</div>
+            <span class="desc">각 분야별 디미가 전문가 그룹</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #66bb6a;" onclick="location.href='#'">
+            <div>📝 [온라인 수강신청]</div>
+            <span class="desc">제20기 교육생 원서 접수</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #81c784;" onclick="location.href='board.html'">
+            <div>💬 [수강생 커뮤니티]</div>
+            <span class="desc">선배 수료생들의 생생한 후기</span>
+        </div>
     </div>
 
     <div class="container">
         
-        <div class="section-card">
-            <div class="sec-title">📖 교육 과정 소개</div>
-            <div class="intro-text">
-                <span class="highlight">도시농업관리사란?</span><br>
-                농업·농촌 자원이나 이를 이용해 국민의 신체, 정서, 심리, 인지, 사회 등의 건강을 도모하는 활동과 산업을 이끄는 <b>국가기술자격증 취득 전문가</b>입니다. (도시농업의 육성 및 지원에 관한 법률 제11조의2에 근거 / 농림축산식품부장관 자격부여)
+        <!-- 그리드 분할 (소개와 역할) -->
+        <div class="grid-2col">
+            <div class="section-card">
+                <div class="sec-title">📖 교육 과정 소개</div>
+                <div class="intro-text">
+                    <span class="highlight">도시농업관리사란?</span><br>
+                    농업·농촌 자원이나 이를 이용해 국민의 신체, 정서, 심리, 인지, 사회 등의 건강을 도모하는 활동과 산업을 이끄는 <b>국가기술자격증 취득 전문가</b>입니다. <br><br>
+                    <span style="font-size: 0.95rem; color: #888;">(도시농업의 육성 및 지원에 관한 법률 제11조의2에 근거 / 농림축산식품부장관 자격부여)</span>
+                </div>
             </div>
-            
-            <div class="role-list">
-                <h4>✨ 도시농업관리사가 하는 일</h4>
-                <ul>
-                    <li>식물, 동물, 농작물을 통한 치유프로그램 운영</li>
-                    <li>유치원, 학교 텃밭관리 및 상담활동</li>
-                    <li>귀농귀촌 및 청년창업 프로젝트 참여</li>
-                    <li>반려식물 등 도시농업 교육강사 및 큐레이터 활동</li>
-                </ul>
+
+            <div class="section-card" style="background: #f4f9ea; border: 1px solid #dcedc8;">
+                <div class="sec-title" style="border-left-color: #2e7d32;">✨ 관리사가 하는 일</div>
+                <div class="role-list" style="background: none; border: none; padding: 0;">
+                    <ul>
+                        <li>식물, 동물, 농작물을 통한 치유프로그램 기획 및 운영</li>
+                        <li>유치원, 학교 텃밭관리 및 학생 대상 자연 상담활동</li>
+                        <li>귀농귀촌 및 청년창업 프로젝트 멘토링 참여</li>
+                        <li>반려식물 등 도시농업 교육강사 및 큐레이터 활동</li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -136,11 +172,11 @@
                 </tr>
                 <tr>
                     <th>교육기간</th>
-                    <td>2026. 4. 18 (토) ~ 6. 14 (일) <br><span style="font-size:0.85rem; color:#666;">(토, 일 주말 수업)</span></td>
+                    <td>2026. 4. 18 (토) ~ 6. 14 (일) <span style="font-size:0.95rem; color:#666;">(토, 일 주말 수업)</span></td>
                 </tr>
                 <tr>
                     <th>교육시간</th>
-                    <td>오전 10:00 ~ 19:00 <br><span style="font-size:0.85rem; color:#666;">(10회 / 이론 40H, 실습 40H / 총 80H)</span></td>
+                    <td>오전 10:00 ~ 19:00 <span style="font-size:0.95rem; color:#666;">(10회 / 이론 40H, 실습 40H / 총 80H)</span></td>
                 </tr>
                 <tr>
                     <th>교육내용</th>
@@ -155,7 +191,7 @@
                 </tr>
                 <tr>
                     <th>입금계좌</th>
-                    <td><b style="color:var(--primary-blue);">농협 351-1129-612953</b> <br><span style="font-size:0.9rem; color:#666;">(예금주: 디미가)</span></td>
+                    <td><b style="color:var(--primary-blue);">농협 351-1129-612953</b> <span style="font-size:0.95rem; color:#666;">(예금주: 디미가)</span></td>
                 </tr>
             </table>
 
@@ -163,31 +199,29 @@
                 <div class="benefit-title">🎁 수료자 특별 혜택 (특전)</div>
                 <ul class="benefit-list">
                     <li>도시농업관리사과정 수료 후 농업관련 자격증 취득 시 <b>국가자격 부여</b></li>
-                    <li>스마트팜, 귀농귀촌 <b>필수 교육시간 40시간 인정</b></li>
-                    <li>수료생 대상 <b>농업자금 지원 혜택</b> 가이드</li>
+                    <li>스마트팜, 귀농귀촌 <b>필수 교육시간 40시간 공식 인정</b></li>
+                    <li>수료생 대상 <b>농업자금 지원 혜택 및 컨설팅 가이드</b> 제공</li>
                 </ul>
             </div>
         </div>
 
-        <div class="section-card">
-            <div class="sec-title">📍 오시는 길 및 문의</div>
-            
-            <div style="font-size:1.05rem; font-weight:800; color:#222; margin-bottom:10px;">
-                도시농업대학 디미가(주) 안산본부
-            </div>
-            <div style="font-size:0.95rem; color:#555; margin-bottom:15px; font-weight:600;">
-                경기도 안산시 상록구 사사안골길 106
-            </div>
-
-            <div class="map-area">
-                <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="지도 위치">
+        <!-- 지도와 연락처 분할 -->
+        <div class="grid-map">
+            <div class="section-card">
+                <div class="sec-title">📍 오시는 길</div>
+                <div style="font-size:1.15rem; font-weight:800; color:#222; margin-bottom:5px;">도시농업대학 디미가(주) 안산본부</div>
+                <div style="font-size:1.05rem; color:#555; margin-bottom:20px; font-weight:600;">경기도 안산시 상록구 사사안골길 106</div>
+                <div class="map-area">
+                    <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=800&auto=format&fit=crop" alt="지도 위치">
+                </div>
             </div>
 
             <div class="contact-box">
-                <div style="font-size:0.95rem; font-weight:800; color:#555;">📞 수강 문의 및 상담 신청</div>
+                <div style="font-size:1.1rem; font-weight:900; color:#555; margin-bottom: 10px;">📞 수강 문의 및 상담 신청</div>
                 <div class="contact-num">031-419-1151</div>
                 <div class="contact-num">010-3768-2491</div>
-                <div style="font-size:0.85rem; color:#888; margin-top:5px; font-weight:700;">* 네이버 카페: 디미가 자연치유대학</div>
+                <div style="width: 40px; height: 3px; background: #ffcc80; margin: 20px auto;"></div>
+                <div style="font-size:0.95rem; color:#888; font-weight:700; line-height: 1.5;">* 자세한 정보는 네이버 카페<br><b>'디미가 자연치유대학'</b>을 참조하세요.</div>
             </div>
         </div>
 

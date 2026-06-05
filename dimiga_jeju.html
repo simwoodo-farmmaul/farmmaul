@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>팜마을 - 디미가 제주 교육장</title>
     <style>
-        /* 구글 웹 폰트 'Jua' 및 기본 폰트 설정 */
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         
         :root { 
@@ -18,79 +17,91 @@
         
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: #333; padding-bottom: 80px; }
 
-        /* 공통 헤더 (팜마을 통합 디자인으로 변경) */
+        /* 헤더 (1200px) */
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; text-decoration: none; }
         .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); text-decoration: none; }
         .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
-        .header .title { font-weight: 900; font-size: 1.2rem; color: #222; }
+        .header .title { font-weight: 900; font-size: 1.3rem; color: #222; }
 
         /* 메인 비주얼 배너 */
-        .hero-section { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1550983196-85712f5a04e3?q=80&w=800&auto=format&fit=crop') no-repeat center; background-size: cover; color: #fff; text-align: center; padding: 60px 20px; }
-        .hero-badge { display: inline-block; background: var(--jeju-orange); color: #fff; padding: 5px 12px; border-radius: 20px; font-weight: 900; font-size: 0.9rem; margin-bottom: 15px; }
-        .hero-title { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0 0 10px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); }
-        .hero-desc { font-size: 1.05rem; font-weight: 600; line-height: 1.5; opacity: 0.9; }
+        .hero-section { background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1550983196-85712f5a04e3?q=80&w=1200&auto=format&fit=crop') no-repeat center; background-size: cover; color: #fff; text-align: center; padding: 80px 20px 100px; }
+        .hero-badge { display: inline-block; background: var(--jeju-orange); color: #fff; padding: 5px 15px; border-radius: 20px; font-weight: 900; font-size: 1rem; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .hero-title { font-family: 'Jua', sans-serif; font-size: 3rem; margin: 0 0 15px; text-shadow: 0 2px 5px rgba(0,0,0,0.3); line-height: 1.3; }
+        .hero-desc { font-size: 1.2rem; font-weight: 600; line-height: 1.6; opacity: 0.95; }
 
-        /* 컨텐츠 뼈대 */
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
+        /* ✨ 제주본부 전용 퀵 메뉴 */
+        .sub-menus { max-width: 1200px; margin: -50px auto 40px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; position: relative; z-index: 10; } 
+        .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 15px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.15); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; border: 2px solid rgba(255,255,255,0.1); }
+        .sub-menu-banner:hover { transform: translateY(-5px); }
+        .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
 
-        /* 섹션 공통 */
-        .section-card { background: #fff; border-radius: 20px; padding: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.04); }
-        .sec-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 20px; color: #222; display: flex; align-items: center; gap: 8px; border-left: 5px solid var(--jeju-orange); padding-left: 12px; }
+        /* 컨텐츠 뼈대 (1200px 확장 및 그리드) */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 30px; }
+        .grid-intro { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; }
+        .grid-map { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+
+        .section-card { background: #fff; border-radius: 20px; padding: 40px; box-shadow: 0 5px 20px rgba(0,0,0,0.04); height: 100%; box-sizing: border-box; }
+        .sec-title { font-size: 1.4rem; font-weight: 900; margin-bottom: 25px; color: #222; display: flex; align-items: center; gap: 8px; border-left: 5px solid var(--jeju-orange); padding-left: 15px; }
 
         /* 1. 소개 영역 */
-        .intro-text { font-size: 1.05rem; color: #555; line-height: 1.7; word-break: keep-all; font-weight: 500; }
-        .highlight { color: var(--jeju-orange); font-weight: 800; }
+        .intro-text { font-size: 1.1rem; color: #555; line-height: 1.8; word-break: keep-all; font-weight: 500; }
+        .highlight { color: var(--jeju-orange); font-weight: 900; }
 
         /* 2. 커리큘럼 (교육 내용) */
         .curriculum-grid { display: flex; flex-direction: column; gap: 15px; }
-        .curriculum-item { display: flex; gap: 15px; background: #fdfdfd; border: 1px solid #eee; padding: 20px; border-radius: 15px; transition: 0.2s; }
+        .curriculum-item { display: flex; gap: 20px; background: #fdfdfd; border: 1px solid #eee; padding: 25px; border-radius: 15px; transition: 0.2s; align-items: center; }
         .curriculum-item:hover { border-color: var(--jeju-orange); box-shadow: 0 5px 15px rgba(251,140,0,0.1); }
-        .curriculum-num { font-family: 'Jua', sans-serif; font-size: 2rem; color: var(--primary-green); width: 40px; flex-shrink: 0; text-align: center; }
-        .curriculum-info h3 { margin: 0 0 8px; font-size: 1.15rem; font-weight: 900; color: #222; }
-        .curriculum-info p { margin: 0; font-size: 0.95rem; color: #666; line-height: 1.5; }
+        .curriculum-num { font-family: 'Jua', sans-serif; font-size: 2.5rem; color: var(--primary-green); width: 50px; flex-shrink: 0; text-align: center; }
+        .curriculum-info h3 { margin: 0 0 10px; font-size: 1.25rem; font-weight: 900; color: #222; }
+        .curriculum-info p { margin: 0; font-size: 1.05rem; color: #666; line-height: 1.6; }
 
         /* 3. 스케줄 영역 */
-        .schedule-box { background: #fff8eb; border-radius: 15px; padding: 20px; border: 1px solid #ffe0b2; }
-        .schedule-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #ffcc80; }
+        .schedule-box { background: #fff8eb; border-radius: 15px; padding: 30px; border: 1px solid #ffe0b2; }
+        .schedule-row { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px dashed #ffcc80; }
         .schedule-row:last-child { border-bottom: none; padding-bottom: 0; }
-        .sch-date { font-weight: 900; color: var(--jeju-orange); font-size: 1.05rem; }
-        .sch-name { font-weight: 700; color: #444; flex: 1; margin: 0 15px; }
-        .sch-status { font-size: 0.85rem; font-weight: 800; padding: 4px 10px; border-radius: 8px; }
+        .sch-date { font-weight: 900; color: var(--jeju-orange); font-size: 1.15rem; width: 150px; }
+        .sch-name { font-weight: 700; color: #444; flex: 1; margin: 0 20px; font-size: 1.1rem; }
+        .sch-status { font-size: 0.95rem; font-weight: 800; padding: 6px 15px; border-radius: 8px; }
         .status-open { background: var(--primary-green); color: #fff; }
         .status-full { background: #e0e0e0; color: #888; }
 
-        /* 4. 갤러리 (사진) */
-        .gallery-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .gallery-img { width: 100%; height: 180px; object-fit: cover; border-radius: 12px; transition: 0.2s; cursor: pointer; }
-        .gallery-img:hover { transform: scale(1.02); }
+        /* 4. 갤러리 (사진) - 와이드에 맞춰 4칸으로 확장 */
+        .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .gallery-img { width: 100%; height: 200px; object-fit: cover; border-radius: 12px; transition: 0.2s; cursor: pointer; }
+        .gallery-img:hover { transform: scale(1.03); box-shadow: 0 5px 15px rgba(0,0,0,0.15); }
 
         /* 5. 오시는 길 */
-        .map-area { width: 100%; height: 200px; background: #e9ecef; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #888; font-weight: 700; margin-bottom: 15px; overflow: hidden; }
-        .map-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-        .info-row { display: flex; gap: 10px; margin-bottom: 10px; font-size: 0.95rem; }
-        .info-label { font-weight: 900; color: #555; width: 60px; }
+        .map-area { width: 100%; height: 280px; background: #e9ecef; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #888; font-weight: 700; margin-bottom: 0; overflow: hidden; }
+        .map-area img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
+        
+        .contact-box { padding: 10px 0; display: flex; flex-direction: column; justify-content: center; height: 100%; }
+        .info-row { display: flex; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; }
+        .info-label { font-weight: 900; color: #555; width: 70px; }
 
         /* 하단 고정 신청 버튼 */
-        .btn-bottom-fixed { position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px; background: var(--jeju-orange); color: #fff; border: none; font-size: 1.25rem; font-weight: 900; cursor: pointer; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; gap: 10px; transition: background 0.2s; }
+        .btn-bottom-fixed { position: fixed; bottom: 0; left: 0; width: 100%; padding: 25px; background: var(--jeju-orange); color: #fff; border: none; font-size: 1.4rem; font-weight: 900; cursor: pointer; z-index: 1000; box-shadow: 0 -5px 15px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; gap: 10px; transition: background 0.2s; }
         .btn-bottom-fixed:hover { background: #e65100; }
 
-        /* 모바일 반응형 */
-        @media (max-width: 768px) {
-            .logo-text { font-size: 1.8rem; }
-            .logo-icon { height: 2.5rem; }
-            .header .title { font-size: 1rem; }
+        @media (max-width: 1024px) {
+            .grid-intro, .grid-map { grid-template-columns: 1fr; gap: 20px; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .section-card { height: auto; }
+            .sub-menus { grid-template-columns: repeat(2, 1fr); margin-top: -30px; }
+            .hero-title { font-size: 2.5rem; }
         }
-
-        @media (max-width: 480px) {
-            .hero-section { padding: 40px 20px; }
-            .hero-title { font-size: 1.8rem; }
-            .section-card { padding: 20px; }
-            .curriculum-item { flex-direction: column; gap: 10px; }
-            .curriculum-num { text-align: left; }
-            .schedule-row { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .sch-name { margin: 0; }
+        @media (max-width: 768px) {
+            .header .title { font-size: 1.1rem; }
+            .hero-section { padding: 60px 20px 80px; }
+            .hero-title { font-size: 2rem; }
+            .section-card { padding: 25px; }
+            .sub-menu-banner { padding: 15px 10px; font-size: 1.1rem; }
+            .curriculum-item { flex-direction: column; gap: 10px; align-items: flex-start; }
+            .schedule-row { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .sch-name { margin: 0; font-size: 1rem; }
+            .sch-date { width: auto; }
+            .gallery-img { height: 160px; }
         }
     </style>
 </head>
@@ -114,38 +125,61 @@
         <p class="hero-desc">당신의 꿈을 현실로 만들어 드립니다.<br>귀농 정착을 위한 교육부터 맞춤형 주택 3D 설계까지!</p>
     </div>
 
+    <!-- ✨ 제주본부 전용 퀵 메뉴 추가 -->
+    <div class="sub-menus">
+        <div class="sub-menu-banner" style="background: #e65100;" onclick="location.href='#'">
+            <div>🍊 [제주 스마트팜 교육]</div>
+            <span class="desc">귀농귀촌 실무 및 스마트팜</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #ef6c00;" onclick="location.href='#'">
+            <div>🏠 [3D 건축/설계 상담]</div>
+            <span class="desc">(주)모르디자인 하우스</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #f57c00;" onclick="location.href='#'">
+            <div>💰 [귀농귀촌 정책지원]</div>
+            <span class="desc">정착 자금 및 토지 상담 가이드</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #fb8c00;" onclick="location.href='board.html'">
+            <div>📸 [시공·교육 갤러리]</div>
+            <span class="desc">생생한 교육 현장 및 시공 사례</span>
+        </div>
+    </div>
+
     <div class="container">
         
-        <div class="section-card">
-            <div class="sec-title">📖 교육장 및 서비스 소개</div>
-            <div class="intro-text">
-                <b>도시농업대학 디미가 제주 교육장</b>은 농업의 새로운 전환과 안정적인 농촌 정착을 꿈꾸는 분들을 위한 <span class="highlight">종합 귀농귀촌 솔루션</span>을 제공합니다.<br><br>
-                단순한 농업 교육을 넘어, 최신 기술을 접목한 스마트팜 교육, 성공적인 정착을 위한 정책 자금 지원 안내, 그리고 <b>(주)모르디자인</b>과 함께하는 <span class="highlight">귀농 맞춤형 주택 3D 설계 및 건설 관리</span>까지 당신의 든든한 동반자가 되어 드립니다.
+        <!-- 소개와 커리큘럼 좌우 분할 -->
+        <div class="grid-intro">
+            <div class="section-card">
+                <div class="sec-title">📖 교육장 및 서비스 소개</div>
+                <div class="intro-text">
+                    <b>도시농업대학 디미가 제주 교육장</b>은 농업의 새로운 전환과 안정적인 농촌 정착을 꿈꾸는 분들을 위한 <span class="highlight">종합 귀농귀촌 솔루션</span>을 제공합니다.<br><br>
+                    단순한 농업 교육을 넘어, 최신 기술을 접목한 스마트팜 교육, 성공적인 정착을 위한 정책 자금 지원 안내, 그리고 <b>(주)모르디자인</b>과 함께하는 <span class="highlight">귀농 맞춤형 주택 3D 설계 및 건설 관리</span>까지 당신의 든든한 동반자가 되어 드립니다.
+                </div>
             </div>
-        </div>
 
-        <div class="section-card">
-            <div class="sec-title">🛠️ 주요 교육 및 지원 서비스</div>
-            <div class="curriculum-grid">
-                <div class="curriculum-item">
-                    <div class="curriculum-num">01</div>
-                    <div class="curriculum-info">
-                        <h3>귀농·귀촌 & 스마트팜 교육</h3>
-                        <p>농업의 기초부터 현대적인 스마트팜 기술까지 실용적인 솔루션을 제공하여 지속 가능한 농업 전문가로 성장하도록 돕습니다.</p>
+            <div class="section-card">
+                <div class="sec-title">🛠️ 주요 교육 및 지원 서비스</div>
+                <div class="curriculum-grid">
+                    <div class="curriculum-item">
+                        <div class="curriculum-num">01</div>
+                        <div class="curriculum-info">
+                            <h3>귀농·귀촌 & 스마트팜 교육</h3>
+                            <p>농업의 기초부터 현대적인 스마트팜 기술까지 실용적인 솔루션을 제공하여 지속 가능한 농업 전문가로 성장하도록 돕습니다.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="curriculum-item">
-                    <div class="curriculum-num">02</div>
-                    <div class="curriculum-info">
-                        <h3>맞춤형 주택 3D 설계</h3>
-                        <p>단순한 전통적 농촌을 넘어 기술과 혁신이 결합된 3D 설계 기술을 통해 귀농 정착을 위한 최적의 현대식 주택을 설계합니다.</p>
+                    <div class="curriculum-item">
+                        <div class="curriculum-num">02</div>
+                        <div class="curriculum-info">
+                            <h3>맞춤형 주택 3D 설계</h3>
+                            <p>단순한 전통적 농촌을 넘어 기술과 혁신이 결합된 3D 설계 기술을 통해 귀농 정착을 위한 최적의 현대식 주택을 설계합니다.</p>
+                        </div>
                     </div>
-                </div>
-                <div class="curriculum-item">
-                    <div class="curriculum-num">03</div>
-                    <div class="curriculum-info">
-                        <h3>정책 자금 및 토지·건설 관리</h3>
-                        <p>토지 관련 정보 제공, 정책 자금 지원 가이드, 그리고 환경 친화적인 지속 가능한 건설 관리 서비스를 종합적으로 제공합니다.</p>
+                    <div class="curriculum-item">
+                        <div class="curriculum-num">03</div>
+                        <div class="curriculum-info">
+                            <h3>정책 자금 및 토지·건설 관리</h3>
+                            <p>토지 관련 정보 제공, 정책 자금 지원 가이드, 그리고 환경 친화적인 지속 가능한 건설 관리 서비스를 종합적으로 제공합니다.</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -170,7 +204,7 @@
                     <div class="sch-status status-full">마감됨</div>
                 </div>
             </div>
-            <div style="font-size:0.85rem; color:#888; margin-top:15px; text-align:right;">* 3D 주택 설계 및 건축 상담은 사전 예약제로 진행됩니다.</div>
+            <div style="font-size:0.9rem; color:#888; margin-top:20px; text-align:right; font-weight: 700;">* 3D 주택 설계 및 건축 상담은 사전 예약제로 진행됩니다.</div>
         </div>
 
         <div class="section-card">
@@ -183,14 +217,25 @@
             </div>
         </div>
 
-        <div class="section-card">
-            <div class="sec-title">📍 오시는 길 및 문의</div>
-            <div class="map-area">
-                <img src="https://images.unsplash.com/photo-1616858349586-35c8eebbd780?q=80&w=800&auto=format&fit=crop" alt="제주도 지도 위치">
+        <!-- 지도와 연락처 좌우 분할 -->
+        <div class="grid-map">
+            <div class="section-card">
+                <div class="sec-title">📍 오시는 길</div>
+                <div class="map-area">
+                    <img src="https://images.unsplash.com/photo-1616858349586-35c8eebbd780?q=80&w=800&auto=format&fit=crop" alt="제주도 지도 위치">
+                </div>
             </div>
-            <div class="info-row"><span class="info-label">주소</span><span>제주특별자치도 제주시 주르레남길31, 101동 102호</span></div>
-            <div class="info-row"><span class="info-label">이메일</span><span>canu9000@naver.com</span></div>
-            <div class="info-row"><span class="info-label">상담전화</span><span style="color:var(--jeju-orange); font-weight:900; font-size:1.1rem;">010-5817-4004</span></div>
+
+            <div class="section-card">
+                <div class="sec-title">📞 상담 문의</div>
+                <div class="contact-box">
+                    <div class="info-row"><span class="info-label">주소</span><span>제주특별자치도 제주시 주르레남길31, 101동 102호</span></div>
+                    <div class="info-row"><span class="info-label">이메일</span><span>canu9000@naver.com</span></div>
+                    <div style="width: 100%; height: 1px; background: #eee; margin: 20px 0;"></div>
+                    <div style="font-size: 1.1rem; color: #555; font-weight: 800; margin-bottom: 10px;">상담 예약 직통전화</div>
+                    <div style="color:var(--jeju-orange); font-weight:900; font-size:1.8rem; letter-spacing: 1px;">010-5817-4004</div>
+                </div>
+            </div>
         </div>
 
     </div>
