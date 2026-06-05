@@ -34,18 +34,34 @@
         /* 카테고리 전용 상단 배너 (비료 테마: 브라운 계열) */
         .category-hero {
             background: linear-gradient(135deg, #a1887f 0%, #5d4037 100%);
-            color: white; text-align: center; padding: 60px 20px; margin-bottom: 40px;
+            color: white; text-align: center; padding: 60px 20px; margin-bottom: 30px;
         }
         .category-hero h1 { font-size: 2.6rem; margin-bottom: 15px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         .category-hero p { font-size: 1.2rem; opacity: 0.95; font-weight: 600; }
+
+        /* ✨ 신규 추가: 비료 전용 서브 메뉴 */
+        .sub-menus { max-width: 1200px; margin: -60px auto 40px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; position: relative; z-index: 10; } 
+        .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; }
+        .sub-menu-banner:hover { transform: translateY(-5px); }
+        .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 400; opacity: 0.9; }
+
+        /* ✨ 신규 추가: 비료 가이드 섹션 */
+        .guide-section { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
+        .guide-title { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 20px; border-left: 4px solid var(--primary-brown); padding-left: 10px; font-weight: 900; }
+        .integrated-guide-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .guide-box { background: #fff; border-radius: 15px; padding: 30px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .guide-box:hover { transform: translateY(-5px); border-color: var(--primary-brown); box-shadow: 0 8px 20px rgba(121,85,72,0.15); }
+        .guide-box .icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .guide-box .title { font-size: 1.15rem; font-weight: 900; color: #222; margin-bottom: 12px; }
+        .guide-box .desc { font-size: 0.9rem; color: #666; line-height: 1.5; word-break: keep-all; }
 
         /* 필터 및 등록 버튼 바 (1200px 중앙 정렬) */
         .filter-bar {
             max-width: 1200px; margin: 0 auto 30px; padding: 0 20px;
             display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
-        .item-count { font-size: 1.1rem; font-weight: 800; color: #555; }
-        .item-count span { color: var(--primary-orange); font-size: 1.3rem; }
+        .item-count { font-size: 1.2rem; font-weight: 800; color: #333; }
+        .item-count span { color: var(--primary-orange); font-size: 1.4rem; }
         
         .filter-right { display: flex; gap: 10px; align-items: center; }
         .btn-register-herb { background: var(--primary-brown); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(121,85,72,0.2); text-decoration: none; }
@@ -70,15 +86,21 @@
 
         /* 반응형 설정 */
         @media (max-width: 1024px) {
-            .product-grid { grid-template-columns: repeat(3, 1fr); }
+            .product-grid, .integrated-guide-grid { grid-template-columns: repeat(3, 1fr); }
+            .sub-menus { grid-template-columns: repeat(2, 1fr); margin-top: -30px; }
         }
         @media (max-width: 768px) {
             .header-container { flex-direction: row; justify-content: space-between; }
             .location-picker { margin-left: 0; font-size: 0.9rem; padding: 6px 10px; }
-            .category-hero { padding: 40px 20px; margin-bottom: 25px; }
+            .category-hero { padding: 40px 20px 80px; margin-bottom: 25px; }
             .category-hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
             .category-hero p { font-size: 1rem; }
             
+            .sub-menus { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: -60px; }
+            .sub-menu-banner { padding: 15px 10px; font-size: 1.05rem; }
+            
+            .integrated-guide-grid { grid-template-columns: 1fr; gap: 15px; }
+
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .product-image { height: 160px; }
             .product-info { padding: 15px; }
@@ -106,8 +128,56 @@
         <p>농작물을 튼튼하게 키워줄 믿을 수 있는 지역 생산 비료</p>
     </div>
 
+    <!-- ✨ 비료 전용 퀵 메뉴 (카테고리별 검색 연동) -->
+    <div class="sub-menus">
+        <div class="sub-menu-banner" style="background: #795548;" onclick="location.href='search_result.html?keyword=퇴비'">
+            <div>🍂 [밑거름/퇴비]</div>
+            <span class="desc">토양을 살리는 기초 거름</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #8d6e63;" onclick="location.href='search_result.html?keyword=액비'">
+            <div>💧 [웃거름/액비]</div>
+            <span class="desc">성장을 돕는 천연 액체비료</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #a1887f;" onclick="location.href='search_result.html?keyword=상토'">
+            <div>🪴 [원예/상토]</div>
+            <span class="desc">베란다 텃밭용 분갈이 흙</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #bcaaa4;" onclick="location.href='search_result.html?keyword=영양제'">
+            <div>🧪 [천연 영양제]</div>
+            <span class="desc">칼슘, 마그네슘 친환경 보충제</span>
+        </div>
+    </div>
+
+    <!-- ✨ 비료 가이드 섹션 -->
+    <section class="guide-section">
+        <h2 class="guide-title">📖 팜마을 비료 종합 가이드</h2>
+        <div class="integrated-guide-grid">
+            <div class="guide-box" onclick="location.href='knowhow.html'">
+                <span class="icon">📏</span>
+                <div class="title">작물별 비료 주는 법</div>
+                <div class="desc">배추, 무, 토마토 등 우리 농작물에 딱 맞는 거름 시기와 적정량을 알아보세요.</div>
+            </div>
+            <div class="guide-box" onclick="location.href='knowhow.html'">
+                <span class="icon">♻️</span>
+                <div class="title">친환경 퇴비 만들기</div>
+                <div class="desc">음식물 쓰레기나 낙엽을 활용해 집에서 손쉽게 천연 퇴비를 만드는 방법.</div>
+            </div>
+            <div class="guide-box" onclick="location.href='knowhow.html'">
+                <span class="icon">🔍</span>
+                <div class="title">우리 텃밭 토양 진단</div>
+                <div class="desc">산성도(pH)와 영양 상태를 확인하고 내 땅에 부족한 영양분을 채워보세요.</div>
+            </div>
+            <div class="guide-box" onclick="location.href='qna.html'">
+                <span class="icon">💬</span>
+                <div class="title">비료 전문가 Q&A</div>
+                <div class="desc">비료 사용 중 궁금한 점이 생겼나요? 이웃 전문가들에게 직접 물어보세요.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 상품 목록 상단 필터 -->
     <div class="filter-bar">
-        <div class="item-count">등록된 비료 <span id="totalCount">0</span>개</div>
+        <div class="item-count">등록된 비료상품 <span id="totalCount">0</span>개</div>
         <div class="filter-right">
             <!-- 🌟 이 버튼을 누르면 비료 태그가 자동 입력된 상태로 상품 등록 화면으로 이동합니다 -->
             <a href="register.html?fertilizer=true" class="btn-register-herb">➕ 우리 농장 비료 등록하기</a>
