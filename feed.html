@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팜마을 - 건강한 수제 사료</title>
+    <title>팜마을 - 건강한 수제 사료관</title>
 
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
@@ -21,12 +21,12 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
-        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 65px; }
+        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
         
-        /* 헤더 */
+        /* 1200px 확장 헤더 */
         header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; }
         .logo-leaf { font-size: 1.8rem; -webkit-text-fill-color: initial; }
         .location-picker { font-size: 1.05rem; font-weight: 800; cursor: pointer; padding: 8px 12px; border-radius: 8px; background: #f1f3f5; margin-left: 20px; display: inline-block; }
@@ -34,41 +34,78 @@
         /* 카테고리 전용 상단 배너 (사료 테마: 옐로우/골드 계열) */
         .category-hero {
             background: linear-gradient(135deg, #fbc02d 0%, #f57f17 100%);
-            color: white; text-align: center; padding: 50px 20px; margin-bottom: 30px;
+            color: white; text-align: center; padding: 60px 20px; margin-bottom: 40px;
         }
-        .category-hero h1 { font-size: 2.4rem; margin-bottom: 10px; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .category-hero p { font-size: 1.1rem; opacity: 0.9; }
+        .category-hero h1 { font-size: 2.6rem; margin-bottom: 15px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .category-hero p { font-size: 1.2rem; opacity: 0.95; font-weight: 600; }
 
-        /* 필터 바 */
+        /* ✨ 신규 추가: 사료 전용 서브 메뉴 */
+        .sub-menus { max-width: 1200px; margin: -60px auto 40px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; position: relative; z-index: 10; } 
+        .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.15); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; }
+        .sub-menu-banner:hover { transform: translateY(-5px); }
+        .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 400; opacity: 0.9; }
+
+        /* ✨ 신규 추가: 사료 가이드 섹션 */
+        .guide-section { max-width: 1200px; margin: 0 auto 40px; padding: 0 20px; }
+        .guide-title { font-size: 1.5rem; color: var(--text-dark); margin-bottom: 20px; border-left: 4px solid var(--primary-yellow); padding-left: 10px; font-weight: 900; }
+        .integrated-guide-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .guide-box { background: #fff; border-radius: 15px; padding: 30px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
+        .guide-box:hover { transform: translateY(-5px); border-color: var(--primary-yellow); box-shadow: 0 8px 20px rgba(245,127,23,0.15); }
+        .guide-box .icon { font-size: 2.5rem; margin-bottom: 15px; display: block; }
+        .guide-box .title { font-size: 1.15rem; font-weight: 900; color: #222; margin-bottom: 12px; }
+        .guide-box .desc { font-size: 0.9rem; color: #666; line-height: 1.5; word-break: keep-all; }
+
+        /* 필터 및 등록 버튼 바 (1200px 중앙 정렬) */
         .filter-bar {
-            max-width: 1200px; margin: 0 auto 20px; padding: 0 20px;
-            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1200px; margin: 0 auto 30px; padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;
         }
-        .item-count { font-weight: 700; }
-        .item-count span { color: var(--primary-yellow); }
-        .sort-select { padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd; font-weight: 600; outline: none; cursor: pointer; }
+        .item-count { font-size: 1.2rem; font-weight: 800; color: #333; }
+        .item-count span { color: var(--primary-orange); font-size: 1.4rem; }
+        
+        .filter-right { display: flex; gap: 10px; align-items: center; }
+        .btn-register-herb { background: var(--primary-yellow); color: white; border: none; padding: 10px 20px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(245,127,23,0.2); text-decoration: none; }
+        .btn-register-herb:hover { background: #e65100; transform: translateY(-2px); }
+        .sort-select { padding: 10px 15px; border-radius: 20px; border: 1px solid #ddd; font-weight: 700; font-size: 0.95rem; outline: none; cursor: pointer; color: #444; }
 
-        /* 상품 그리드 */
+        /* 상품 그리드 (4칸 배열로 확장) */
         .product-grid { max-width: 1200px; margin: 0 auto 60px; padding: 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-        .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border: 1px solid #eaeaea; transition: transform 0.2s; cursor: pointer; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
-        .product-image { width: 100%; height: 200px; background-color: #f0f0f0; object-fit: cover; }
-        .product-info { padding: 15px; }
-        .product-info h3 { font-size: 1.1rem; margin-bottom: 8px; color: var(--text-dark); }
-        .product-info .price { font-size: 1.2rem; font-weight: bold; color: var(--primary-orange); }
-        .product-info .producer { font-size: 0.9rem; color: var(--text-light); margin-top: 5px; }
+        .product-card { background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.04); border: 1px solid #eaeaea; transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; }
+        .product-card:hover { transform: translateY(-6px); box-shadow: 0 10px 25px rgba(245,127,23,0.15); border-color: var(--primary-yellow); }
+        .product-image { width: 100%; height: 220px; background-color: #f0f0f0; object-fit: cover; }
+        .product-info { padding: 20px; flex: 1; display: flex; flex-direction: column; }
+        .product-info h3 { font-size: 1.15rem; margin-bottom: 10px; color: #222; font-weight: 800; line-height: 1.4; word-break: keep-all; }
+        .product-info .price { font-size: 1.35rem; font-weight: 900; color: var(--primary-orange); margin-bottom: 10px; }
+        .product-info .producer { font-size: 0.95rem; color: #666; font-weight: 600; margin-top: auto; }
 
+        /* 로딩 및 빈 화면 메시지 */
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 80px 20px; background: #fff; border-radius: 20px; border: 2px dashed #ddd; color: #888; font-weight: 700; font-size: 1.1rem; }
+        
         /* 모바일 하단 메뉴 */
         .mobile-bottom-nav { display: none; }
 
-        /* 반응형 */
+        /* 반응형 설정 */
+        @media (max-width: 1024px) {
+            .product-grid, .integrated-guide-grid { grid-template-columns: repeat(3, 1fr); }
+            .sub-menus { grid-template-columns: repeat(2, 1fr); margin-top: -30px; }
+        }
         @media (max-width: 768px) {
-            .header-container { flex-direction: column; gap: 10px; }
-            .location-picker { margin-left: 0; }
-            .category-hero { padding: 30px 20px; }
-            .category-hero h1 { font-size: 1.8rem; }
-            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
-            .product-image { height: 140px; }
+            .header-container { flex-direction: row; justify-content: space-between; }
+            .location-picker { margin-left: 0; font-size: 0.9rem; padding: 6px 10px; }
+            .category-hero { padding: 40px 20px 80px; margin-bottom: 25px; }
+            .category-hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
+            .category-hero p { font-size: 1rem; }
+            
+            .sub-menus { grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: -60px; }
+            .sub-menu-banner { padding: 15px 10px; font-size: 1.05rem; }
+            
+            .integrated-guide-grid { grid-template-columns: 1fr; gap: 15px; }
+
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .product-image { height: 160px; }
+            .product-info { padding: 15px; }
+            .product-info h3 { font-size: 1.05rem; }
+            
             .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; justify-content: space-around; align-items: center; border-top: 1px solid #eaeaea; }
             .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.75rem; font-weight: 600; width: 25%; }
             .nav-item .icon { font-size: 1.3rem; }
@@ -88,50 +125,74 @@
 
     <div class="category-hero">
         <h1>🌾 우리 동네 건강한 사료</h1>
-        <p>반려동물부터 가축까지, 안심하고 먹일 수 있는 지역 수제 사료</p>
+        <p>반려동물부터 가축까지, 안심하고 먹일 수 있는 수제/천연 사료</p>
     </div>
 
+    <!-- ✨ 사료 전용 퀵 메뉴 (카테고리별 검색 연동) -->
+    <div class="sub-menus">
+        <div class="sub-menu-banner" style="background: #f57f17;" onclick="location.href='search_result.html?keyword=강아지사료'">
+            <div>🐶 [반려견 수제간식]</div>
+            <span class="desc">무방부제/천연 강아지 간식</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #fbc02d;" onclick="location.href='search_result.html?keyword=고양이사료'">
+            <div>🐱 [반려묘 영양식]</div>
+            <span class="desc">고양이를 위한 건강 츄르/사료</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #f9a825;" onclick="location.href='search_result.html?keyword=새모이'">
+            <div>🦜 [관상조류 모이]</div>
+            <span class="desc">앵무새, 카나리아 영양 알곡</span>
+        </div>
+        <div class="sub-menu-banner" style="background: #ef6c00;" onclick="location.href='search_result.html?keyword=가축사료'">
+            <div>🐄 [가축용 천연사료]</div>
+            <span class="desc">소, 닭, 돼지용 유기농 곡물사료</span>
+        </div>
+    </div>
+
+    <!-- ✨ 사료 가이드 섹션 -->
+    <section class="guide-section">
+        <h2 class="guide-title">📖 올바른 사료 급여 가이드</h2>
+        <div class="integrated-guide-grid">
+            <div class="guide-box" onclick="location.href='knowhow.html'">
+                <span class="icon">🍖</span>
+                <div class="title">수제 간식 보관법</div>
+                <div class="desc">방부제가 없는 천연 수제 간식을 오랫동안 신선하게 보관하는 냉장/냉동 요령.</div>
+            </div>
+            <div class="guide-box" onclick="location.href='knowhow.html'">
+                <span class="icon">⚖️</span>
+                <div class="title">반려동물 적정 급여량</div>
+                <div class="desc">우리 강아지, 고양이의 체중과 나이에 맞는 하루 권장 칼로리 계산법.</div>
+            </div>
+            <div class="guide-box" onclick="location.href='knowhow.html'">
+                <span class="icon">🌿</span>
+                <div class="title">알러지 유발 원료 확인</div>
+                <div class="desc">눈물이 나거나 피부가 붉어질 때 의심해 봐야 할 흔한 사료 알러지 성분.</div>
+            </div>
+            <div class="guide-box" onclick="location.href='qna.html'">
+                <span class="icon">💬</span>
+                <div class="title">사료 성분 Q&A</div>
+                <div class="desc">이 사료 성분 괜찮을까? 이웃집 집사들과 노하우를 나누고 질문해 보세요.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 상품 목록 상단 필터 -->
     <div class="filter-bar">
-        <div class="item-count">총 <span>32</span>개의 상품</div>
-        <select class="sort-select">
-            <option>최신등록순</option>
-            <option>인기순</option>
-            <option>낮은가격순</option>
-        </select>
+        <div class="item-count">등록된 사료/간식 <span id="totalCount">0</span>개</div>
+        <div class="filter-right">
+            <!-- 🌟 이 버튼을 누르면 사료 태그가 자동 입력된 상태로 상품 등록 화면으로 이동합니다 -->
+            <a href="register.html?feed=true" class="btn-register-herb">➕ 우리 동네 사료 등록하기</a>
+            <select class="sort-select">
+                <option>최신등록순</option>
+                <option>인기순</option>
+                <option>낮은가격순</option>
+            </select>
+        </div>
     </div>
 
-    <div class="product-grid">
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1582791694773-1081a28a313e?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>강아지 무염 수제 닭가슴살 육포</h3>
-                <div class="price">13,000원</div>
-                <div class="producer">🧑‍🌾 평택시 안중읍 반려사랑 공방</div>
-            </div>
-        </div>
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1522276498395-f4f68f7f8454?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>앵무새 영양 알곡 모이 1kg</h3>
-                <div class="price">11,000원</div>
-                <div class="producer">🧑‍🌾 화성시 동탄 생산자</div>
-            </div>
-        </div>
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1524704796725-9fc3044a58b2?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>관상어용 프리미엄 수제 사료</h3>
-                <div class="price">18,000원</div>
-                <div class="producer">🧑‍🌾 수원시 물소리 수족관</div>
-            </div>
-        </div>
-        <div class="product-card" onclick="location.href='detail.html'">
-            <div class="product-image" style="background-image: url('https://images.unsplash.com/photo-1601004890684-d8cbf643f5f2?q=80&w=400&auto=format&fit=crop'); background-size: cover;"></div>
-            <div class="product-info">
-                <h3>유기농 닭 모이 (파쇄곡) 10kg</h3>
-                <div class="price">16,500원</div>
-                <div class="producer">🧑‍🌾 오산시 생산자 (HUB보관)</div>
-            </div>
+    <!-- 🌟 자바스크립트를 통해 서버에서 사료 상품만 쏙쏙 뽑아와서 여기에 그립니다 -->
+    <div class="product-grid" id="feedContainer">
+        <div class="empty-state">
+            서버에서 사료/간식 정보를 불러오고 있습니다... 🐾
         </div>
     </div>
 
@@ -150,5 +211,65 @@
         </a>
     </div>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 서버(DB)에서 모든 상품 목록을 가져옵니다.
+            fetch('/api/products')
+            .then(response => response.json())
+            .then(result => {
+                if(result.success) {
+                    const container = document.getElementById('feedContainer');
+                    const countEl = document.getElementById('totalCount');
+                    
+                    // 전체 상품 중에서 카테고리가 '조류','축산물' 이거나, 해시태그/카테고리에 '사료'가 포함된 상품만 필터링합니다.
+                    const feedProducts = result.data.filter(p => {
+                        const hasCategory = p.category && (p.category.includes('사료') || p.category.includes('조류') || p.category.includes('축산물'));
+                        const hasTag = p.tags && (p.tags.includes('사료') || p.tags.includes('간식') || p.tags.includes('모이'));
+                        return hasCategory || hasTag;
+                    });
+                    
+                    // 필터링된 상품 개수를 상단에 표시
+                    countEl.innerText = feedProducts.length;
+                    
+                    if (feedProducts.length > 0) {
+                        container.innerHTML = ''; // 안내 문구 지우기
+                        
+                        feedProducts.forEach(product => {
+                            // 등록된 사진이 없으면 펫푸드 느낌의 기본 이미지를 사용합니다.
+                            const imgUrl = product.image || 'https://images.unsplash.com/photo-1582791694773-1081a28a313e?q=80&w=400&auto=format&fit=crop';
+                            
+                            const itemHtml = `
+                                <div class="product-card" onclick="location.href='detail.html?id=${product.id}'">
+                                    <img src="${imgUrl}" alt="사료 상품" class="product-image">
+                                    <div class="product-info">
+                                        <h3>${product.title}</h3>
+                                        <div class="price">${Number(product.sale_price).toLocaleString()}원</div>
+                                        <div class="producer">🧑‍🌾 ${product.farm_name || '동네 이웃'}</div>
+                                    </div>
+                                </div>
+                            `;
+                            container.insertAdjacentHTML('beforeend', itemHtml);
+                        });
+                    } else {
+                        // 사료 상품이 하나도 없을 경우 표시할 안내 화면
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                아직 등록된 수제 사료나 간식이 없습니다.<br><br>
+                                <span style="font-size: 0.95rem; font-weight: 500;">우리아이 건강한 먹거리를 이웃에게 가장 먼저 소개해보세요! 상단의 [등록하기] 버튼을 눌러보세요.</span>
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('사료 상품 목록 불러오기 실패:', error);
+                document.getElementById('feedContainer').innerHTML = `
+                    <div class="empty-state" style="color: #e53935;">
+                        서버와 통신하는 중 오류가 발생했습니다.<br>잠시 후 다시 시도해주세요.
+                    </div>
+                `;
+            });
+        });
+    </script>
 </body>
 </html>

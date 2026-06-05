@@ -568,6 +568,16 @@
         }
 
         // ==========================================
+        // 🌟 [추가] 사료관에서 넘어왔을 때 자동 설정 🌟
+        // ==========================================
+        if (urlParams.get('feed') === 'true') {
+            document.querySelector('.header span').innerText = "FarmMaul 사료/간식 등록";
+            if (!tags.includes('사료')) { tags.push('사료'); localStorage.setItem('farm_tags', JSON.stringify(tags)); }
+            if (!activeTags.includes('사료')) { activeTags.push('사료'); }
+            renderTags(); sync();
+        }
+
+        // ==========================================
         // 🌟 수정 모드 시 서버에서 기존 데이터 복구 🌟
         // ==========================================
         const editId = urlParams.get('edit');
