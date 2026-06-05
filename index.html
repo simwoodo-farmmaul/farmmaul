@@ -167,26 +167,29 @@
         .hub-item-info { font-size: 0.95rem; color: #555; font-weight: 600; display: flex; align-items: flex-start; gap: 5px; }
         .hub-item-info span { color: #ff5e62; font-size: 0.9rem; margin-top: 1px; }
 
+        /* 1. 상단 메뉴 4개 (생산용품관, 약초, 비료, 사료) */
         .extra-menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }      
-        .extra-menu-box { border-radius: 15px; padding: 12px 15px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; word-break: keep-all; }
+        .extra-menu-box { border-radius: 15px; padding: 15px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; word-break: keep-all; }
         .extra-menu-box:nth-child(1) { background: linear-gradient(135deg, #e3f2fd, #bbdefb); } /* 생산용품관 */
         .extra-menu-box:nth-child(2) { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); } /* 약초 */
         .extra-menu-box:nth-child(3) { background: linear-gradient(135deg, #efebe9, #d7ccc8); } /* 비료 */
         .extra-menu-box:nth-child(4) { background: linear-gradient(135deg, #fffde7, #fff59d); } /* 사료 */
         .extra-menu-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .extra-menu-box .icon { font-size: 2.3rem; margin-bottom: 8px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1)); }
-        .extra-menu-box .title { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); }
+        .extra-menu-box .title { font-size: 1.15rem; font-weight: 900; color: var(--text-dark); }
 
+        /* 2. 중앙 긴 배너 3개 */
         .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; margin-top: 20px; }
         .dimiga-box { cursor: pointer; flex: 1; background: linear-gradient(to right, #6b9122, #87B32E); border-radius: 15px; padding: 25px 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; gap: 10px; transition: transform 0.2s; }
         .dimiga-box:hover { transform: translateY(-3px); }
         .dimiga-box .d-title { color: #ffffff; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.5px; word-break: keep-all; }
         .dimiga-box .d-sub { color: #ffffff; font-size: 1rem; font-weight: 700; letter-spacing: -0.5px; opacity: 0.9; word-break: keep-all; }
 
+        /* 3. 하단 메뉴 3개 (잘키우는법, 질문있어요, 잔디밭) */
         .sub-menus { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; } 
-        .sub-menu-banner { color: white; padding: 25px 15px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; word-break: keep-all; }
+        .sub-menu-banner { color: white; padding: 20px 10px; border-radius: 12px; text-align: center; font-size: 1.2rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; word-break: keep-all; }
         .sub-menu-banner:hover { transform: translateY(-3px); }
-        .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 400; opacity: 0.9; }
+        .sub-menu-banner span.desc { font-size: 0.85rem; font-weight: 400; opacity: 0.9; }
         .banner-guide { background: var(--primary-green); }
         .banner-qa { background: var(--primary-orange); }
         .banner-lawn { background: #a066c0; }
@@ -261,13 +264,27 @@
             .hub-display-area { flex-direction: column; padding: 15px; }
             .hub-map-img-box { height: 250px; }
 
-            .extra-menu-grid { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        /* 🌟 모바일 반응형 처리 규칙 변경 */
+        @media (max-width: 768px) {
+            /* ... (다른 모바일 설정들) ... */
+            
+            /* 1. 상단 메뉴: 모바일에서 1줄에 2개씩 */
+            .extra-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .extra-menu-box { padding: 15px 10px; border-radius: 12px; }
-            .extra-menu-box .icon { font-size: 1.8rem; margin-bottom: 5px; }
-            .extra-menu-box .title { font-size: 0.95rem; }
+            .extra-menu-box .icon { font-size: 2rem; margin-bottom: 5px; }
+            .extra-menu-box .title { font-size: 1.05rem; }
 
-            .event-banner-inner { flex-direction: column; gap: 10px; }
-            .sub-menus { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+            /* 2. 중앙 배너: 모바일에서 세로로 1줄에 1개씩 꽉 차게 */
+            .event-banner-inner { flex-direction: column; gap: 12px; margin-top: 25px; }
+
+            /* 3. 하단 메뉴: 모바일에서 1줄에 3개씩 나란히 꽉 차게 */
+            .sub-menus { grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 25px; }
+            .sub-menu-banner { padding: 12px 5px; border-radius: 10px; }
+            .sub-menu-banner div { font-size: 0.95rem; font-weight: 900; letter-spacing: -0.5px; }
+            .sub-menu-banner span.desc { display: none; /* 모바일에서는 칸이 좁으므로 설명글 숨김 */ }
+            
+            /* ... (다른 모바일 설정들) ... */
+        }
             
             .cta-section h2 { font-size: 1.6rem; }
             .cta-buttons { flex-direction: column; gap: 10px; }
@@ -491,7 +508,7 @@
 
 <section class="common-section" style="display: flex; flex-direction: column; gap: 30px;">
         
-        <div class="extra-menu-grid">
+       <div class="extra-menu-grid">
             <div class="extra-menu-box" onclick="location.href='shop.html'"><span class="icon">🛠️</span><span class="title">생산용품관</span></div>
             <div class="extra-menu-box" onclick="location.href='herb.html'"><span class="icon">🌿</span><span class="title">약초</span></div>
             <div class="extra-menu-box" onclick="location.href='fertilizer.html'"><span class="icon">🍂</span><span class="title">비료</span></div>
@@ -503,7 +520,6 @@
                 <div class="d-title">🌱 [팜마을 스마트팜 체험]</div>
                 <div class="d-sub">스마트 미래농업 교육</div>
             </div>
-            
             <div class="dimiga-box" onclick="location.href='dimiga_ansan.html'">
                 <div class="d-title">🌸 [도시농업대학교 디미가]</div>
                 <div class="d-sub">안산 본부 교육장</div>
@@ -514,6 +530,20 @@
             </div>
         </div>
 
+        <div class="sub-menus">
+            <div class="sub-menu-banner banner-guide" onclick="location.href='knowhow.html'">
+                <div>📖 [잘키우는법]</div>
+                <span class="desc">생산 및 사육 가이드 제공</span>
+            </div>
+            <div class="sub-menu-banner banner-qa" onclick="location.href='qna.html'">
+                <div>💬 [질문있어요]</div>
+                <span class="desc">자주 묻는 질문(FAQ) 및 Q&A</span>
+            </div>
+            <div class="sub-menu-banner banner-lawn" onclick="location.href='board.html'">
+                <div>🌱 [잔디밭]</div>
+                <span class="desc">영상 및 사진 자유게시판</span>
+            </div>
+        </div>
         <div class="sub-menus">
             <div class="sub-menu-banner banner-guide" onclick="location.href='knowhow.html'">
                 <div>📖 [잘키우는법]</div>
