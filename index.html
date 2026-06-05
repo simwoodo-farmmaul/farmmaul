@@ -167,29 +167,29 @@
         .hub-item-info { font-size: 0.95rem; color: #555; font-weight: 600; display: flex; align-items: flex-start; gap: 5px; }
         .hub-item-info span { color: #ff5e62; font-size: 0.9rem; margin-top: 1px; }
 
-        .extra-menu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }      
-        .extra-menu-box { border-radius: 15px; padding: 12px 20px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .extra-menu-box:nth-child(1) { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); }
-        .extra-menu-box:nth-child(2) { background: linear-gradient(135deg, #efebe9, #d7ccc8); }
-        .extra-menu-box:nth-child(3) { background: linear-gradient(135deg, #fffde7, #fff59d); }
+        .extra-menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }      
+        .extra-menu-box { border-radius: 15px; padding: 12px 15px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; word-break: keep-all; }
+        .extra-menu-box:nth-child(1) { background: linear-gradient(135deg, #e3f2fd, #bbdefb); } /* 생산용품관 */
+        .extra-menu-box:nth-child(2) { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); } /* 약초 */
+        .extra-menu-box:nth-child(3) { background: linear-gradient(135deg, #efebe9, #d7ccc8); } /* 비료 */
+        .extra-menu-box:nth-child(4) { background: linear-gradient(135deg, #fffde7, #fff59d); } /* 사료 */
         .extra-menu-box:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
-        .extra-menu-box .icon { font-size: 2.5rem; margin-bottom: 10px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1)); }
-        .extra-menu-box .title { font-size: 1.2rem; font-weight: 800; color: var(--text-dark); }
+        .extra-menu-box .icon { font-size: 2.3rem; margin-bottom: 8px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1)); }
+        .extra-menu-box .title { font-size: 1.15rem; font-weight: 800; color: var(--text-dark); }
 
-        .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; }
+        .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; margin-top: 20px; }
         .dimiga-box { cursor: pointer; flex: 1; background: linear-gradient(to right, #6b9122, #87B32E); border-radius: 15px; padding: 25px 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; gap: 10px; transition: transform 0.2s; }
         .dimiga-box:hover { transform: translateY(-3px); }
         .dimiga-box .d-title { color: #ffffff; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.5px; word-break: keep-all; }
         .dimiga-box .d-sub { color: #ffffff; font-size: 1rem; font-weight: 700; letter-spacing: -0.5px; opacity: 0.9; word-break: keep-all; }
 
-        .sub-menus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; } 
-        .sub-menu-banner { color: white; padding: 25px 20px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; }
+        .sub-menus { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px; } 
+        .sub-menu-banner { color: white; padding: 25px 15px; border-radius: 12px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; gap: 8px; word-break: keep-all; }
         .sub-menu-banner:hover { transform: translateY(-3px); }
         .sub-menu-banner span.desc { font-size: 0.9rem; font-weight: 400; opacity: 0.9; }
-        .banner-shop { background: var(--primary-blue); }
         .banner-guide { background: var(--primary-green); }
         .banner-qa { background: var(--primary-orange); }
-        .banner-lawn { background: #a066c0; } 
+        .banner-lawn { background: #a066c0; }
 
         .integrated-guide-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
         .guide-box { background: #fff; border-radius: 15px; padding: 30px 20px; text-align: center; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; }
@@ -492,13 +492,13 @@
 <section class="common-section" style="display: flex; flex-direction: column; gap: 30px;">
         
         <div class="extra-menu-grid">
+            <div class="extra-menu-box" onclick="location.href='shop.html'"><span class="icon">🛠️</span><span class="title">생산용품관</span></div>
             <div class="extra-menu-box" onclick="location.href='herb.html'"><span class="icon">🌿</span><span class="title">약초</span></div>
             <div class="extra-menu-box" onclick="location.href='fertilizer.html'"><span class="icon">🍂</span><span class="title">비료</span></div>
             <div class="extra-menu-box" onclick="location.href='feed.html'"><span class="icon">🌾</span><span class="title">사료</span></div>
         </div>
 
        <div class="event-banner-inner">
-            <!-- 새로 추가된 팜마을 스마트팜 체험 메뉴 -->
             <div class="dimiga-box" onclick="location.href='smartfarm_exp.html'">
                 <div class="d-title">🌱 [팜마을 스마트팜 체험]</div>
                 <div class="d-sub">스마트 미래농업 교육</div>
@@ -515,10 +515,6 @@
         </div>
 
         <div class="sub-menus">
-            <div class="sub-menu-banner banner-shop" onclick="location.href='shop.html'">
-                <div>🛠️ [생산용품관]</div>
-                <span class="desc">필요한 기구/용품 본사 구매</span>
-            </div>
             <div class="sub-menu-banner banner-guide" onclick="location.href='knowhow.html'">
                 <div>📖 [잘키우는법]</div>
                 <span class="desc">생산 및 사육 가이드 제공</span>
