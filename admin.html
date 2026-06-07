@@ -313,7 +313,24 @@
         </div>
 
         <div id="view-finance" class="view-section"><div class="card"><h2 class="card-title">정산 및 수익 관리 내역</h2></div></div>
-        <div id="view-content" class="view-section"><div class="card"><h2 class="card-title">콘텐츠 관리 내역</h2></div></div>
+        <div id="view-content" class="view-section">
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">📝 회사소개 및 이용약관 관리</h2></div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: 800; display: block; margin-bottom: 8px;">수정할 항목 선택</label>
+                    <select id="policySectionSelect" onchange="loadPolicy()" style="width: 100%; max-width: 300px; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-weight: 700;">
+                        <option value="회사소개">회사소개</option>
+                        <option value="이용약관">이용약관</option>
+                        <option value="개인정보처리방침">개인정보처리방침</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 15px;">
+                    <label style="font-weight: 800; display: block; margin-bottom: 8px;">내용 작성 (HTML 태그 사용 가능)</label>
+                    <textarea id="policyContent" style="width: 100%; height: 400px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; line-height: 1.6; outline: none; resize: vertical; box-sizing: border-box;"></textarea>
+                </div>
+                <button onclick="savePolicy()" style="background: var(--master-blue); color: white; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 1rem;">현재 내용 저장하기</button>
+            </div>
+        </div>
         <div id="view-shop" class="view-section"><div class="card"><h2 class="card-title">본사 직영 용품 리스트</h2></div></div>
         <div id="view-board" class="view-section"><div class="card"><h2 class="card-title">게시물 통합 관리</h2></div></div>
         
@@ -360,7 +377,24 @@
             </div>
         </div>
         
-        <div id="view-approval" class="view-section"><div class="card"><h2 class="card-title">가입 및 승인 관리</h2></div></div>
+        <div id="view-approval" class="view-section">
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">👨‍🌾 전체 가입 회원 목록</h2></div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>가입 일시</th>
+                            <th>닉네임 (이름)</th>
+                            <th>로그인 이메일</th>
+                            <th>관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="memberTableBody">
+                        <tr><td colspan="4" style="text-align:center; padding:30px;">회원 명단을 불러오는 중입니다...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
         <div id="view-notice" class="view-section"><div class="card"><h2 class="card-title">공지사항 및 푸시 발송</h2></div></div>
     </main>
 
@@ -391,8 +425,8 @@
             fetch('/api/user')
             .then(res => res.json())
             .then(data => {
-                const adminNames = ['김영진', '김영진(지산)', '지산'];
-                if (data.loggedIn && adminNames.includes(data.user.nickname)) {
+                const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com']; // 이메일 보안 검사로 통일
+                if (data.loggedIn && adminEmails.includes(data.user.email)) {
                     document.getElementById('loginUserName').innerText = `총괄 관리자 ${data.user.nickname} 님`;
                 } else {
                     alert("이 페이지는 최고 관리자만 접근할 수 있습니다. 메인으로 돌아갑니다.");
@@ -404,8 +438,86 @@
             // 데이터 로딩 시작
             loadHubList();
             loadFarmProducts(); 
-            loadOrderList(); // 🌟 주문 내역 로딩 함수 호출
+            loadOrderList();
+            loadMembers(); // 🌟 추가: 회원 목록 불러오기
+            loadPolicy();  // 🌟 추가: 약관 데이터 불러오기
         });
+        
+        // ==========================================
+        // 🌟 [추가] 회원 목록 불러오기 및 강제 탈퇴
+        // ==========================================
+        function loadMembers() {
+            fetch('/api/admin/members')
+            .then(res => res.json())
+            .then(result => {
+                const tbody = document.getElementById('memberTableBody');
+                tbody.innerHTML = '';
+                
+                if (result.success && result.data.length > 0) {
+                    result.data.forEach(user => {
+                        const date = new Date(user.created_at).toLocaleString('ko-KR');
+                        const row = `
+                            <tr>
+                                <td style="font-size:0.9rem; color:#666;">${date}</td>
+                                <td style="font-weight:900; color:#333;">${user.name}</td>
+                                <td style="color:var(--master-blue); font-weight:700;">${user.email}</td>
+                                <td>
+                                    <button class="btn-sm" style="color:#ff5e62; border-color:#ffcdd2;" onclick="deleteMember(${user.id}, '${user.name}')">강제탈퇴</button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.insertAdjacentHTML('beforeend', row);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">가입된 회원이 없습니다.</td></tr>';
+                }
+            });
+        }
+
+        function deleteMember(id, name) {
+            if(confirm(`정말 [${name}] 회원을 강제로 탈퇴 처리하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+                fetch('/api/admin/members/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        alert('성공적으로 탈퇴 처리되었습니다.');
+                        loadMembers(); // 목록 새로고침
+                    } else {
+                        alert('탈퇴 처리 실패: ' + data.message);
+                    }
+                });
+            }
+        }
+
+        // ==========================================
+        // 🌟 [추가] 회사소개 및 이용약관 조회/저장
+        // ==========================================
+        function loadPolicy() {
+            const section = document.getElementById('policySectionSelect').value;
+            fetch('/api/policy/' + encodeURIComponent(section))
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('policyContent').value = data.success ? data.content : '';
+            });
+        }
+
+        function savePolicy() {
+            const section = document.getElementById('policySectionSelect').value;
+            const content = document.getElementById('policyContent').value;
+            fetch('/api/policy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ section: section, content: content })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    alert(`[${section}] 내용이 성공적으로 저장되었습니다!`);
+                } else {
+                    alert('저장 중 오류가 발생했습니다.');
+                }
+            });
+        }
         
         // ==========================================
         // 🌟 [추가] 실제 주문 내역 리스트 불러오기
