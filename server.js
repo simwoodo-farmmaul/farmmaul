@@ -339,7 +339,7 @@ app.post('/api/chat', (req, res) => {
     
     db.query(createTableQuery, (err) => {
         const insertQuery = `INSERT INTO farm_chats (sender, receiver, message) VALUES (?, ?, ?)`;
-        db.query(insertQuery, [sender, receiver || '지산동 영진농원', message], (err, result) => {
+        db.query(insertQuery, [sender, receiver || '팜마을 관리자', message], (err, result) => {
             if (err) return res.status(500).json({ success: false });
             res.json({ success: true, message: '전송 완료' });
         });

@@ -67,7 +67,7 @@
        <div class="chat-header">
             <button class="back-btn" onclick="history.back()">←</button>
             <div class="farm-info">
-                <div class="farm-name" id="chatFarmName">🧑‍🌾 팜마을 농가</div>
+                <div class="farm-name" id="chatFarmName">🧑‍🌾 팜마을 관리자</div>
                 <div class="farm-status">● 보통 1시간 내 응답</div>
             </div>
             <button style="border:none; background:none; font-size:1.4rem; cursor:pointer;">⋮</button>
@@ -142,8 +142,9 @@
                         // 상품 보기 버튼을 누르면 해당 상품 상세페이지로 이동
                         document.getElementById('chatProductBtn').onclick = () => location.href = 'detail.html?id=' + p.id;
                         
-                        // 🌟 핵심: 메시지를 받을 사람(생산자)을 등록자 닉네임으로 자동 설정
-                        chatReceiver = p.owner_nickname || p.farm_name || '지산동 영진농원';
+                        let chatReceiver = "팜마을 관리자"; // 기본 수신자
+                                      // ...
+                       chatReceiver = p.owner_nickname || p.farm_name || '팜마을 관리자';
                     }
                 })
                 .catch(err => console.error('상품 정보 로드 실패:', err));
