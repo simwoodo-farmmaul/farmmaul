@@ -112,7 +112,7 @@
         const scrollTarget = document.getElementById('scrollTarget');
         
         let currentUser = "";
-        let chatReceiver = "관리자"; // 기본 수신자
+             let chatReceiver = "팜마을 관리자"; // 기본 수신자 (여기서 팜마을 관리자로 통일)
 
         // 주소창에서 상품 번호 가져오기 (예: chat.html?id=3)
         const urlParams = new URLSearchParams(window.location.search);
@@ -142,9 +142,8 @@
                         // 상품 보기 버튼을 누르면 해당 상품 상세페이지로 이동
                         document.getElementById('chatProductBtn').onclick = () => location.href = 'detail.html?id=' + p.id;
                         
-                        let chatReceiver = "팜마을 관리자"; // 기본 수신자
-                                      // ...
-                       chatReceiver = p.owner_nickname || p.farm_name || '팜마을 관리자';
+                        // 🌟 핵심: 메시지를 받을 사람(생산자)을 등록자 닉네임으로 자동 설정
+                                        chatReceiver = p.owner_nickname || p.farm_name || '팜마을 관리자';
                     }
                 })
                 .catch(err => console.error('상품 정보 로드 실패:', err));

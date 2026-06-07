@@ -49,7 +49,7 @@ const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
 function checkIsAdmin(user) {
     if (!user) return false;
     return adminEmails.includes(user.email) && user.kakaoId === null;
-}. 
+}
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
@@ -181,7 +181,7 @@ app.delete('/api/board/:id', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.'});
     const postId = req.params.id;
     const nickname = req.session.user.nickname;
-    const isAdmin = checkIsAdmin(req.session.user);;
+    const isAdmin = checkIsAdmin(req.session.user);
     if (isAdmin) {
         db.query(`DELETE FROM farm_board WHERE id=?`, [postId], (err, result) => {
             res.json({ success: true, message: '관리자 권한으로 글을 삭제했습니다.' });
