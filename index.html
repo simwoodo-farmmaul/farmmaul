@@ -869,12 +869,12 @@
                 .then(data => {
                     const authZone = document.getElementById('auth-zone');
                     if (data.loggedIn) {
-                        // 🌟 관리자 명단 확인 (서버 시스템과 동일한 명단 적용)
-                        const adminNames = ['김영진', '김영진(지산)', '지산'];
-                        const isAdmin = adminNames.includes(data.user.nickname);
+                        // 🌟 관리자 명단 확인 (이메일 기준, 카카오 로그인 접근 불가)
+                        const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
+                        const isAdmin = adminEmails.includes(data.user.email) && data.user.kakaoId === null;
                         
                         // 🌟 관리자일 경우에만 상단 메뉴 구석에 나타나는 버튼 HTML
-                        const adminBtnHtml = isAdmin ? `<a href="admin.html" style="padding: 5px 10px; background-color: #2e7d32; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; margin-right: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">⚙️ 통합 관리자</a>` : '';
+                        const adminBtnHtml = isAdmin ? `<a href="admin.html" style="padding: 5px 10px; background-color: #2e7d32; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; margin-right: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">관리자</a>` : '';
 
                         // 상단 메뉴 업데이트
                         authZone.innerHTML = `

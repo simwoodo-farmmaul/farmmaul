@@ -44,7 +44,12 @@ const createEmailMembersTable = `
 db.query(createEmailMembersTable, () => {});
 console.log('✅ 데이터베이스 창고 무중단 풀(Pool) 연결 성공!');
 
-const adminNames = ['김영진', '김영진(지산)', '지산']; 
+// 🌟 관리자 명단 (이메일 기준, 카카오 로그인 접근 불가)
+const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com']; 
+function checkIsAdmin(user) {
+    if (!user) return false;
+    return adminEmails.includes(user.email) && user.kakaoId === null;
+}. 
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/register.html', (req, res) => res.sendFile(path.join(__dirname, 'register.html')));
@@ -113,7 +118,8 @@ app.get('/auth/kakao/callback', async (req, res) => {
         const email = userData.kakao_account?.email || '';
         db.query(`CREATE TABLE IF NOT EXISTS farm_members (id INT AUTO_INCREMENT PRIMARY KEY, kakao_id BIGINT UNIQUE NOT NULL, nickname VARCHAR(100) NOT NULL, email VARCHAR(100), joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
             db.query(`INSERT INTO farm_members (kakao_id, nickname, email) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE nickname=?`, [kakaoId, nickname, email, nickname], () => {
-                req.session.user = { kakaoId: kakaoId, nickname: nickname };
+                // 카카오 로그인 시 세션에 이메일 정보도 함께 저장하도록 추가
+                req.session.user = { kakaoId: kakaoId, nickname: nickname, email: email };
                 res.send(`<script>alert('${nickname}님, 반갑습니다!'); location.href='/';</script>`);
             });
         });
@@ -153,7 +159,7 @@ app.get('/api/board/:id', (req, res) => {
         db.query(`SELECT * FROM farm_board WHERE id = ?`, [postId], (err, result) => {
             if (result.length === 0) return res.status(404).json({ success: false });
             const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
-            const isAdmin = adminNames.includes(currentUser); 
+            const isAdmin = checkIsAdmin(req.session ? req.session.user : null); 
             res.json({ success: true, data: result[0], currentUser: currentUser, isAdmin: isAdmin });
         });
     });
@@ -175,7 +181,7 @@ app.delete('/api/board/:id', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.'});
     const postId = req.params.id;
     const nickname = req.session.user.nickname;
-    const isAdmin = adminNames.includes(nickname);
+    const isAdmin = checkIsAdmin(req.session.user);;
     if (isAdmin) {
         db.query(`DELETE FROM farm_board WHERE id=?`, [postId], (err, result) => {
             res.json({ success: true, message: '관리자 권한으로 글을 삭제했습니다.' });
@@ -257,7 +263,7 @@ app.get('/api/products/:id', (req, res) => {
         if(err) return res.status(500).json({ success: false });
         if(result.length > 0) {
             const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
-            const isAdmin = adminNames.includes(currentUser); 
+            const isAdmin = checkIsAdmin(req.session ? req.session.user : null); 
             res.json({ success: true, data: result[0], currentUser: currentUser, isAdmin: isAdmin });
         } else {
             res.json({ success: false, message: '상품을 찾을 수 없습니다.' });
@@ -268,7 +274,7 @@ app.get('/api/products/:id', (req, res) => {
 app.put('/api/products/:id', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     const nickname = req.session.user.nickname;
-    const isAdmin = adminNames.includes(nickname);
+    const isAdmin = checkIsAdmin(req.session.user);;
     const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData } = req.body;
     
     db.query(`SELECT owner_nickname FROM farm_products WHERE id = ?`, [req.params.id], (err, rows) => {
@@ -305,7 +311,7 @@ app.put('/api/products/:id', (req, res) => {
 app.delete('/api/products/:id', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     const nickname = req.session.user.nickname;
-    const isAdmin = adminNames.includes(nickname);
+    const isAdmin = checkIsAdmin(req.session.user);
 
     db.query(`SELECT owner_nickname FROM farm_products WHERE id = ?`, [req.params.id], (err, rows) => {
         if (!rows || rows.length === 0) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다.' });
