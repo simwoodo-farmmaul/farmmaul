@@ -384,6 +384,7 @@
                     <thead>
                         <tr>
                             <th>가입 일시</th>
+                            <th>가입 구분</th>
                             <th>닉네임 (이름)</th>
                             <th>로그인 이메일</th>
                             <th>관리</th>
@@ -456,27 +457,46 @@
                 if (result.success && result.data.length > 0) {
                     result.data.forEach(user => {
                         const date = new Date(user.created_at).toLocaleString('ko-KR');
+                        
+                        // 카카오 가입자면 노란 뱃지, 이메일이면 회색 뱃지 생성
+                        const joinBadge = user.join_type === '카카오' 
+                            ? `<span class="badge" style="background:#FEE500; color:#3C1E1E;">💬 카카오</span>`
+                            : `<span class="badge" style="background:#f1f3f5; color:#333;">📧 이메일</span>`;
+
                         const row = `
                             <tr>
                                 <td style="font-size:0.9rem; color:#666;">${date}</td>
-                                <td style="font-weight:900; color:#333;">${user.name}</td>
-                                <td style="color:var(--master-blue); font-weight:700;">${user.email}</td>
+                                <td>${joinBadge}</td>
+                                <td style="font-weight:900; color:#333;">${user.nickname}</td>
+                                <td style="color:var(--master-blue); font-weight:700;">${user.email || '이메일 없음'}</td>
                                 <td>
-                                    <button class="btn-sm" style="color:#ff5e62; border-color:#ffcdd2;" onclick="deleteMember(${user.id}, '${user.name}')">강제탈퇴</button>
+                                    <button class="btn-sm" style="color:#ff5e62; border-color:#ffcdd2;" onclick="deleteMember('${user.source_table}', ${user.id}, '${user.nickname}')">강제탈퇴</button>
                                 </td>
                             </tr>
                         `;
                         tbody.insertAdjacentHTML('beforeend', row);
                     });
                 } else {
-                    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:30px; color:#888;">가입된 회원이 없습니다.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#888;">가입된 회원이 없습니다.</td></tr>';
                 }
             });
         }
 
-        function deleteMember(id, name) {
+        // 삭제 시 카카오/이메일 유형(type)을 서버로 같이 보냄
+        function deleteMember(type, id, name) {
             if(confirm(`정말 [${name}] 회원을 강제로 탈퇴 처리하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
-                fetch('/api/admin/members/' + id, { method: 'DELETE' })
+                fetch('/api/admin/members/' + type + '/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        alert('성공적으로 탈퇴 처리되었습니다.');
+                        loadMembers(); // 목록 새로고침
+                    } else {
+                        alert('탈퇴 처리 실패: ' + data.message);
+                    }
+                });
+            }
+        }
                 .then(res => res.json())
                 .then(data => {
                     if(data.success) {

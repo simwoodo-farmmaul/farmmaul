@@ -570,22 +570,35 @@ app.post('/api/policy', (req, res) => {
 // 🌟 [추가] 회원 관리 (목록 조회 및 강제 탈퇴) API
 // ==========================================
 app.get('/api/admin/members', (req, res) => {
-    // 최고 관리자인지 한 번 더 꼼꼼히 확인
     const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
     if (!isAdmin) return res.status(403).json({ success: false, message: '권한이 없습니다.' });
 
-    db.query('SELECT id, name, email, created_at FROM farm_email_users ORDER BY created_at DESC', (err, results) => {
+    // 이메일 명단과 카카오 명단을 하나로 합치면서 '가입 구분표(join_type)'를 붙여줍니다.
+    const query = `
+        SELECT id, name as nickname, email, created_at, '이메일' as join_type, 'email' as source_table 
+        FROM farm_email_users 
+        UNION ALL 
+        SELECT id, nickname, email, joined_at as created_at, '카카오' as join_type, 'kakao' as source_table 
+        FROM farm_members 
+        ORDER BY created_at DESC
+    `;
+
+    db.query(query, (err, results) => {
         if (err) return res.status(500).json({ success: false });
         res.json({ success: true, data: results });
     });
 });
 
-app.delete('/api/admin/members/:id', (req, res) => {
+// 카카오인지 이메일인지 구분하여 해당 테이블에서 삭제
+app.delete('/api/admin/members/:type/:id', (req, res) => {
     const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
     if (!isAdmin) return res.status(403).json({ success: false, message: '권한이 없습니다.' });
 
     const memberId = req.params.id;
-    db.query('DELETE FROM farm_email_users WHERE id = ?', [memberId], (err, result) => {
+    const joinType = req.params.type; // 'email' 또는 'kakao'
+    const targetTable = joinType === 'kakao' ? 'farm_members' : 'farm_email_users';
+
+    db.query(`DELETE FROM ${targetTable} WHERE id = ?`, [memberId], (err, result) => {
         if (err) return res.status(500).json({ success: false });
         res.json({ success: true, message: '해당 회원이 강제 탈퇴 처리되었습니다.' });
     });
