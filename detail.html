@@ -90,7 +90,7 @@
         .btn-buy:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(135,179,46,0.4); }
 
         /* 상세 설명 섹션 */
-        .sec-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; color: #222; border-bottom: 2px solid #222; padding-bottom: 10px; display: inline-block; }
+        .sec-title { font-size: 1.5rem; font-weight: 900; margin-bottom: 25px; color: #222; border-bottom: 2px solid #222; padding-bottom: 10px; display: table; }
         .detail-block { margin-bottom: 50px; }
         .detail-img { width: 100%; max-width: 800px; border-radius: 15px; margin-bottom: 20px; display: block; }
         .detail-text { font-size: 1.1rem; line-height: 1.8; color: #444; font-weight: 500; max-width: 800px; white-space: pre-wrap; background: #f9f9f9; padding: 25px; border-radius: 15px; }
@@ -467,7 +467,7 @@
                         }
 
                         // ★ 3. 추가 사진 및 설명 연동
-                       const detailSection = document.querySelector('.bottom-section');
+                        const detailSection = document.querySelector('.bottom-section');
                         
                         // 🌟 무조건 기존 가짜 샘플 사진 블록부터 깨끗하게 지웁니다.
                         const oldBlocks = detailSection.querySelectorAll('.detail-block');
@@ -476,11 +476,10 @@
                         if (p.content_data) {
                             try {
                                 const contents = JSON.parse(p.content_data);
+                                const faqTitle = Array.from(detailSection.querySelectorAll('h2.sec-title')).find(h => h.innerText.includes('FAQ'));
+                                
                                 if (contents.length > 0) {
-                                    
-                                    // FAQ 타이틀 위에 차례대로 추가하기
-                                    const faqTitle = Array.from(detailSection.querySelectorAll('h2.sec-title')).find(h => h.innerText.includes('FAQ'));
-                                    
+                                    // 추가 사진이 있을 때 차례대로 추가
                                     contents.forEach(c => {
                                         const block = document.createElement('div');
                                         block.className = 'detail-block';
@@ -490,6 +489,12 @@
                                         `;
                                         detailSection.insertBefore(block, faqTitle);
                                     });
+                                } else {
+                                    // 🌟 추가 사진이 한 장도 없을 때 빈칸 방지 안내문구
+                                    const emptyBlock = document.createElement('div');
+                                    emptyBlock.className = 'detail-block';
+                                    emptyBlock.innerHTML = `<div class="detail-text" style="text-align:center; padding:40px; background:#f9f9f9; color:#888;">등록된 추가 상품 상세 설명이 없습니다.</div>`;
+                                    detailSection.insertBefore(emptyBlock, faqTitle);
                                 }
                             } catch(e) {}
                         }
