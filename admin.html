@@ -387,7 +387,7 @@
                             <th>가입 구분</th>
                             <th>닉네임 (이름)</th>
                             <th>로그인 이메일</th>
-                            <th>관리</th>
+                            <th>휴대폰 번호</th> <th>관리</th>
                         </tr>
                     </thead>
                     <tbody id="memberTableBody">
@@ -396,7 +396,25 @@
                 </table>
             </div>
         </div>
-        <div id="view-notice" class="view-section"><div class="card"><h2 class="card-title">공지사항 및 푸시 발송</h2></div></div>
+        <div id="view-notice" class="view-section">
+            <div class="card">
+                <div class="card-header"><h2 class="card-title">📢 전체 회원 문자(SMS) 알림 발송</h2></div>
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 20px;">
+                    <p style="margin-top:0; font-size: 0.95rem; color: #555; font-weight: 700;">
+                        💡 휴대폰 번호를 등록한 회원들에게 단체 문자를 발송합니다.<br>
+                        (※ 문자 발송 서비스 연동 후 실제 발송이 가능합니다.)
+                    </p>
+                    <div style="margin-bottom: 15px;">
+                        <label style="font-weight: 900; display: block; margin-bottom: 8px;">문자 내용 입력</label>
+                        <textarea id="smsContent" placeholder="[팜마을] 새로운 꿀고구마 상품이 동네 HUB에 입고되었습니다! 지금 바로 확인해보세요. https://farmaul.com" style="width: 100%; height: 120px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; line-height: 1.5; outline: none; resize: vertical; box-sizing: border-box;"></textarea>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.85rem; color: #888; font-weight: 700;" id="smsByteCounter">0 / 90 byte (LMS 전환 전)</span>
+                        <button onclick="sendTestSms()" style="background: var(--master-orange); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-weight: 900; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(230,145,56,0.3);">전체 회원에게 문자 전송 🚀</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
     <div class="modal-overlay" id="dynamicHubModal">
@@ -469,8 +487,8 @@
                                 <td>${joinBadge}</td>
                                 <td style="font-weight:900; color:#333;">${user.nickname}</td>
                                 <td style="color:var(--master-blue); font-weight:700;">${user.email || '이메일 없음'}</td>
-                                <td>
-                                    <button class="btn-sm" style="color:#ff5e62; border-color:#ffcdd2;" onclick="deleteMember('${user.source_table}', ${user.id}, '${user.nickname}')">강제탈퇴</button>
+                                <td style="font-weight:800; color:#555;">${user.phone || '미등록'}</td> <td>
+                                <button class="btn-sm" style="color:#ff5e62; border-color:#ffcdd2;" onclick="deleteMember('${user.source_table}', ${user.id}, '${user.nickname}')">강제탈퇴</button>
                                 </td>
                             </tr>
                         `;

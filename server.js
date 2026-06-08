@@ -31,17 +31,20 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
-db.query(`ALTER TABLE farm_board ADD COLUMN views INT DEFAULT 0`, () => {}); 
 const createEmailMembersTable = `
     CREATE TABLE IF NOT EXISTS farm_email_users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(100) UNIQUE NOT NULL,
         password VARCHAR(255) NOT NULL,
+        phone VARCHAR(20), /* 🌟 휴대폰 번호 저장 칸 추가 */
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
 `;
-db.query(createEmailMembersTable, () => {});
+db.query(createEmailMembersTable, () => {
+    // 이미 테이블이 만들어져 있는 경우를 대비해 phone 칸을 강제로 추가하는 안전 코드
+    db.query(`ALTER TABLE farm_email_users ADD COLUMN phone VARCHAR(20)`, () => {});
+});
 
 // 카카오 가입자 테이블도 미리 생성 (에러 방지용)
 db.query(`CREATE TABLE IF NOT EXISTS farm_members (id INT AUTO_INCREMENT PRIMARY KEY, kakao_id BIGINT UNIQUE NOT NULL, nickname VARCHAR(100) NOT NULL, email VARCHAR(100), joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {});
@@ -61,10 +64,11 @@ app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.ht
 app.get('/join.html', (req, res) => res.sendFile(path.join(__dirname, 'join.html')));
 
 app.post('/api/register', (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone } = req.body; // 🌟 휴대폰 번호 추가
     db.query('SELECT * FROM farm_email_users WHERE email = ?', [email], (err, results) => {
         if (results && results.length > 0) return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
-        db.query('INSERT INTO farm_email_users (name, email, password) VALUES (?, ?, ?)', [name, email, password], (err, result) => {
+        // 🌟 저장 항목에 phone 추가
+        db.query('INSERT INTO farm_email_users (name, email, password, phone) VALUES (?, ?, ?, ?)', [name, email, password, phone || ''], (err, result) => {
             if (err) return res.status(500).json({ success: false, message: '가입 처리 중 데이터베이스 오류가 발생했습니다.' });
             res.json({ success: true, message: '팜마을 회원가입이 성공적으로 완료되었습니다! 🎉' });
         });
@@ -579,10 +583,10 @@ app.get('/api/admin/members', (req, res) => {
 
     // 이메일 명단과 카카오 명단을 하나로 합치면서 '가입 구분표(join_type)'를 붙여줍니다.
     const query = `
-        SELECT id, name as nickname, email, created_at, 'email' as join_type, 'farm_email_users' as source_table 
+        SELECT id, name as nickname, email, phone, created_at, 'email' as join_type, 'farm_email_users' as source_table 
         FROM farm_email_users 
         UNION ALL 
-        SELECT id, nickname, email, joined_at as created_at, 'kakao' as join_type, 'farm_members' as source_table 
+        SELECT id, nickname, email, '' as phone, joined_at as created_at, 'kakao' as join_type, 'farm_members' as source_table 
         FROM farm_members 
         ORDER BY created_at DESC
     `;
