@@ -114,12 +114,12 @@ app.get('/api/hubs/:id', (req, res) => {
 app.get('/auth/kakao/callback', async (req, res) => {
     const authCode = req.query.code; 
     const KAKAO_REST_API_KEY = 'e2676a110b5565e56d2863dd7a9581c8'; 
-    const REDIRECT_URI = '[https://farmaul.com/auth/kakao/callback](https://farmaul.com/auth/kakao/callback)'; 
+    const REDIRECT_URI = 'https://farmaul.com/auth/kakao/callback'; 
     if (!authCode) return res.send("<script>alert('인증 코드가 없습니다.'); location.href='/';</script>");
     try {
-        const tokenResponse = await fetch('[https://kauth.kakao.com/oauth/token](https://kauth.kakao.com/oauth/token)', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }, body: `grant_type=authorization_code&client_id=${KAKAO_REST_API_KEY}&redirect_uri=${REDIRECT_URI}&code=${authCode}` });
+        const tokenResponse = await fetch('https://kauth.kakao.com/oauth/token', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8' }, body: `grant_type=authorization_code&client_id=${KAKAO_REST_API_KEY}&redirect_uri=${REDIRECT_URI}&code=${authCode}` });
         const tokenData = await tokenResponse.json();
-        const userResponse = await fetch('[https://kapi.kakao.com/v2/user/me](https://kapi.kakao.com/v2/user/me)', { headers: { 'Authorization': `Bearer ${tokenData.access_token}` } });
+        const userResponse = await fetch('https://kapi.kakao.com/v2/user/me', { headers: { 'Authorization': `Bearer ${tokenData.access_token}` } });
         const userData = await userResponse.json();
         const kakaoId = userData.id;
         const nickname = userData.kakao_account?.profile?.nickname || '팜마을 회원';
