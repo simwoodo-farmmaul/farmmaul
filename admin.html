@@ -443,7 +443,7 @@
             loadMembers(); // 🌟 추가: 회원 목록 불러오기
             loadPolicy();  // 🌟 추가: 약관 데이터 불러오기
         });
-        
+
         // ==========================================
         // 🌟 [추가] 회원 목록 불러오기 및 강제 탈퇴
         // ==========================================
@@ -459,7 +459,7 @@
                         const date = new Date(user.created_at).toLocaleString('ko-KR');
                         
                         // 카카오 가입자면 노란 뱃지, 이메일이면 회색 뱃지 생성
-                        const joinBadge = user.join_type === '카카오' 
+                        const joinBadge = user.join_type === 'kakao' 
                             ? `<span class="badge" style="background:#FEE500; color:#3C1E1E;">💬 카카오</span>`
                             : `<span class="badge" style="background:#f1f3f5; color:#333;">📧 이메일</span>`;
 
@@ -479,13 +479,17 @@
                 } else {
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#888;">가입된 회원이 없습니다.</td></tr>';
                 }
+            })
+            .catch(err => {
+                console.error("회원 목록 로딩 중 에러:", err);
+                document.getElementById('memberTableBody').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; color:#888;">회원 목록을 불러올 수 없습니다.</td></tr>';
             });
         }
 
         // 삭제 시 카카오/이메일 유형(type)을 서버로 같이 보냄
-        function deleteMember(type, id, name) {
+        function deleteMember(tableType, id, name) {
             if(confirm(`정말 [${name}] 회원을 강제로 탈퇴 처리하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
-                fetch('/api/admin/members/' + type + '/' + id, { method: 'DELETE' })
+                fetch('/api/admin/members/' + tableType + '/' + id, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(data => {
                     if(data.success) {
@@ -494,18 +498,8 @@
                     } else {
                         alert('탈퇴 처리 실패: ' + data.message);
                     }
-                });
-            }
-        }
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        alert('성공적으로 탈퇴 처리되었습니다.');
-                        loadMembers(); // 목록 새로고침
-                    } else {
-                        alert('탈퇴 처리 실패: ' + data.message);
-                    }
-                });
+                })
+                .catch(err => alert("서버와 통신 중 오류가 발생했습니다."));
             }
         }
 

@@ -42,6 +42,10 @@ const createEmailMembersTable = `
     )
 `;
 db.query(createEmailMembersTable, () => {});
+
+// 카카오 가입자 테이블도 미리 생성 (에러 방지용)
+db.query(`CREATE TABLE IF NOT EXISTS farm_members (id INT AUTO_INCREMENT PRIMARY KEY, kakao_id BIGINT UNIQUE NOT NULL, nickname VARCHAR(100) NOT NULL, email VARCHAR(100), joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {});
+
 console.log('✅ 데이터베이스 창고 무중단 풀(Pool) 연결 성공!');
 
 // 🌟 관리자 명단 (이메일 기준, 카카오 로그인 접근 불가)
@@ -575,16 +579,19 @@ app.get('/api/admin/members', (req, res) => {
 
     // 이메일 명단과 카카오 명단을 하나로 합치면서 '가입 구분표(join_type)'를 붙여줍니다.
     const query = `
-        SELECT id, name as nickname, email, created_at, '이메일' as join_type, 'email' as source_table 
+        SELECT id, name as nickname, email, created_at, 'email' as join_type, 'farm_email_users' as source_table 
         FROM farm_email_users 
         UNION ALL 
-        SELECT id, nickname, email, joined_at as created_at, '카카오' as join_type, 'kakao' as source_table 
+        SELECT id, nickname, email, joined_at as created_at, 'kakao' as join_type, 'farm_members' as source_table 
         FROM farm_members 
         ORDER BY created_at DESC
     `;
 
     db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ success: false });
+        if (err) {
+            console.error("회원목록 조회 에러:", err);
+            return res.status(500).json({ success: false });
+        }
         res.json({ success: true, data: results });
     });
 });
@@ -595,8 +602,12 @@ app.delete('/api/admin/members/:type/:id', (req, res) => {
     if (!isAdmin) return res.status(403).json({ success: false, message: '권한이 없습니다.' });
 
     const memberId = req.params.id;
-    const joinType = req.params.type; // 'email' 또는 'kakao'
-    const targetTable = joinType === 'kakao' ? 'farm_members' : 'farm_email_users';
+    const targetTable = req.params.type; // 'farm_email_users' 또는 'farm_members'
+
+    // 보안을 위해 테이블 이름 검증
+    if(targetTable !== 'farm_email_users' && targetTable !== 'farm_members') {
+        return res.status(400).json({ success: false });
+    }
 
     db.query(`DELETE FROM ${targetTable} WHERE id = ?`, [memberId], (err, result) => {
         if (err) return res.status(500).json({ success: false });
