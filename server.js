@@ -546,10 +546,78 @@ app.post('/api/notices', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [추가] 마이페이지 (내 정보 조회/수정/탈퇴) API
+// ==========================================
+
+// 1. 내 정보 불러오기
+app.get('/api/mypage', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const user = req.session.user;
+    
+    // 카카오 가입자인 경우
+    if (user.kakaoId) {
+        db.query('SELECT nickname as name, email, joined_at as created_at FROM farm_members WHERE kakao_id = ?', [user.kakaoId], (err, results) => {
+            if (err || results.length === 0) return res.status(500).json({ success: false });
+            res.json({ success: true, data: { ...results[0], join_type: 'kakao', phone: '카카오 간편가입 회원' } });
+        });
+    } 
+    // 이메일 일반 가입자인 경우
+    else {
+        db.query('SELECT name, email, phone, created_at FROM farm_email_users WHERE email = ?', [user.email], (err, results) => {
+            if (err || results.length === 0) return res.status(500).json({ success: false });
+            res.json({ success: true, data: { ...results[0], join_type: 'email' } });
+        });
+    }
+});
+
+// 2. 내 정보(휴대폰 번호, 비밀번호) 수정하기
+app.put('/api/mypage', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false });
+    
+    const user = req.session.user;
+    const { phone, password } = req.body;
+
+    if (user.kakaoId) {
+        return res.json({ success: false, message: '카카오 로그인 회원은 카카오톡 앱에서 정보를 수정해야 합니다.' });
+    } else {
+        let query = 'UPDATE farm_email_users SET phone = ?';
+        let params = [phone || ''];
+        
+        // 비밀번호 변경을 입력했을 때만 비밀번호도 함께 수정
+        if (password && password.trim() !== '') {
+            query += ', password = ?';
+            params.push(password);
+        }
+        query += ' WHERE email = ?';
+        params.push(user.email);
+
+        db.query(query, params, (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: '오류가 발생했습니다.' });
+            res.json({ success: true, message: '내 정보가 성공적으로 수정되었습니다! 🌱' });
+        });
+    }
+});
+
+// 3. 회원 스스로 직접 탈퇴하기 (계정 삭제)
+app.delete('/api/mypage', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false });
+    
+    const user = req.session.user;
+    
+    if (user.kakaoId) {
+        db.query('DELETE FROM farm_members WHERE kakao_id = ?', [user.kakaoId], (err) => {
+            req.session.destroy(() => res.json({ success: true, message: '회원 탈퇴가 안전하게 처리되었습니다. 그동안 감사했습니다.' }));
+        });
+    } else {
+        db.query('DELETE FROM farm_email_users WHERE email = ?', [user.email], (err) => {
+            req.session.destroy(() => res.json({ success: true, message: '회원 탈퇴가 안전하게 처리되었습니다. 그동안 감사했습니다.' }));
+        });
+    }
+});
+
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
-// ==========================================
-// [팜마을 관리자] 회사소개 및 약관 API
-// ==========================================
 // ==========================================
 // [팜마을 관리자] 회사소개 및 약관 API
 // ==========================================
