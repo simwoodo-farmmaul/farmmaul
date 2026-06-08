@@ -8,7 +8,11 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body { background-color: #f9fbf9; color: #333; padding-bottom: 60px; }
         header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #a066c0; text-decoration: none; }
+        
+        /* 🌟 좌, 중, 우 완벽한 균형을 위한 3등분 스타일 */
+        .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
+        .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #a066c0; white-space: nowrap; }
+        .btn-list { flex: 1; text-align: right; text-decoration: none; font-weight: bold; color: #666; }
         
         .main-container { max-width: 800px; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .detail-header { padding: 25px 30px; border-bottom: 1px solid #f0f0f0; }
@@ -34,8 +38,16 @@
 <body>
 
     <header>
-        <a href="board.html" class="logo">🌱 잔디밭 이야기</a>
-        <a href="board.html" style="text-decoration: none; font-weight: bold; color: #666;">목록으로</a>
+        <!-- 좌측: 팜마을 로고 -->
+        <a href="index.html" class="farm-logo">
+            <img src="farmmaul.webp" alt="로고" style="height: 24px; width: auto; border-radius: 4px;" onerror="this.style.display='none'"> 팜마을
+        </a>
+        
+        <!-- 중앙: 잔디밭 이야기 타이틀 -->
+        <div class="center-title">🌱 잔디밭 이야기</div>
+        
+        <!-- 우측: 목록으로 버튼 -->
+        <a href="board.html" class="btn-list">목록으로</a>
     </header>
 
     <div class="main-container">

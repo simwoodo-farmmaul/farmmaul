@@ -146,11 +146,17 @@
                     const img = new Image();
                     img.onload = function() {
                         let w = img.width, h = img.height;
-                        if (w > h) { if (w > 1200) { h = Math.round(h * 1200 / w); w = 1200; } } 
-                        else { if (h > 1200) { w = Math.round(w * 1200 / h); h = 1200; } }
+                        if (w > h) { if (w > 640) { h = Math.round(h * 640 / w); w = 640; } } 
+                        else { if (h > 640) { w = Math.round(w * 640 / h); h = 640; } }
                         const cvs = document.createElement('canvas'); cvs.width = w; cvs.height = h;
-                        cvs.getContext('2d').drawImage(img, 0, 0, w, h);
-                        resolve(cvs.toDataURL('image/jpeg', 0.7));
+                        const ctx = cvs.getContext('2d');
+                        
+                        // ✨ 배경 투명 현상을 막기 위해 캔버스를 먼저 흰색으로 채워줍니다.
+                        ctx.fillStyle = "#ffffff";
+                        ctx.fillRect(0, 0, w, h);
+                        
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(cvs.toDataURL('image/jpeg', 0.5)); // 🌟 초고효율 압축
                     };
                     img.src = event.target.result;
                 };
