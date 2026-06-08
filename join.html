@@ -69,6 +69,10 @@
                 <input type="password" id="regPasswordConfirm" placeholder="비밀번호 확인" required>
                 <span class="password-toggle" onclick="togglePass('regPasswordConfirm', this)">👁️</span>
             </div>
+            <div class="input-group">
+                <label>휴대폰 번호</label>
+                <input type="tel" id="userPhone" placeholder="휴대폰 번호 (- 없이 입력)" required>
+            </div>
             
             <div class="terms-group">
                 <input type="checkbox" id="terms" required>
@@ -106,10 +110,16 @@
                 return;
             }
 
-            fetch('/api/register', {
+           fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password })
+                // 🌟 body 부분에 phone 데이터를 직접 가져와서 추가해 줍니다.
+                body: JSON.stringify({ 
+                    name, 
+                    email, 
+                    password, 
+                    phone: document.getElementById('userPhone').value 
+                })
             })
             .then(res => res.json())
             .then(data => {
