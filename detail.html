@@ -147,7 +147,7 @@
     <div class="header">
         <div class="header-inner">
             <a href="#" class="btn" onclick="history.back()">←</a>
-            <div class="title">FarmMaul 상품안내</div>
+            <div class="title">팜마을 상품안내</div>
             <a href="#" class="btn" onclick="alert('상품이 공유되었습니다.')">🔗</a>
         </div>
     </div>
@@ -467,14 +467,16 @@
                         }
 
                         // ★ 3. 추가 사진 및 설명 연동
-                        const detailSection = document.querySelector('.bottom-section');
+                       const detailSection = document.querySelector('.bottom-section');
+                        
+                        // 🌟 무조건 기존 가짜 샘플 사진 블록부터 깨끗하게 지웁니다.
+                        const oldBlocks = detailSection.querySelectorAll('.detail-block');
+                        oldBlocks.forEach(b => b.remove());
+
                         if (p.content_data) {
                             try {
                                 const contents = JSON.parse(p.content_data);
                                 if (contents.length > 0) {
-                                    // 기존 가짜 샘플 블록 지우기
-                                    const oldBlocks = detailSection.querySelectorAll('.detail-block');
-                                    oldBlocks.forEach(b => b.remove());
                                     
                                     // FAQ 타이틀 위에 차례대로 추가하기
                                     const faqTitle = Array.from(detailSection.querySelectorAll('h2.sec-title')).find(h => h.innerText.includes('FAQ'));

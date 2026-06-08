@@ -427,6 +427,25 @@
                     } else { vw.style.display = 'none'; }
                 } else { vw.style.display = 'none'; }
 
+                // 🌟 추가 사진(10장) 미리보기 화면 실시간 연동
+                const detailArea = document.getElementById('pvDetail');
+                if(detailArea) {
+                    if(contents.length > 0) {
+                        let cHtml = '<div style="margin-top:20px; border-top:2px solid #eee; padding-top:20px;"></div>';
+                        contents.forEach(c => {
+                            cHtml += `
+                                <div style="margin-bottom:20px;">
+                                    <img src="${c.img}" style="width:100%; border-radius:10px; margin-bottom:10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                                    <div style="font-size:0.95rem; color:#555; background:#f9f9f9; padding:15px; border-radius:10px; white-space:pre-wrap; line-height: 1.6;">${c.text ? c.text.replace(/\n/g, '<br>') : '상세 설명이 없습니다.'}</div>
+                                </div>
+                            `;
+                        });
+                        detailArea.innerHTML = cHtml;
+                    } else {
+                        detailArea.innerHTML = '';
+                    }
+                }
+
                 const faqArea = document.getElementById('pvFaqView');
                 if(faqArea) {
                     if(faqs.length > 0 && faqs.some(f => f.q || f.a)) {
@@ -512,6 +531,8 @@
                 };
                 reader.readAsDataURL(file);
             });
+            // 🌟 같은 사진을 지웠다가 다시 올릴 수 있도록 입력칸 초기화
+            event.target.value = '';
         });
 
         function renderContents() {
