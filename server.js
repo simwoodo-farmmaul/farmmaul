@@ -617,7 +617,6 @@ app.delete('/api/mypage', (req, res) => {
     }
 });
 
-app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
 // ==========================================
 // [팜마을 관리자] 회사소개 및 약관 API
 // ==========================================
@@ -686,3 +685,5 @@ app.delete('/api/admin/members/:type/:id', (req, res) => {
         res.json({ success: true, message: '해당 회원이 강제 탈퇴 처리되었습니다.' });
     });
 });
+// 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
+app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
