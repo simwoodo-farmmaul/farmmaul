@@ -11,14 +11,20 @@
         :root { --primary-green: #87B32E; --primary-orange: #E69138; --primary-blue: #4B9AD2; --bg-color: #f1f3f5; --text-dark: #333; }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
         body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 120px; }
+        
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
+        /* 🌟 헤더 폭 800px로 수정 */
         .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         .btn-icon { font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #333; font-weight: 900; }
         .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-blue); }
+        
+        /* 🌟 전체 컨테이너 폭 800px로 수정 */
         .container { max-width: 800px; margin: 20px auto 0; padding: 0 20px; }
+        
         .info-banner { background: linear-gradient(135deg, #e1f5fe, #b3e5fc); border: 1px solid #81d4fa; border-radius: 15px; padding: 25px 20px; margin-bottom: 25px; text-align: center; }
         .info-banner h2 { font-size: 1.4rem; color: #0277bd; margin-bottom: 10px; font-weight: 900; }
         .info-banner p { font-size: 0.95rem; color: #01579b; line-height: 1.5; font-weight: 700; }
+        
         .form-section { background: #fff; border-radius: 15px; padding: 30px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 20px; border: 1px solid #eaeaea; }
         .form-title { font-size: 1.15rem; font-weight: 900; color: #222; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; border-bottom: 2px solid #f8f9fa; padding-bottom: 15px; }
         .form-group { margin-bottom: 20px; }
@@ -27,6 +33,7 @@
         .form-input { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 1rem; outline: none; background: #f9f9f9; transition: 0.2s; }
         .form-input:focus { border-color: var(--primary-blue); background: #fff; }
         textarea.form-input { height: 100px; resize: none; margin-top: 10px; }
+        
         .chip-group { display: flex; flex-wrap: wrap; gap: 10px; }
         .chip-group input { display: none; }
         .chip-group label { flex: 1; min-width: 130px; padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 10px; text-align: center; cursor: pointer; font-weight: 800; color: #555; transition: 0.2s; }
@@ -41,6 +48,7 @@
         .edit-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
         
         .submit-btn-wrap { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; }
+        /* 🌟 하단 버튼 폭 800px로 수정 */
         .submit-btn { max-width: 800px; margin: 0 auto; width: 100%; padding: 16px; background: var(--primary-blue); color: white; border: none; font-size: 1.2rem; font-weight: 900; border-radius: 12px; cursor: pointer; display: block; text-align: center; }
 
         @media (max-width: 768px) {

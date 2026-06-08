@@ -326,7 +326,16 @@
             document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
             dataList.forEach(hub => {
-                const imgUrl = hub.hub_image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop";
+                // 🌟 [수정됨] JSON 형식으로 저장된 여러 장의 사진 중 0번째(대표 사진)를 썸네일로 가져옴
+                let imgUrl = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop";
+                if (hub.hub_image) {
+                    try {
+                        const parsedImages = JSON.parse(hub.hub_image);
+                        if (parsedImages.length > 0) imgUrl = parsedImages[0];
+                    } catch (e) {
+                        imgUrl = hub.hub_image; // 옛날 방식으로 저장된 1장짜리 데이터 호환
+                    }
+                }
                 
                 let badgeClass = "badge-store"; 
                 if(hub.hub_type.includes("카페") || hub.hub_type.includes("식당")) {
@@ -335,9 +344,10 @@
 
                 const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
 
+                // 🌟 [수정됨] onclick 속성에 window.open을 적용하여 새 창(새 탭)에서 허브 상세 페이지가 열리도록 변경
                 const cardHtml = `
                     <div class="hub-card" 
-                         onclick="location.href='hub.html?id=${hub.id}'"
+                         onclick="window.open('hub.html?id=${hub.id}', '_blank')"
                          onmouseover="updateSearchMap('${cleanAddr}')">
                         <img src="${imgUrl}" class="hub-img" alt="허브 전경">
                         <div class="hub-info">
