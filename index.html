@@ -843,7 +843,7 @@
                 const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
                 const itemHtml = `
                     <div class="hub-list-item" 
-                         onclick="location.href='hub.html?id=${hub.id}'"
+                         onclick="window.open('hub.html?id=${hub.id}', '_blank')"
                          onmouseover="updateMainMap('${cleanAddr}')">
                         <div class="hub-item-name">${hub.hub_name}</div>
                         <div class="hub-item-info"><span>📍</span> ${hub.hub_address}</div>
