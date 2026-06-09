@@ -22,10 +22,11 @@
 
         /* 1. 상단 헤더 */
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
-        .back-btn { font-size: 1.5rem; font-weight: 900; cursor: pointer; color: #333; }
-        .logo-small { font-family: 'Jua', sans-serif; font-size: 1.5rem; color: var(--primary-green); display: flex; align-items: center; gap: 5px; }
-        .search-icon { font-size: 1.4rem; cursor: pointer; color: #555; }
+        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
+        .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
+        .btn-search { flex: 1; text-align: right; text-decoration: none; font-weight: bold; color: #666; font-size: 1.1rem; cursor: pointer; }
 
         /* 2. 히어로 배너 */
         .board-hero { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 35px 20px; text-align: center; border-bottom: 1px solid #b2d8b4; }
@@ -84,9 +85,11 @@
 
     <div class="header">
         <div class="header-inner">
-            <div class="back-btn" onclick="history.back()">←</div>
-            <div class="logo-small">📖 잘키우는법</div>
-            <div class="search-icon" onclick="alert('게시글 검색창이 열립니다.')">🔍</div>
+            <a href="index.html" class="farm-logo">
+                <img src="farmmaul.webp" alt="로고" style="height: 24px; width: auto; border-radius: 4px;" onerror="this.style.display='none'"> 팜마을
+            </a>
+            <div class="center-title">📖 잘키우는법</div>
+            <div class="btn-search" onclick="alert('검색 기능이 열립니다.')">🔍검색</div>
         </div>
     </div>
 
@@ -97,10 +100,7 @@
 
     <div class="filter-wrapper">
         <div class="filter-scroll">
-            <button class="filter-btn active" onclick="switchFilter(this, 'all')">전체보기</button>
-            <button class="filter-btn" onclick="switchFilter(this, 'tip')">💡 꿀팁만</button>
-            <button class="filter-btn" onclick="switchFilter(this, 'qna')">❓ 질문만</button>
-            <button class="filter-btn" onclick="switchFilter(this, 'agri')">🌱 농산</button>
+            <button class="filter-btn active" onclick="switchFilter(this, 'agri')">🌱 농산</button>
             <button class="filter-btn" onclick="switchFilter(this, 'livestock')">🥩 축산</button>
             <button class="filter-btn" onclick="switchFilter(this, 'bird')">🦜 조류</button>
             <button class="filter-btn" onclick="switchFilter(this, 'fish')">🐟 어류</button>
@@ -203,11 +203,25 @@
 
     </div>
 
-    <button class="btn-write-fab" onclick="alert('글쓰기 에디터 화면으로 이동합니다. ✍️')">
+    <button class="btn-write-fab" onclick="checkLoginForWrite()">
         ✏️ 글쓰기
     </button>
 
     <script>
+        // 🌟 비회원 글쓰기 차단 기능
+        function checkLoginForWrite() {
+            fetch('/api/user')
+                .then(res => res.json())
+                .then(data => {
+                    if(data.loggedIn) {
+                        location.href = 'knowhow_write.html'; 
+                    } else {
+                        alert('일반회원 이상 글쓰기가 가능합니다. 로그인 화면으로 이동합니다.');
+                        location.href = 'login.html'; 
+                    }
+                });
+        }
+
         // 카테고리 필터링 기능
         function switchFilter(btn, category) {
             // 버튼 활성화 토글

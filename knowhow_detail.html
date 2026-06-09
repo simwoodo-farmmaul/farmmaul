@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>팜마을 - 노하우 상세</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
+        body { background-color: #f4f7f6; color: #333; padding-bottom: 60px; }
+        header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:10; }
+        .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
+        .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
+        
+        .main-container { max-width: 800px; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .detail-header { padding: 25px 30px; border-bottom: 1px solid #f0f0f0; }
+        .post-title { font-size: 1.5rem; font-weight: 900; color: #222; margin-bottom: 12px; line-height: 1.4; }
+        .post-info { font-size: 0.9rem; color: #666; display: flex; gap: 15px; }
+        
+        .detail-body { padding: 30px; line-height: 1.7; font-size: 1.05rem; color: #444; }
+        .image-gallery { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        .gallery-img { width: 100%; max-height: 500px; object-fit: contain; border-radius: 8px; background: #fafafa; }
+        .post-text-content { white-space: pre-wrap; margin-top: 20px; }
+
+        .author-actions { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: right; display: none; }
+        .btn-action { padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; margin-left: 10px; }
+        .btn-delete { background: #ff4d4d; color: white; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="index.html" class="farm-logo"><img src="farmmaul.webp" style="height: 24px;"> 팜마을</a>
+        <div class="center-title">📖 잘키우는법 상세</div>
+        <a href="knowhow.html" style="flex:1; text-align:right; text-decoration:none; color:#666; font-weight:bold;">목록으로</a>
+    </header>
+
+    <div class="main-container">
+        <div class="detail-header">
+            <div class="post-title" id="postTitle">로딩 중입니다...</div>
+            <div class="post-info">
+                <span id="postAuthor">🧑‍🌾 </span>
+                <span id="postDate">📅 </span>
+            </div>
+        </div>
+        
+        <div class="detail-body">
+            <div class="image-gallery" id="imageGallery"></div>
+            <div class="post-text-content" id="postContent"></div>
+
+            <div class="author-actions" id="authorActions">
+                <button class="btn-action btn-delete" onclick="deletePost()">🗑️ 이 노하우 삭제하기</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPostId = null;
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentPostId = urlParams.get('id');
+
+            fetch(`/api/board/${currentPostId}`)
+                .then(res => res.json())
+                .then(result => {
+                    if(!result.success) { alert('글을 가져올 수 없습니다.'); location.href = 'knowhow.html'; return; }
+
+                    const post = result.data;
+                    document.getElementById('postTitle').innerText = post.title;
+                    document.getElementById('postAuthor').innerText = `🧑‍🌾 ${post.nickname}`;
+                    document.getElementById('postDate').innerText = `📅 ${new Date(post.created_at).toLocaleDateString()}`;
+                    document.getElementById('postContent').innerText = post.content;
+
+                    // 🌟 작성자 본인 및 관리자 권한 확인 (삭제 버튼 노출)
+                    if (result.currentUser === post.nickname || result.isAdmin) {
+                        document.getElementById('authorActions').style.display = 'block';
+                    }
+
+                    // 사진 렌더링
+                    let images = [];
+                    try { images = JSON.parse(post.images); } catch(e) { images = []; }
+                    const gallery = document.getElementById('imageGallery');
+                    images.forEach(imgBase64 => {
+                        const imgTag = document.createElement('img');
+                        imgTag.className = 'gallery-img'; imgTag.src = imgBase64;
+                        gallery.appendChild(imgTag);
+                    });
+                });
+        });
+
+        function deletePost() {
+            if(confirm('정말 이 노하우 글을 삭제하시겠습니까?')) {
+                fetch(`/api/board/${currentPostId}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(res => {
+                    alert('삭제되었습니다.');
+                    if(res.success) location.href = 'knowhow.html';
+                });
+            }
+        }
+    </script>
+</body>
+</html>

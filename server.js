@@ -685,5 +685,90 @@ app.delete('/api/admin/members/:type/:id', (req, res) => {
         res.json({ success: true, message: '해당 회원이 강제 탈퇴 처리되었습니다.' });
     });
 });
+
+// ==========================================
+// 🌟 [추가] 잘키우는법(노하우) 전용 게시판 DB 연동 API
+// ==========================================
+
+// 1. 노하우 글 작성 (POST)
+app.post('/api/knowhow', (req, res) => {
+    // 일반회원(로그인한 사람) 이상만 글쓰기 허용
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ success: false, message: '일반회원 이상 글쓰기가 가능합니다.' });
+    }
+    
+    const { title, content, images } = req.body;
+    const nickname = req.session.user.nickname;
+    
+    // 노하우 전용 저장소(테이블)가 없다면 자동으로 생성
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_knowhow (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nickname VARCHAR(100) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            images LONGTEXT,
+            views INT DEFAULT 0,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    
+    db.query(createTableQuery, () => {
+        db.query(`INSERT INTO farm_knowhow (nickname, title, content, images) VALUES (?, ?, ?, ?)`, 
+        [nickname, title, content, JSON.stringify(images || [])], (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: 'DB 저장 오류' });
+            res.json({ success: true, message: '성공적으로 노하우가 등록되었습니다! 🌟' });
+        });
+    });
+});
+
+// 2. 노하우 글 목록 전체 조회 (GET)
+app.get('/api/knowhow', (req, res) => {
+    // 카테고리 태그([🌱 농산] 등)가 포함된 최신 글부터 불러오기
+    db.query(`SELECT id, nickname, title, content, images, views, created_at FROM farm_knowhow ORDER BY created_at DESC`, (err, results) => {
+        if(err) return res.json({ success: true, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
+
+// 3. 노하우 상세 조회 및 조회수 증가 (GET)
+app.get('/api/knowhow/:id', (req, res) => {
+    const postId = req.params.id;
+    // 클릭 시 자동으로 조회수(views) 1 증가
+    db.query(`UPDATE farm_knowhow SET views = views + 1 WHERE id = ?`, [postId], () => {
+        db.query(`SELECT * FROM farm_knowhow WHERE id = ?`, [postId], (err, result) => {
+            if (err || result.length === 0) return res.status(404).json({ success: false });
+            
+            // 현재 로그인한 사람과 관리자 여부를 파악하여 수정/삭제 버튼 노출 권한을 부여함
+            const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
+            const isAdmin = checkIsAdmin(req.session ? req.session.user : null); 
+            res.json({ success: true, data: result[0], currentUser: currentUser, isAdmin: isAdmin });
+        });
+    });
+});
+
+// 4. 노하우 글 삭제 (DELETE)
+app.delete('/api/knowhow/:id', (req, res) => {
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    }
+    const postId = req.params.id;
+    const nickname = req.session.user.nickname;
+    const isAdmin = checkIsAdmin(req.session.user);
+
+    if (isAdmin) {
+        // 관리자는 묻지도 따지지도 않고 삭제 가능
+        db.query(`DELETE FROM farm_knowhow WHERE id=?`, [postId], (err, result) => {
+            res.json({ success: true, message: '관리자 권한으로 노하우를 삭제했습니다.' });
+        });
+    } else {
+        // 일반회원은 자기가 쓴 글만 삭제 가능
+        db.query(`DELETE FROM farm_knowhow WHERE id=? AND nickname=?`, [postId, nickname], (err, result) => {
+             if(result.affectedRows === 0) return res.status(403).json({ success: false, message: '삭제 권한이 없습니다.'});
+             res.json({ success: true, message: '노하우가 안전하게 삭제되었습니다.' });
+        });
+    }
+});
+
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
