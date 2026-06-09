@@ -829,5 +829,43 @@ app.post('/api/qna/:id/reply', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [추가] 자주 묻는 질문(FAQ) 관리 API
+// ==========================================
+
+// 1. FAQ 목록 불러오기 (일반 사용자 & 관리자 공통)
+app.get('/api/faqs', (req, res) => {
+    // 테이블이 없으면 자동 생성
+    db.query(`CREATE TABLE IF NOT EXISTS farm_faqs (id INT AUTO_INCREMENT PRIMARY KEY, question VARCHAR(255) NOT NULL, answer TEXT NOT NULL, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
+        db.query(`SELECT * FROM farm_faqs ORDER BY id ASC`, (err, results) => {
+            if (err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    });
+});
+
+// 2. FAQ 등록하기 (관리자 전용)
+app.post('/api/faqs', (req, res) => {
+    const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
+    if (!isAdmin) return res.status(403).json({ success: false, message: '관리자 권한이 없습니다.' });
+    
+    const { question, answer } = req.body;
+    db.query(`INSERT INTO farm_faqs (question, answer) VALUES (?, ?)`, [question, answer], (err) => {
+        if(err) return res.status(500).json({ success: false, message: 'FAQ 저장 오류' });
+        res.json({ success: true, message: '자주 묻는 질문이 등록되었습니다!' });
+    });
+});
+
+// 3. FAQ 삭제하기 (관리자 전용)
+app.delete('/api/faqs/:id', (req, res) => {
+    const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
+    if (!isAdmin) return res.status(403).json({ success: false, message: '관리자 권한이 없습니다.' });
+    
+    db.query(`DELETE FROM farm_faqs WHERE id = ?`, [req.params.id], (err) => {
+        if(err) return res.status(500).json({ success: false, message: 'FAQ 삭제 오류' });
+        res.json({ success: true, message: '해당 질문이 삭제되었습니다.' });
+    });
+});
+
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
