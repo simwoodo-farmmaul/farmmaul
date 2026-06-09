@@ -33,11 +33,13 @@
         .board-hero h1 { font-family: 'Jua', sans-serif; font-size: 2rem; margin: 0 0 10px; color: #2e7d32; }
         .board-hero p { font-size: 0.95rem; color: #444; margin: 0; line-height: 1.5; font-weight: 700; word-break: keep-all; }
 
-        /* 3. 카테고리 필터 슬라이더 */
+       /* 3. 카테고리 필터 슬라이더 */
         .filter-wrapper { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 61px; z-index: 90; }
-        .filter-scroll { max-width: 800px; margin: 0 auto; display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; white-space: nowrap; }
-        .filter-scroll::-webkit-scrollbar { display: none; }
-        .filter-btn { background: #f1f3f5; color: #666; border: 1px solid #ddd; padding: 8px 18px; border-radius: 20px; font-size: 0.9rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        .filter-scroll { max-width: 800px; margin: 0 auto; display: flex; gap: 10px; padding: 15px 20px; }
+        
+        /* 🌟 flex: 1을 주어 4개의 버튼이 빈 공간 없이 동일하게 길어지도록 맞춤 */
+        .filter-btn { flex: 1; text-align: center; background: #f1f3f5; color: #666; border: 1px solid #ddd; padding: 12px 0; border-radius: 12px; font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
+        
         .filter-btn.active { background: var(--primary-green); color: #fff; border-color: var(--primary-green); box-shadow: 0 4px 10px rgba(135,179,46,0.3); }
 
         /* 4. 게시글 리스트 영역 */
