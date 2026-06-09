@@ -83,6 +83,12 @@
 
         <!-- 1. 🌟 FAQ 영역 (DB에서 불러옴) -->
         <div id="faqTab" class="tab-content active">
+            
+            <!-- 🌟 관리자용 FAQ 관리 버튼 (일반 회원에게는 숨겨짐) -->
+            <div id="adminFaqBtnWrap" style="text-align: right; margin-bottom: 15px; display: none;">
+                <button onclick="location.href='admin_faq.html'" style="background: var(--primary-orange, #E69138); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">🛠️ FAQ 작성 및 관리 페이지로 가기</button>
+            </div>
+
             <div id="faqListArea">
                 <div style="text-align:center; padding:50px; color:#888;">자주 묻는 질문을 불러오는 중입니다... ⏳</div>
             </div>
@@ -113,6 +119,16 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             loadFaqList(); // 페이지 로드 시 FAQ 불러오기
+            
+            // 🌟 현재 접속자가 관리자인지 확인하고 FAQ 관리 버튼 보여주기
+            fetch('/api/user').then(res => res.json()).then(data => {
+                if(data.loggedIn) {
+                    const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
+                    if(adminEmails.includes(data.user.email) && !data.user.kakaoId) {
+                        document.getElementById('adminFaqBtnWrap').style.display = 'block';
+                    }
+                }
+            });
         });
 
         // 탭 전환 기능
