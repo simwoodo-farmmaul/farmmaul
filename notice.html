@@ -3,243 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>팜마을 - 알림판 (공지사항)</title>
-
-    <link rel="icon" type="image/webp" href="farmmaul.webp">
-    <link rel="apple-touch-icon" href="farmmaul.webp">
-
+    <title>팜마을 - 알림판</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
-
-        :root {
-            --primary-green: #87B32E;
-            --primary-orange: #E69138;
-            --primary-blue: #4B9AD2; 
-            --notice-blue: #1565c0; /* 알림판 포인트 컬러 */
-            --bg-color: #f8f9fa;
-            --text-dark: #333;
-            --text-light: #666;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', -apple-system, sans-serif; word-break: keep-all; }
-        body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 80px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
+        body { background-color: #f8f9fa; color: #333; padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
+
+        /* 헤더 스타일 */
+        .header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
+        .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
+        .btn-home { flex: 1; text-align: right; font-weight: bold; color: #666; font-size: 1rem; }
+
+        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+
+        /* 상단 배너 */
+        .notice-banner { background: linear-gradient(135deg, #87B32E, #6b9122); border-radius: 15px; padding: 30px; text-align: center; color: white; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(135, 179, 46, 0.3); }
+        .notice-banner h2 { font-size: 1.5rem; font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .notice-banner p { font-size: 1rem; line-height: 1.6; opacity: 0.95; margin-bottom: 0; }
+
+        /* 리스트 헤더 및 글쓰기 폼 */
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #eaeaea; padding-bottom: 15px; }
+        .list-title { font-size: 1.3rem; font-weight: 900; color: #222; }
+        .btn-write { display: none; background: #E69138; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-write:hover { background: #d84315; }
+
+        .write-box { display: none; background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .write-box input, .write-box textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; outline: none; }
+        .write-box textarea { height: 150px; resize: none; }
+        .btn-submit { background: #87B32E; color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
+
+        /* 공지사항 아이템 */
+        .notice-item { background: #fff; border-radius: 12px; padding: 25px; border: 1px solid #eee; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
+        .notice-title { font-size: 1.2rem; font-weight: 900; color: #222; margin-bottom: 8px; }
+        .notice-meta { font-size: 0.9rem; color: #888; font-weight: 600; margin-bottom: 15px; }
+        .notice-content { font-size: 1.05rem; color: #444; line-height: 1.6; white-space: pre-wrap; padding-top: 15px; border-top: 1px dashed #eee; display: none; }
+        .notice-content.expanded { display: block; }
         
-        /* 1200px 확장 헤더 (통합 디자인) */
-        header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .header-container { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-text { font-family: 'Jua', sans-serif; font-size: 2.2rem; margin: 0; padding: 0; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -1px; filter: drop-shadow(0px 3px 4px rgba(135, 179, 46, 0.2)); text-decoration: none; }
-        .logo-icon { height: 3.0rem; width: auto; vertical-align: middle; }
-        .header-back { font-size: 1.5rem; color: #333; font-weight: 900; padding-right: 15px; }
-
-        /* 알림판 상단 배너 */
-        .category-hero {
-            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--notice-blue) 100%);
-            color: white; text-align: center; padding: 60px 20px; margin-bottom: 40px;
-        }
-        .category-hero h1 { font-size: 2.6rem; margin-bottom: 15px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .category-hero p { font-size: 1.2rem; opacity: 0.95; font-weight: 600; }
-
-        /* 메인 컨테이너 */
-        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
-
-        /* 탭 메뉴 */
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .tab { padding: 10px 25px; background: #fff; border: 1px solid #ddd; border-radius: 30px; font-weight: 800; cursor: pointer; color: #666; transition: 0.2s; font-size: 1.05rem; }
-        .tab:hover { background: #f1f3f5; }
-        .tab.active { background: var(--notice-blue); color: #fff; border-color: var(--notice-blue); }
-
-        /* 게시판 리스트 영역 */
-        .notice-board { background: #fff; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); border: 1px solid #eaeaea; overflow: hidden; }
-        
-        .notice-item { display: flex; align-items: center; padding: 20px 25px; border-bottom: 1px solid #f1f3f5; transition: background 0.2s; cursor: pointer; }
-        .notice-item:last-child { border-bottom: none; }
-        .notice-item:hover { background: #f8fbfd; }
-
-        /* 뱃지 스타일 */
-        .n-badge { padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 900; margin-right: 15px; flex-shrink: 0; text-align: center; min-width: 70px; }
-        .badge-urgent { background: #ffebee; color: #c62828; }
-        .badge-event { background: #e3f2fd; color: #1565c0; }
-        .badge-normal { background: #f1f3f5; color: #555; }
-
-        .n-title { flex: 1; font-size: 1.15rem; font-weight: 700; color: #222; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 15px; }
-        .n-date { font-size: 0.95rem; color: #888; font-weight: 500; white-space: nowrap; }
-
-        /* 모바일 하단 메뉴 */
-        .mobile-bottom-nav { display: none; }
-
-        /* 반응형 설정 */
-        @media (max-width: 768px) {
-            .header-container { flex-direction: row; justify-content: space-between; }
-            .category-hero { padding: 40px 20px; margin-bottom: 25px; }
-            .category-hero h1 { font-size: 1.8rem; margin-bottom: 8px; }
-            .category-hero p { font-size: 1rem; }
-            
-            .tabs { overflow-x: auto; white-space: nowrap; padding-bottom: 5px; margin-bottom: 15px; }
-            .tab { padding: 8px 18px; font-size: 0.95rem; }
-
-            .notice-item { padding: 15px; flex-direction: column; align-items: flex-start; gap: 8px; }
-            .n-badge { margin-right: 0; display: inline-block; padding: 4px 10px; font-size: 0.8rem; }
-            .n-title { font-size: 1.05rem; white-space: normal; padding-right: 0; line-height: 1.4; }
-            .n-date { font-size: 0.85rem; color: #999; }
-            
-            .mobile-bottom-nav { display: flex; position: fixed; bottom: 0; left: 0; width: 100%; height: 65px; background: #fff; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); z-index: 1000; justify-content: space-around; align-items: center; border-top: 1px solid #eaeaea; }
-            .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-light); font-size: 0.75rem; font-weight: 600; width: 25%; }
-            .nav-item .icon { font-size: 1.3rem; }
-        }
+        .toggle-btn { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 8px; text-align: center; color: #555; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-delete { background: #ff4d4d; color: white; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; align-self: flex-end; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="header-container">
-            <div style="display: flex; align-items: center;">
-                <a href="index.html" class="header-back">←</a>
-                <a href="index.html" class="logo-text">
-                    <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <div class="category-hero">
-        <h1>📢 팜마을 알림판</h1>
-        <p>우리 동네 팜마을의 새로운 소식과 유용한 공지를 확인하세요</p>
+    <div class="header">
+        <a href="index.html" class="farm-logo"><img src="farmmaul.webp" style="height: 24px;" onerror="this.style.display='none'"> 팜마을</a>
+        <div class="center-title">📢 알림판</div>
+        <a href="index.html" class="btn-home">홈으로</a>
     </div>
 
     <div class="container">
-        
-        <div class="tabs">
-            <div class="tab active" onclick="filterNotice('전체보기', event)">전체보기</div>
-            <div class="tab" onclick="filterNotice('중요공지', event)">중요공지</div>
-            <div class="tab" onclick="filterNotice('이벤트', event)">이벤트</div>
-            <div class="tab" onclick="filterNotice('일반', event)">일반</div>
+        <!-- 상단 배너 -->
+        <div class="notice-banner">
+            <h2>📢 팜마을 최신 소식</h2>
+            <p>팜마을의 새로운 공지사항과 이벤트 소식을<br>가장 먼저 확인해 보세요!</p>
         </div>
 
-        <div class="notice-board" id="noticeBoard">
-            <div style="padding: 50px; text-align: center; color: #888; font-weight: 700;">
-                서버에서 팜마을 공지사항을 불러오는 중입니다... 📢
-            </div>
-        </div>
-            
-            <div class="notice-item" onclick="alert('공지사항 상세 페이지로 이동합니다.')">
-                <div class="n-badge badge-urgent">중요공지</div>
-                <div class="n-title">[필독] 직거래 상품 수령 시 주의사항 및 반품 규정 개정 안내</div>
-                <div class="n-date">2026. 05. 28</div>
-            </div>
-
-            <div class="notice-item" onclick="alert('공지사항 상세 페이지로 이동합니다.')">
-                <div class="n-badge badge-event">이벤트</div>
-                <div class="n-title">🎉 첫 생산자 등록 이벤트! 스마트 농업 키트 증정 (종료임박)</div>
-                <div class="n-date">2026. 05. 20</div>
-            </div>
-
-            <div class="notice-item" onclick="alert('공지사항 상세 페이지로 이동합니다.')">
-                <div class="n-badge badge-event">이벤트</div>
-                <div class="n-title">디미가 도시농업대학 제20기 교육생 모집 알림</div>
-                <div class="n-date">2026. 05. 15</div>
-            </div>
-
-            <div class="notice-item" onclick="alert('공지사항 상세 페이지로 이동합니다.')">
-                <div class="n-badge badge-normal">일반</div>
-                <div class="n-title">시스템 정기 점검에 따른 서비스 일시 중단 안내 (6/10 새벽)</div>
-                <div class="n-date">2026. 05. 10</div>
-            </div>
-            
-            <div class="notice-item" onclick="alert('공지사항 상세 페이지로 이동합니다.')">
-                <div class="n-badge badge-normal">일반</div>
-                <div class="n-title">팜마을 안드로이드/아이폰 앱 설치(PWA) 지원 업데이트 완료</div>
-                <div class="n-date">2026. 04. 25</div>
-            </div>
-
-            <div class="notice-item" onclick="alert('공지사항 상세 페이지로 이동합니다.')">
-                <div class="n-badge badge-normal">일반</div>
-                <div class="n-title">개인정보 처리방침 변경 사전 안내</div>
-                <div class="n-date">2026. 04. 10</div>
-            </div>
+        <div class="list-header">
+            <div class="list-title">전체 공지사항</div>
+            <button id="adminWriteBtn" class="btn-write" onclick="toggleWriteForm()">✏️ 공지 작성 (관리자)</button>
         </div>
 
+        <!-- 글쓰기 폼 (관리자에게만 보임) -->
+        <div id="writeForm" class="write-box">
+            <h4 style="margin-bottom: 15px; color: #333;">새로운 공지사항 작성</h4>
+            <input type="text" id="nTitle" placeholder="공지 제목을 입력해주세요" required>
+            <textarea id="nContent" placeholder="공지 내용을 자세히 적어주세요." required></textarea>
+            <button class="btn-submit" onclick="submitNotice()">공지 등록하기</button>
+        </div>
+
+        <!-- 공지사항 리스트 -->
+        <div id="noticeListArea">
+            <div style="text-align:center; padding:50px; color:#888;">서버에서 공지사항을 불러오는 중입니다... ⏳</div>
+        </div>
     </div>
 
-    <div class="mobile-bottom-nav">
-        <a href="index.html" class="nav-item">
-            <span class="icon">🏠</span><span class="text">홈</span>
-        </a>
-        <a href="search_result.html" class="nav-item">
-            <span class="icon">🔍</span><span class="text">동네검색</span>
-        </a>
-        <a href="chat.html" class="nav-item">
-            <span class="icon">💬</span><span class="text">채팅</span>
-        </a>
-        <a href="mypage.html" class="nav-item">
-            <span class="icon">👤</span><span class="text">내정보</span>
-        </a>
-    </div>
-<script>
-        let allNotices = []; // 서버에서 가져온 전체 공지사항을 담아둘 주머니
+    <script>
+        let isAdminGlobal = false;
 
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. 페이지가 열리자마자 서버에 공지사항을 요청합니다.
-            fetch('/api/notices')
-            .then(res => res.json())
-            .then(result => {
-                if(result.success) {
-                    allNotices = result.data;
-                    renderNotices('전체보기'); // 가져온 데이터를 화면에 그립니다.
-                } else {
-                    document.getElementById('noticeBoard').innerHTML = '<div style="padding: 50px; text-align: center; color: #ff5e62; font-weight: 700;">데이터를 불러오지 못했습니다.</div>';
+            // 접속자가 관리자인지 확인
+            fetch('/api/user').then(res => res.json()).then(data => {
+                if(data.loggedIn) {
+                    const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
+                    if(adminEmails.includes(data.user.email) && !data.user.kakaoId) {
+                        isAdminGlobal = true;
+                        document.getElementById('adminWriteBtn').style.display = 'block';
+                    }
                 }
-            })
-            .catch(err => {
-                document.getElementById('noticeBoard').innerHTML = '<div style="padding: 50px; text-align: center; color: #ff5e62; font-weight: 700;">서버 연결에 실패했습니다.</div>';
+                loadNotices(); // 권한 확인 후 리스트 불러오기
             });
         });
 
-        // 2. 탭(전체/중요/이벤트) 클릭 시 화면 필터링 기능
-        function filterNotice(type, event) {
-            // 눌린 탭에만 색상 칠하기
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-
-            renderNotices(type);
+        // 작성 폼 열고 닫기
+        function toggleWriteForm() {
+            const form = document.getElementById('writeForm');
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
         }
 
-        // 3. 데이터를 화면(HTML)으로 변환해서 꽂아주는 함수
-        function renderNotices(type) {
-            const board = document.getElementById('noticeBoard');
-            board.innerHTML = '';
+        // 🌟 공지사항 등록 (서버 전송)
+        function submitNotice() {
+            const title = document.getElementById('nTitle').value;
+            const content = document.getElementById('nContent').value;
+            if(!title) { alert('제목을 입력해주세요.'); return; }
 
-            let filtered = allNotices;
-            if(type !== '전체보기') {
-                filtered = allNotices.filter(n => n.notice_type === type);
-            }
-
-            if(filtered.length === 0) {
-                board.innerHTML = '<div style="padding: 50px; text-align: center; color: #888; font-weight: 700;">해당하는 공지사항이 없습니다.</div>';
-                return;
-            }
-
-            filtered.forEach(n => {
-                // 분류에 따라 뱃지 색상 변경
-                let badgeClass = 'badge-normal';
-                if(n.notice_type === '중요공지') badgeClass = 'badge-urgent';
-                else if(n.notice_type === '이벤트') badgeClass = 'badge-event';
-
-                // 날짜 포맷 예쁘게 만들기 (예: 2026. 06. 05)
-                const d = new Date(n.created_at);
-                const dateStr = `${d.getFullYear()}. ${String(d.getMonth()+1).padStart(2,'0')}. ${String(d.getDate()).padStart(2,'0')}`;
-
-                const itemHtml = `
-                    <div class="notice-item" onclick="alert('공지사항 상세 내용 페이지는 준비 중입니다.')">
-                        <div class="n-badge ${badgeClass}">${n.notice_type}</div>
-                        <div class="n-title">${n.title}</div>
-                        <div class="n-date">${dateStr}</div>
-                    </div>
-                `;
-                board.insertAdjacentHTML('beforeend', itemHtml);
+            fetch('/api/notices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, content })
+            })
+            .then(res => res.json())
+            .then(result => {
+                alert(result.message);
+                if(result.success) {
+                    document.getElementById('nTitle').value = '';
+                    document.getElementById('nContent').value = '';
+                    document.getElementById('writeForm').style.display = 'none';
+                    loadNotices(); // 리스트 새로고침
+                }
             });
         }
-    </script>
 
+        // 🌟 공지사항 목록 불러오기
+        function loadNotices() {
+            fetch('/api/notices')
+            .then(res => res.json())
+            .then(result => {
+                const listArea = document.getElementById('noticeListArea');
+                listArea.innerHTML = '';
+
+                if(result.data.length === 0) {
+                    listArea.innerHTML = '<div style="text-align:center; padding:50px; background:#fff; border-radius:12px; border:1px solid #eee; color:#888; font-weight:600;">등록된 공지사항이 없습니다.</div>';
+                    return;
+                }
+
+                result.data.forEach(item => {
+                    const date = new Date(item.created_at).toLocaleDateString();
+                    
+                    // 내용이 있으면 펼쳐보기 버튼 활성화
+                    let contentHtml = '';
+                    let toggleBtn = '';
+                    if(item.content && item.content.trim() !== '') {
+                        contentHtml = `<div id="content_${item.id}" class="notice-content">${item.content.replace(/\n/g, '<br>')}</div>`;
+                        toggleBtn = `<div class="toggle-btn" onclick="toggleContent(${item.id}, this)">상세 내용 보기 🔽</div>`;
+                    }
+
+                    // 관리자일 경우에만 삭제 버튼 추가
+                    let deleteBtn = '';
+                    if(isAdminGlobal) {
+                        deleteBtn = `<button class="btn-delete" style="display:block;" onclick="deleteNotice(${item.id})">이 공지 삭제하기</button>`;
+                    }
+
+                    const html = `
+                        <div class="notice-item">
+                            <div class="notice-title">📢 ${item.title}</div>
+                            <div class="notice-meta">📅 ${date}</div>
+                            ${toggleBtn}
+                            ${contentHtml}
+                            ${deleteBtn}
+                        </div>
+                    `;
+                    listArea.insertAdjacentHTML('beforeend', html);
+                });
+            });
+        }
+
+        // 내용 펼쳐보기 기능
+        function toggleContent(id, btn) {
+            const contentDiv = document.getElementById(`content_${id}`);
+            if (contentDiv.classList.contains('expanded')) {
+                contentDiv.classList.remove('expanded');
+                btn.innerText = '상세 내용 보기 🔽';
+            } else {
+                contentDiv.classList.add('expanded');
+                btn.innerText = '내용 접기 🔼';
+            }
+        }
+
+        // 🌟 공지사항 삭제
+        function deleteNotice(id) {
+            if(confirm('정말 이 공지사항을 삭제하시겠습니까?')) {
+                fetch(`/api/notices/${id}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if(result.success) loadNotices();
+                });
+            }
+        }
+    </script>
 </body>
 </html>

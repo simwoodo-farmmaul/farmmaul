@@ -867,5 +867,18 @@ app.delete('/api/faqs/:id', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [추가] 알림판(공지사항) 삭제 API (관리자 전용)
+// ==========================================
+app.delete('/api/notices/:id', (req, res) => {
+    const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
+    if (!isAdmin) return res.status(403).json({ success: false, message: '관리자 권한이 없습니다.' });
+    
+    db.query(`DELETE FROM farm_notices WHERE id = ?`, [req.params.id], (err) => {
+        if(err) return res.status(500).json({ success: false, message: '삭제 중 오류가 발생했습니다.' });
+        res.json({ success: true, message: '해당 공지사항이 안전하게 삭제되었습니다.' });
+    });
+});
+
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
