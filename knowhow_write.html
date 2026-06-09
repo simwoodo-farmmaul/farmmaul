@@ -141,7 +141,7 @@
             const btn = document.getElementById('submitBtn');
             btn.innerText = '저장하는 중...'; btn.disabled = true;
 
-            fetch('/api/board', {
+            fetch('/api/knowhow', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(submitData)
