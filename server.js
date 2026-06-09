@@ -770,5 +770,64 @@ app.delete('/api/knowhow/:id', (req, res) => {
     }
 });
 
+// ==========================================
+// 🌟 [추가] 팜마을 질문있어요 (Q&A) 게시판 API
+// ==========================================
+
+// ==========================================
+// 🌟 [추가] 팜마을 질문있어요 (Q&A) 게시판 API
+// ==========================================
+// 1. 질문 작성하기
+app.post('/api/qna', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const { title, content } = req.body;
+    const nickname = req.session.user.nickname;
+    
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_qna (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nickname VARCHAR(100) NOT NULL,
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            reply TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    
+    db.query(createTableQuery, () => {
+        db.query(`INSERT INTO farm_qna (nickname, title, content) VALUES (?, ?, ?)`, [nickname, title, content], (err) => {
+            if (err) return res.status(500).json({ success: false, message: '저장 오류' });
+            res.json({ success: true, message: '질문이 성공적으로 등록되었습니다!' });
+        });
+    });
+});
+
+// 2. 질문 목록 불러오기
+app.get('/api/qna', (req, res) => {
+    // 💡 에러 방지를 위해 테이블이 없을 경우 대비 껍데기 쿼리 실행
+    db.query(`CREATE TABLE IF NOT EXISTS farm_qna (id INT AUTO_INCREMENT PRIMARY KEY, nickname VARCHAR(100), title VARCHAR(255), content TEXT, reply TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
+        db.query(`SELECT * FROM farm_qna ORDER BY created_at DESC`, (err, results) => {
+            if(err) return res.json({ success: true, data: [] });
+            
+            const currentUser = (req.session && req.session.user) ? req.session.user.nickname : null;
+            const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
+            res.json({ success: true, data: results, currentUser, isAdmin });
+        });
+    });
+});
+
+// 3. 관리자 답변 달기
+app.post('/api/qna/:id/reply', (req, res) => {
+    const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
+    if (!isAdmin) return res.status(403).json({ success: false, message: '관리자만 답변을 달 수 있습니다.' });
+    
+    const { reply } = req.body;
+    db.query(`UPDATE farm_qna SET reply = ? WHERE id = ?`, [reply, req.params.id], (err) => {
+        if(err) return res.status(500).json({ success: false, message: '답변 저장 오류' });
+        res.json({ success: true, message: '답변이 등록되었습니다!' });
+    });
+});
+
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
