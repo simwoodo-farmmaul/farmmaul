@@ -210,7 +210,7 @@
     </button>
 
     <script>
-        // 🌟 비회원 글쓰기 차단 기능
+        // 1. 비회원 글쓰기 차단 기능
         function checkLoginForWrite() {
             fetch('/api/user')
                 .then(res => res.json())
@@ -224,20 +224,74 @@
                 });
         }
 
-        // 카테고리 필터링 기능
+        // 🌟 2. 서버(DB)에서 내가 쓴 노하우 글 불러와서 화면에 그리기
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/knowhow')
+            .then(response => response.json())
+            .then(result => {
+                const container = document.getElementById('post-container');
+                container.innerHTML = ''; // 기존에 있던 가짜 샘플 글들을 모두 지웁니다.
+
+                if(result.success && result.data.length > 0) {
+                    result.data.forEach(post => {
+                        // 제목 앞에 붙여둔 태그([농산], [축산] 등)를 인식하여 분류용 영문 코드로 변환
+                        let catName = "기타";
+                        let dataCat = "all"; 
+                        if(post.title.includes('[농산]')) { catName = "농산"; dataCat = "agri"; }
+                        else if(post.title.includes('[축산]')) { catName = "축산"; dataCat = "livestock"; }
+                        else if(post.title.includes('[조류]')) { catName = "조류"; dataCat = "bird"; }
+                        else if(post.title.includes('[어류]')) { catName = "어류"; dataCat = "fish"; }
+
+                        // 리스트에 보여줄 때 제목에서 [농산] 같은 태그는 예쁘게 떼어내고 알맹이만 보여줍니다.
+                        let cleanTitle = post.title.replace(/\[.*?\]\s*/, '');
+                        
+                        // 내용이 너무 길면 80자에서 자르고 '...'을 붙입니다.
+                        let previewText = post.content.length > 80 ? post.content.substring(0, 80) + '...' : post.content;
+                        let dateText = new Date(post.created_at).toLocaleDateString();
+
+                        // 화면에 뿌려줄 예쁜 카드 디자인
+                        const itemHtml = `
+                            <div class="post-card" data-category="${dataCat}" onclick="location.href='knowhow_detail.html?id=${post.id}'">
+                                <div class="post-header">
+                                    <div class="badge-group">
+                                        <span class="badge-type type-tip">💡 꿀팁</span>
+                                        <span class="badge-cat">${catName}</span>
+                                    </div>
+                                    <span style="font-size:0.8rem; color:#aaa; font-weight:700;">${dateText}</span>
+                                </div>
+                                <h2 class="post-title">${cleanTitle}</h2>
+                                <p class="post-preview">${previewText}</p>
+                                <div class="post-footer">
+                                    <div class="author-info">
+                                        <span style="font-weight: 800; color:#555;">🧑‍🌾 ${post.nickname}</span>
+                                    </div>
+                                    <div class="stats-info">
+                                        <span class="stat-item">👁️ 조회 ${post.views || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', itemHtml);
+                    });
+                } else {
+                    container.innerHTML = '<div style="text-align:center; padding:50px; color:#888; font-weight:800; background:#fff; border-radius:15px;">아직 등록된 노하우가 없습니다. 첫 꿀팁을 등록해 보세요! 🌱</div>';
+                }
+            })
+            .catch(error => console.error('노하우 게시글 불러오기 실패:', error));
+        });
+
+        // 3. 카테고리(버튼) 필터링 기능
         function switchFilter(btn, category) {
-            // 버튼 활성화 토글
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // 게시글 필터링
-            const posts = document.querySelectorAll('.post-card, .best-post-section');
+            const posts = document.querySelectorAll('.post-card');
             posts.forEach(post => {
                 if (category === 'all') {
                     post.style.display = 'block';
                 } else {
                     const postCat = post.getAttribute('data-category');
-                    if (postCat.includes(category)) {
+                    if (postCat && postCat.includes(category)) {
                         post.style.display = 'block';
                     } else {
                         post.style.display = 'none';
@@ -246,6 +300,5 @@
             });
         }
     </script>
-
 </body>
 </html>
