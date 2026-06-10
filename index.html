@@ -869,6 +869,14 @@
         }
     </style>
 
+    <!-- 🌟 모바일 화면 전용: 상단 '내정보' 및 푸터 '관리자' 숨김 처리 -->
+    <style>
+        @media (max-width: 768px) {
+            .top-mypage-btn { display: none !important; }
+            .pc-admin-btn { display: none !important; }
+        }
+    </style>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/user')
@@ -889,8 +897,9 @@
                             <a href="/auth/logout" style="padding: 5px 10px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">로그아웃</a>
                         `;
 
-                        // 🌟 관리자일 경우 모바일 화면 하단 메뉴에만 추가
+                        // 🌟 관리자일 경우 메뉴 추가
                         if (isAdmin) {
+                            // 1. 모바일: 하단 고정 내비게이션 바에 아이콘 추가
                             const mobileNav = document.querySelector('.mobile-bottom-nav');
                             if (mobileNav) {
                                 const adminNav = document.createElement('a');
@@ -899,9 +908,19 @@
                                 adminNav.innerHTML = `<span class="icon" style="color:#2e7d32;">⚙️</span><span class="text" style="color:#2e7d32; font-weight:800;">관리자</span>`;
                                 mobileNav.appendChild(adminNav);
                                 
-                                // 메뉴 개수가 늘어났으므로 간격 자동 재조정
                                 const navItems = mobileNav.querySelectorAll('.nav-item');
                                 navItems.forEach(item => item.style.width = (100 / navItems.length) + '%');
+                            }
+
+                            // 2. PC: 화면 맨 아래쪽 푸터 링크 영역에 '관리자페이지' 텍스트 추가
+                            const footerLinks = document.querySelector('.footer-links');
+                            if (footerLinks) {
+                                const pcAdminBtn = document.createElement('a');
+                                pcAdminBtn.href = 'admin.html';
+                                pcAdminBtn.className = 'pc-admin-btn';
+                                pcAdminBtn.innerHTML = '⚙️ 관리자페이지';
+                                pcAdminBtn.style.color = '#2e7d32'; 
+                                footerLinks.appendChild(pcAdminBtn);
                             }
                         }
                     }
