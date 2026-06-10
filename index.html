@@ -860,31 +860,36 @@
                 iframe.src = newSrc;
             }
         }
-    </script>    <script>
+    </script>    
+    
+    <!-- 🌟 모바일 화면 전용: 상단 '내정보' 숨김 처리 -->
+    <style>
+        @media (max-width: 768px) {
+            .top-mypage-btn { display: none !important; }
+        }
+    </style>
+
+    <script>
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/user')
                 .then(response => response.json())
                 .then(data => {
                     const authZone = document.getElementById('auth-zone');
                     if (data.loggedIn) {
-                        // 🌟 관리자 명단 확인 (이메일 기준, 카카오 로그인 접근 불가)
+                        // 관리자 명단 확인
                         const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
                         const isAdmin = adminEmails.includes(data.user.email) && data.user.kakaoId === null;
-                        
-                        // 🌟 관리자일 경우에만 상단 메뉴 구석에 나타나는 버튼 HTML
-                        const adminBtnHtml = isAdmin ? `<a href="admin.html" style="padding: 5px 10px; background-color: #2e7d32; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; margin-right: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">관리자</a>` : '';
 
-                        // 상단 메뉴 업데이트
+                        // 🌟 상단 메뉴: 관리자 버튼 제거, 내정보 버튼에 top-mypage-btn 클래스 추가
                         authZone.innerHTML = `
                             <span style="color: #333; font-weight: bold; margin-right: 8px; font-size:13px; white-space: nowrap;">
                                 👤 ${data.user.nickname}님 환영합니다
                             </span>
-                            ${adminBtnHtml}
-                            <a href="mypage.html" style="padding: 5px 10px; background-color: var(--primary-blue); color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; margin-right: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">내정보</a>
+                            <a href="mypage.html" class="top-mypage-btn" style="padding: 5px 10px; background-color: var(--primary-blue); color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; margin-right: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">내정보</a>
                             <a href="/auth/logout" style="padding: 5px 10px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">로그아웃</a>
                         `;
 
-                        // 🌟 관리자일 경우 모바일 화면 하단 메뉴에도 조용히 추가
+                        // 🌟 관리자일 경우 모바일 화면 하단 메뉴에만 추가
                         if (isAdmin) {
                             const mobileNav = document.querySelector('.mobile-bottom-nav');
                             if (mobileNav) {
