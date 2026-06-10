@@ -64,10 +64,27 @@ app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.ht
 app.get('/join.html', (req, res) => res.sendFile(path.join(__dirname, 'join.html')));
 
 app.post('/api/register', (req, res) => {
-    const { name, email, password, phone } = req.body; // 🌟 휴대폰 번호 추가
-    db.query('SELECT * FROM farm_email_users WHERE email = ?', [email], (err, results) => {
-        if (results && results.length > 0) return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
-        // 🌟 저장 항목에 phone 추가
+    const { name, email, password, phone } = req.body;
+    
+    // 🌟 이메일 또는 전화번호가 DB에 이미 존재하는지 한 번에 검사합니다. 
+    // (빈칸으로 넘어온 전화번호끼리 중복 처리되는 것을 막기 위해 phone != "" 조건 추가)
+    db.query('SELECT * FROM farm_email_users WHERE email = ? OR (phone = ? AND phone != "")', [email, phone], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: '데이터베이스 조회 중 오류가 발생했습니다.' });
+        
+        // 중복 데이터가 발견된 경우
+        if (results && results.length > 0) {
+            const isEmailDuplicate = results.some(user => user.email === email);
+            const isPhoneDuplicate = results.some(user => user.phone === phone);
+
+            if (isEmailDuplicate) {
+                return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
+            }
+            if (isPhoneDuplicate) {
+                return res.status(400).json({ success: false, message: '이미 가입된 전화번호입니다.' });
+            }
+        }
+
+        // 중복이 없다면 정상적으로 가입 진행
         db.query('INSERT INTO farm_email_users (name, email, password, phone) VALUES (?, ?, ?, ?)', [name, email, password, phone || ''], (err, result) => {
             if (err) return res.status(500).json({ success: false, message: '가입 처리 중 데이터베이스 오류가 발생했습니다.' });
             res.json({ success: true, message: '팜마을 회원가입이 성공적으로 완료되었습니다! 🎉' });
