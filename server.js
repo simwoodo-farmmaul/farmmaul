@@ -64,30 +64,22 @@ app.get('/login.html', (req, res) => res.sendFile(path.join(__dirname, 'login.ht
 app.get('/join.html', (req, res) => res.sendFile(path.join(__dirname, 'join.html')));
 
 app.post('/api/register', (req, res) => {
-    const { name, email, password, phone } = req.body;
+    const { name, email, password, phone, address } = req.body;
     
-    // 🌟 이메일 또는 전화번호가 DB에 이미 존재하는지 한 번에 검사합니다. 
-    // (빈칸으로 넘어온 전화번호끼리 중복 처리되는 것을 막기 위해 phone != "" 조건 추가)
-    db.query('SELECT * FROM farm_email_users WHERE email = ? OR (phone = ? AND phone != "")', [email, phone], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: '데이터베이스 조회 중 오류가 발생했습니다.' });
-        
-        // 중복 데이터가 발견된 경우
-        if (results && results.length > 0) {
-            const isEmailDuplicate = results.some(user => user.email === email);
-            const isPhoneDuplicate = results.some(user => user.phone === phone);
-
-            if (isEmailDuplicate) {
-                return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
+    db.query(`ALTER TABLE farm_email_users ADD COLUMN address VARCHAR(255)`, () => {
+        db.query('SELECT * FROM farm_email_users WHERE email = ? OR (phone = ? AND phone != "")', [email, phone], (err, results) => {
+            if (err) return res.status(500).json({ success: false, message: '데이터베이스 조회 중 오류가 발생했습니다.' });
+            
+            if (results && results.length > 0) {
+                if (results.some(user => user.email === email)) return res.status(400).json({ success: false, message: '이미 가입된 이메일 주소입니다.' });
+                if (results.some(user => user.phone === phone)) return res.status(400).json({ success: false, message: '이미 가입된 전화번호입니다.' });
             }
-            if (isPhoneDuplicate) {
-                return res.status(400).json({ success: false, message: '이미 가입된 전화번호입니다.' });
-            }
-        }
 
-        // 중복이 없다면 정상적으로 가입 진행
-        db.query('INSERT INTO farm_email_users (name, email, password, phone) VALUES (?, ?, ?, ?)', [name, email, password, phone || ''], (err, result) => {
-            if (err) return res.status(500).json({ success: false, message: '가입 처리 중 데이터베이스 오류가 발생했습니다.' });
-            res.json({ success: true, message: '팜마을 회원가입이 성공적으로 완료되었습니다! 🎉' });
+            db.query('INSERT INTO farm_email_users (name, email, password, phone, address) VALUES (?, ?, ?, ?, ?)', 
+            [name, email, password, phone || '', address || ''], (err, result) => {
+                if (err) return res.status(500).json({ success: false, message: '가입 처리 중 데이터베이스 오류가 발생했습니다.' });
+                res.json({ success: true, message: '팜마을 회원가입이 성공적으로 완료되었습니다! 🎉' });
+            });
         });
     });
 });
@@ -566,43 +558,44 @@ app.post('/api/notices', (req, res) => {
 // ==========================================
 // 🌟 [추가] 마이페이지 (내 정보 조회/수정/탈퇴) API
 // ==========================================
-
 // 1. 내 정보 불러오기
 app.get('/api/mypage', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     
     const user = req.session.user;
-    
-    // 카카오 가입자인 경우
     if (user.kakaoId) {
-        db.query('SELECT nickname as name, email, joined_at as created_at FROM farm_members WHERE kakao_id = ?', [user.kakaoId], (err, results) => {
-            if (err || results.length === 0) return res.status(500).json({ success: false });
-            res.json({ success: true, data: { ...results[0], join_type: 'kakao', phone: '카카오 간편가입 회원' } });
+        db.query(`ALTER TABLE farm_members ADD COLUMN address VARCHAR(255)`, () => {
+            db.query('SELECT nickname as name, email, joined_at as created_at, address FROM farm_members WHERE kakao_id = ?', [user.kakaoId], (err, results) => {
+                if (err || results.length === 0) return res.status(500).json({ success: false });
+                res.json({ success: true, data: { ...results[0], join_type: 'kakao', phone: '카카오 간편가입 회원' } });
+            });
         });
-    } 
-    // 이메일 일반 가입자인 경우
-    else {
-        db.query('SELECT name, email, phone, created_at FROM farm_email_users WHERE email = ?', [user.email], (err, results) => {
-            if (err || results.length === 0) return res.status(500).json({ success: false });
-            res.json({ success: true, data: { ...results[0], join_type: 'email' } });
+    } else {
+        db.query(`ALTER TABLE farm_email_users ADD COLUMN address VARCHAR(255)`, () => {
+            db.query('SELECT name, email, phone, created_at, address FROM farm_email_users WHERE email = ?', [user.email], (err, results) => {
+                if (err || results.length === 0) return res.status(500).json({ success: false });
+                res.json({ success: true, data: { ...results[0], join_type: 'email' } });
+            });
         });
     }
 });
 
-// 2. 내 정보(휴대폰 번호, 비밀번호) 수정하기
+// 2. 내 정보 수정하기
 app.put('/api/mypage', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false });
     
     const user = req.session.user;
-    const { phone, password } = req.body;
+    const { phone, password, address } = req.body;
 
     if (user.kakaoId) {
-        return res.json({ success: false, message: '카카오 로그인 회원은 카카오톡 앱에서 정보를 수정해야 합니다.' });
+        db.query('UPDATE farm_members SET address = ? WHERE kakao_id = ?', [address || '', user.kakaoId], (err, result) => {
+            if (err) return res.status(500).json({ success: false, message: '오류가 발생했습니다.' });
+            res.json({ success: true, message: '정보가 성공적으로 수정되었습니다! 🌱' });
+        });
     } else {
-        let query = 'UPDATE farm_email_users SET phone = ?';
-        let params = [phone || ''];
+        let query = 'UPDATE farm_email_users SET phone = ?, address = ?';
+        let params = [phone || '', address || ''];
         
-        // 비밀번호 변경을 입력했을 때만 비밀번호도 함께 수정
         if (password && password.trim() !== '') {
             query += ', password = ?';
             params.push(password);

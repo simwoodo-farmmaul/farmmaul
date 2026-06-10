@@ -84,15 +84,24 @@
 
         <div class="edit-form-area" id="editFormArea">
             <div class="form-group">
-                <label>휴대폰 번호 수정</label>
-                <input type="tel" id="userPhone" placeholder="휴대폰 번호 입력 (- 제외)">
+                <label>비밀번호 변경</label>
+                <input type="password" id="userPassword" placeholder="변경할 비밀번호 (기존 유지 시 빈칸)">
             </div>
             <div class="form-group">
-                <label>새 비밀번호 (변경할 때만 입력)</label>
-                <input type="password" id="userPassword" placeholder="변경할 비밀번호 입력">
+                <label>전화번호 변경</label>
+                <input type="tel" id="userPhone" placeholder="변경할 전화번호 입력 (- 제외)">
+            </div>
+            <!-- 🌟 새롭게 추가된 주소 변경 영역 -->
+            <div class="form-group">
+                <label>주소 변경</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <input type="text" id="updateBaseAddress" placeholder="기본 주소" readonly style="flex: 1; background: #f8f9fa; cursor: pointer;" onclick="execDaumPostcodeUpdate()">
+                    <button type="button" onclick="execDaumPostcodeUpdate()" style="padding: 10px 15px; background: #87B32E; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap;">주소 검색</button>
+                </div>
+                <input type="text" id="updateDetailAddress" placeholder="상세 주소를 수정해주세요">
             </div>
             <button class="btn-save" id="saveBtn" onclick="updateMyInfo()">수정 내용 저장하기</button>
-            <button class="btn-delete" onclick="deleteAccount()">계정 영구 탈퇴하기</button>
+            <button class="btn-delete" onclick="deleteAccount()">팜마을 탈퇴하기</button>
         </div>
 
         <div class="menu-group">
@@ -138,11 +147,12 @@
         <a href="mypage.html" class="nav-item active"><span class="icon">👤</span><span class="text">내정보</span></a>
     </div>
 
+    <!-- 🌟 카카오 우편번호 검색 스크립트 추가 -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script>
         let isKakao = false;
 
         document.addEventListener("DOMContentLoaded", () => {
-            // 서버에서 내 정보 불러오기
             fetch('/api/mypage')
             .then(res => res.json())
             .then(result => {
@@ -156,7 +166,11 @@
                 document.getElementById('userName').innerText = user.name + ' 님';
                 document.getElementById('userEmail').innerText = user.email || '이메일 정보 없음';
                 
-                // 카카오 회원 구분 처리
+                // 등록된 주소가 있으면 칸에 채워주기
+                if (user.address) {
+                    document.getElementById('updateBaseAddress').value = user.address;
+                }
+
                 if (user.join_type === 'kakao') {
                     isKakao = true;
                     document.getElementById('joinBadge').innerHTML = '<span class="badge" style="background:#FEE500; color:#3C1E1E;">💬 카카오 간편로그인 연동 회원</span>';
@@ -165,7 +179,7 @@
                     document.getElementById('userPhone').disabled = true;
                     document.getElementById('userPassword').disabled = true;
                     document.getElementById('userPassword').placeholder = '카카오 회원은 비밀번호 변경 불가';
-                    document.getElementById('saveBtn').style.display = 'none';
+                    // 카카오 회원도 주소는 팜마을 안에서 변경 가능하도록 저장 버튼 유지
                 } else {
                     document.getElementById('joinBadge').innerHTML = '<span class="badge" style="background:#f1f3f5; color:#333;">📧 일반 이메일 회원</span>';
                     document.getElementById('userPhone').value = user.phone || '';
@@ -177,48 +191,58 @@
             });
         });
 
-        // 숨겨진 창 열고 닫기 기능
         function toggleEditForm() {
             const formArea = document.getElementById('editFormArea');
-            if (formArea.style.display === 'block') {
-                formArea.style.display = 'none';
-            } else {
-                formArea.style.display = 'block';
-            }
+            formArea.style.display = formArea.style.display === 'block' ? 'none' : 'block';
         }
 
-        // 내 정보 수정 요청 함수
+        function execDaumPostcodeUpdate() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    document.getElementById('updateBaseAddress').value = data.address;
+                    document.getElementById('updateDetailAddress').value = '';
+                    document.getElementById('updateDetailAddress').focus();
+                }
+            }).open();
+        }
+
         function updateMyInfo() {
-            if (isKakao) return; 
-            
             const phone = document.getElementById('userPhone').value;
             const password = document.getElementById('userPassword').value;
+            
+            // 주소 합치기
+            const baseAddr = document.getElementById('updateBaseAddress').value;
+            const detailAddr = document.getElementById('updateDetailAddress').value;
+            const fullAddress = baseAddr ? (baseAddr + ' ' + detailAddr).trim() : '';
+
+            // 카카오 회원은 주소만 전송되도록 처리
+            const bodyData = isKakao ? { address: fullAddress } : { phone, password, address: fullAddress };
 
             fetch('/api/mypage', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ phone: phone, password: password })
+                body: JSON.stringify(bodyData)
             })
             .then(res => res.json())
             .then(data => {
                 alert(data.message);
                 if(data.success) {
                     document.getElementById('userPassword').value = ''; 
-                    toggleEditForm(); // 저장 후 창 닫기
+                    toggleEditForm(); 
                 }
             })
             .catch(err => alert("서버 통신 오류가 발생했습니다."));
         }
 
-        // 회원 스스로 영구 탈퇴하는 함수
+        // 탈퇴 버튼 이름 수정 및 확인 문구 적용
         function deleteAccount() {
-            if (confirm("정말 팜마을에서 탈퇴하시겠습니까?\n등록된 정보가 모두 삭제되며 이 작업은 되돌릴 수 없습니다.")) {
+            if (confirm("정말 팜마을에서 탈퇴하시겠습니까?\n등록된 정보가 삭제되며, 언제든지 다시 가입하실 수 있습니다.")) {
                 fetch('/api/mypage', { method: 'DELETE' })
                 .then(res => res.json())
                 .then(data => {
                     alert(data.message);
                     if(data.success) {
-                        location.href = 'index.html'; // 탈퇴 성공 시 메인 화면으로 추방
+                        location.href = 'index.html'; 
                     }
                 })
                 .catch(err => alert("서버 통신 오류가 발생했습니다."));

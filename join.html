@@ -70,10 +70,20 @@
                 <span class="password-toggle" onclick="togglePass('regPasswordConfirm', this)">👁️</span>
             </div>
             <div class="input-group">
-                <label>휴대폰 번호</label>
+                <label style="display:block; font-weight:800; font-size:0.9rem; color:#555; margin-bottom:5px;">휴대폰 번호</label>
                 <input type="tel" id="userPhone" placeholder="휴대폰 번호 (- 없이 입력)" required>
             </div>
             
+            <!-- 🌟 새롭게 추가된 주소 검색 영역 -->
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label style="display:block; font-weight:800; font-size:0.9rem; color:#555; margin-bottom:5px;">주소</label>
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <input type="text" id="baseAddress" placeholder="기본 주소" readonly style="flex: 1; background: #f8f9fa; cursor: pointer;" onclick="execDaumPostcode()">
+                    <button type="button" onclick="execDaumPostcode()" style="padding: 10px 15px; background: #87B32E; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap;">주소 검색</button>
+                </div>
+                <input type="text" id="detailAddress" placeholder="상세 주소를 입력해주세요">
+            </div>
+
             <div class="terms-group">
                 <input type="checkbox" id="terms" required>
                 <label for="terms">팜마을 <a href="policy.html">이용약관</a> 및 <a href="policy.html">개인정보처리방침</a>에 동의합니다. (필수)</label>
@@ -83,20 +93,31 @@
         </form>
     </div>
 
+    <!-- 🌟 카카오 우편번호 검색 스크립트 -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script>
-        // 👁️ 비밀번호 보이기/숨기기 토글 스크립트 (기존 기능 그대로 유지)
+        function execDaumPostcode() {
+            new daum.Postcode({
+                oncomplete: function(data) {
+                    document.getElementById('baseAddress').value = data.address;
+                    document.getElementById('detailAddress').focus(); // 상세주소로 커서 이동
+                }
+            }).open();
+        }
+
+        // 비밀번호 토글
         function togglePass(inputId, toggleIcon) {
             const input = document.getElementById(inputId);
             if (input.type === "password") {
                 input.type = "text";
-                toggleIcon.style.color = "#87B32E"; // 보일 때는 녹색으로 강조
+                toggleIcon.style.color = "#87B32E";
             } else {
                 input.type = "password";
                 toggleIcon.style.color = "#999";
             }
         }
 
-        // 🌟 진짜 서버 데이터베이스에 이메일 가입 요청 전송 (기존 기능 그대로 유지)
+        // 회원가입 전송
         document.getElementById('registerForm').addEventListener('submit', function(e) {
             e.preventDefault(); 
             
@@ -104,28 +125,33 @@
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
             const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            
+            // 🌟 주소 합치기
+            const baseAddr = document.getElementById('baseAddress').value;
+            const detailAddr = document.getElementById('detailAddress').value;
+            const fullAddress = baseAddr ? (baseAddr + ' ' + detailAddr).trim() : '';
 
             if (password !== passwordConfirm) {
                 alert('비밀번호와 비밀번호 확인이 서로 일치하지 않습니다.');
                 return;
             }
 
-           fetch('/api/register', {
+            fetch('/api/register', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                // 🌟 body 부분에 phone 데이터를 직접 가져와서 추가해 줍니다.
                 body: JSON.stringify({ 
                     name, 
                     email, 
                     password, 
-                    phone: document.getElementById('userPhone').value 
+                    phone: document.getElementById('userPhone').value,
+                    address: fullAddress 
                 })
             })
             .then(res => res.json())
             .then(data => {
                 alert(data.message);
                 if (data.success) {
-                    location.href = 'login.html'; // 가입 완료 시 로그인 창으로 안전 이동
+                    location.href = 'login.html'; 
                 }
             })
             .catch(err => alert('서버 통신 오류가 발생했습니다.'));
