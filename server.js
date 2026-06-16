@@ -981,6 +981,31 @@ app.get('/api/knowhow/comments/:postId', (req, res) => {
         });
     });
 });
+// ==========================================
+// 🌟 [추가] 잔디밭 게시판 - 댓글 기능 창구
+// ==========================================
+app.post('/api/board/comments', (req, res) => {
+    if (!req.session || !req.session.user) return res.json({ success: false, message: '로그인이 필요합니다.' });
+    const { post_id, content } = req.body;
+    const author = req.session.user.nickname;
+    
+    db.query('CREATE TABLE IF NOT EXISTS farm_board_comments (id INT AUTO_INCREMENT PRIMARY KEY, post_id INT, author VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', () => {
+        db.query('INSERT INTO farm_board_comments (post_id, author, content) VALUES (?, ?, ?)', [post_id, author, content], (err) => {
+            if(err) return res.json({ success: false, message: '댓글 등록 실패' });
+            res.json({ success: true, message: '댓글이 등록되었습니다.' });
+        });
+    });
+});
+
+app.get('/api/board/comments/:postId', (req, res) => {
+    const postId = req.params.postId;
+    db.query('CREATE TABLE IF NOT EXISTS farm_board_comments (id INT AUTO_INCREMENT PRIMARY KEY, post_id INT, author VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', () => {
+        db.query('SELECT * FROM farm_board_comments WHERE post_id = ? ORDER BY created_at ASC', [postId], (err, results) => {
+            if(err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    });
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));

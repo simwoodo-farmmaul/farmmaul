@@ -11,7 +11,8 @@
         .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
         .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
         
-        .main-container { max-width: 800px; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        /* 🌟 가로 길이를 1000px로 넓혔습니다 */
+        .main-container { max-width: 1000px; width: 100%; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .detail-header { padding: 25px 30px; border-bottom: 1px solid #f0f0f0; }
         .post-title { font-size: 1.5rem; font-weight: 900; color: #222; margin-bottom: 12px; line-height: 1.4; }
         .post-info { font-size: 0.9rem; color: #666; display: flex; gap: 15px; }
@@ -26,7 +27,6 @@
         .btn-delete { background: #ff4d4d; color: white; }
         .btn-edit { background: #4B9AD2; color: white; }
 
-        /* 👇 새롭게 추가된 댓글 섹션 스타일 */
         .comment-section { background: #fff; padding: 25px 30px; border-top: 5px solid #f4f7f6; }
         .comment-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 15px; }
         .comment-input-box { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -38,7 +38,6 @@
         .comment-text { font-size: 0.95rem; color: #555; }
         .comment-date { font-size: 0.8rem; color: #999; margin-top: 5px; text-align: right; }
 
-        /* 👇 새롭게 추가된 수정 모달(팝업창) 스타일 */
         #editModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
         .edit-box { background: #fff; width: 90%; max-width: 600px; padding: 25px; border-radius: 12px; }
         .edit-box input { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
@@ -47,6 +46,14 @@
         .edit-btns button { padding: 8px 15px; margin-left: 5px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
         .btn-save { background: #87B32E; color: #fff; }
         .btn-cancel { background: #ccc; color: #333; }
+
+        /* 🌟 [새로 추가] 모바일에서 테두리를 화면 끝에 붙여 넓게 보이게 하는 설정 */
+        @media (max-width: 768px) {
+            .main-container { margin: 0 auto; border-radius: 0; border-left: none; border-right: none; }
+            .detail-header { padding: 20px 15px; }
+            .detail-body { padding: 20px 15px; }
+            .comment-section { padding: 20px 15px; }
+        }
     </style>
 </head>
 <body>
@@ -82,8 +89,7 @@
                 <input type="text" id="commentInput" placeholder="댓글을 입력해주세요 (로그인 필요)" onkeypress="if(event.key==='Enter') submitComment()">
                 <button class="comment-submit" onclick="submitComment()">등록</button>
             </div>
-            <div class="comment-list" id="commentList">
-                </div>
+            <div class="comment-list" id="commentList"></div>
         </div>
     </div>
 
@@ -107,7 +113,7 @@
             currentPostId = urlParams.get('id');
 
             loadPost();
-            loadComments(); // 댓글 불러오기 실행!
+            loadComments();
         });
 
         function loadPost() {
@@ -122,16 +128,13 @@
                     document.getElementById('postDate').innerText = `📅 ${new Date(post.created_at).toLocaleDateString()}`;
                     document.getElementById('postContent').innerText = post.content;
 
-                    // 모달 창에 수정하기 좋게 원래 글씨 미리 넣어주기
                     document.getElementById('editTitle').value = post.title;
                     document.getElementById('editContent').value = post.content;
 
-                    // 작성자 본인 또는 관리자일 때만 수정/삭제 버튼 보이기
                     if (result.currentUser === post.nickname || result.isAdmin) {
                         document.getElementById('authorActions').style.display = 'block';
                     }
 
-                    // 사진 렌더링
                     let images = [];
                     try { images = JSON.parse(post.images); } catch(e) { images = []; }
                     const gallery = document.getElementById('imageGallery');
@@ -144,7 +147,6 @@
                 });
         }
 
-        // 삭제 기능
         function deletePost() {
             if(confirm('정말 이 노하우 글을 삭제하시겠습니까?')) {
                 fetch(`/api/knowhow/${currentPostId}`, { method: 'DELETE' })
@@ -156,11 +158,9 @@
             }
         }
 
-        // 수정 팝업창 열고 닫기
         function openEditModal() { document.getElementById('editModal').style.display = 'flex'; }
         function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-        // 수정한 내용 저장하기
         function saveEdit() {
             const newTitle = document.getElementById('editTitle').value;
             const newContent = document.getElementById('editContent').value;
@@ -177,12 +177,11 @@
                 alert(data.message);
                 if(data.success) {
                     closeEditModal();
-                    loadPost(); // 화면 새로고침 안 해도 글씨 바뀌게 함
+                    loadPost();
                 }
             });
         }
 
-        // 댓글 불러오기 기능
         function loadComments() {
             fetch(`/api/knowhow/comments/${currentPostId}`)
             .then(res => res.json())
@@ -206,7 +205,7 @@
             });
         }
 
-        // 댓글 등록하기 기능
+        // 댓글 등록하기 기능 (로그인 이동 기능 추가됨!)
         function submitComment() {
             const content = document.getElementById('commentInput').value.trim();
             if (!content) { alert('댓글 내용을 입력해주세요.'); return; }
@@ -222,7 +221,11 @@
                     document.getElementById('commentInput').value = '';
                     loadComments(); // 댓글 달면 바로 보이게 새로고침
                 } else {
-                    alert(data.message); // 예: 로그인이 필요합니다
+                    alert(data.message);
+                    // 🌟 확인을 누르면 로그인 페이지로 강제 이동!
+                    if (data.message === '로그인이 필요합니다.') {
+                        location.href = 'login.html';
+                    }
                 }
             });
         }

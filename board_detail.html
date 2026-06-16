@@ -9,12 +9,12 @@
         body { background-color: #f9fbf9; color: #333; padding-bottom: 60px; }
         header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         
-        /* 🌟 좌, 중, 우 완벽한 균형을 위한 3등분 스타일 */
         .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
         .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #a066c0; white-space: nowrap; }
         .btn-list { flex: 1; text-align: right; text-decoration: none; font-weight: bold; color: #666; }
         
-        .main-container { max-width: 800px; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        /* 🌟 가로 길이를 1000px로 넓혔습니다 */
+        .main-container { max-width: 1000px; width: 100%; margin: 30px auto; background: white; border-radius: 12px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
         .detail-header { padding: 25px 30px; border-bottom: 1px solid #f0f0f0; }
         .post-title { font-size: 1.6rem; font-weight: 800; color: #222; margin-bottom: 12px; line-height: 1.4; }
         .post-info { font-size: 0.9rem; color: #666; display: flex; gap: 15px; }
@@ -31,22 +31,36 @@
         .btn-action { padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; border: none; margin-left: 10px; }
         .btn-edit { background: #87B32E; color: white; }
         .btn-delete { background: #ff4d4d; color: white; }
-        /* 관리자 표시 라벨 */
         .admin-badge { display:none; background: #ff4d4d; color: white; font-size: 0.75rem; padding: 3px 8px; border-radius: 12px; vertical-align: middle; margin-right: 10px; }
+
+        /* 👇 잔디밭 댓글 섹션 스타일 */
+        .comment-section { background: #fff; padding: 25px 30px; border-top: 5px solid #f9fbf9; }
+        .comment-title { font-size: 1.1rem; font-weight: 900; margin-bottom: 15px; color: #a066c0; }
+        .comment-input-box { display: flex; gap: 10px; margin-bottom: 20px; }
+        .comment-input-box input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; outline: none; }
+        .comment-submit { background: #a066c0; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .comment-list { display: flex; flex-direction: column; gap: 15px; }
+        .comment-item { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
+        .comment-author { font-weight: 800; font-size: 0.95rem; margin-bottom: 5px; color: #222; }
+        .comment-text { font-size: 0.95rem; color: #555; }
+        .comment-date { font-size: 0.8rem; color: #999; margin-top: 5px; text-align: right; }
+
+        /* 🌟 모바일에서 테두리를 화면 끝에 붙여 넓게 보이게 하는 설정 */
+        @media (max-width: 768px) {
+            .main-container { margin: 0 auto; border-radius: 0; border-left: none; border-right: none; }
+            .detail-header { padding: 20px 15px; }
+            .detail-body { padding: 20px 15px; }
+            .comment-section { padding: 20px 15px; }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <!-- 좌측: 팜마을 로고 -->
         <a href="index.html" class="farm-logo">
             <img src="farmmaul.webp" alt="로고" style="height: 24px; width: auto; border-radius: 4px;" onerror="this.style.display='none'"> 팜마을
         </a>
-        
-        <!-- 중앙: 잔디밭 이야기 타이틀 -->
         <div class="center-title">🌱 잔디밭 이야기</div>
-        
-        <!-- 우측: 목록으로 버튼 -->
         <a href="board.html" class="btn-list">목록으로</a>
     </header>
 
@@ -70,6 +84,16 @@
                 <button class="btn-action btn-delete" onclick="deletePost()">🗑️ 삭제하기</button>
             </div>
         </div>
+
+        <!-- 👇 새롭게 추가된 댓글 입력/목록 창 -->
+        <div class="comment-section">
+            <div class="comment-title">💬 잔디밭 댓글</div>
+            <div class="comment-input-box">
+                <input type="text" id="commentInput" placeholder="댓글을 입력해주세요 (로그인 필요)" onkeypress="if(event.key==='Enter') submitComment()">
+                <button class="comment-submit" onclick="submitComment()">등록</button>
+            </div>
+            <div class="comment-list" id="commentList"></div>
+        </div>
     </div>
 
     <script>
@@ -87,6 +111,11 @@
             const urlParams = new URLSearchParams(window.location.search);
             currentPostId = urlParams.get('id');
 
+            loadPost();
+            loadComments(); // 잔디밭 댓글 불러오기 실행!
+        });
+
+        function loadPost() {
             fetch(`/api/board/${currentPostId}`)
                 .then(res => res.json())
                 .then(result => {
@@ -99,11 +128,9 @@
                     document.getElementById('postViews').innerText = `👁️ 조회 ${post.views || 0}`;
                     document.getElementById('postContent').innerText = post.content;
 
-                    // 🌟 로그인한 사람이 '작성자 본인'이거나 '관리자'라면 권한 버튼을 보여줍니다.
                     if (result.currentUser === post.nickname || result.isAdmin) {
                         document.getElementById('authorActions').style.display = 'block';
                         
-                        // 단, 관리자라도 '남이 쓴 글'을 내 마음대로 수정(조작)하면 안 되므로, 수정 버튼은 숨기고 '삭제'만 가능하게 합니다.
                         if (result.currentUser !== post.nickname && result.isAdmin) {
                             document.getElementById('btnEdit').style.display = 'none';
                             document.getElementById('adminBadge').style.display = 'inline-block';
@@ -122,7 +149,7 @@
                         gallery.appendChild(imgTag);
                     });
                 });
-        });
+        }
 
         function editPost() { location.href = `board_edit.html?id=${currentPostId}`; }
 
@@ -135,6 +162,55 @@
                     if(res.success) location.href = 'board.html';
                 });
             }
+        }
+
+        // 잔디밭 댓글 불러오기 기능
+        function loadComments() {
+            fetch(`/api/board/comments/${currentPostId}`)
+            .then(res => res.json())
+            .then(result => {
+                const list = document.getElementById('commentList');
+                list.innerHTML = '';
+                if (result.success && result.data.length > 0) {
+                    result.data.forEach(comment => {
+                        const date = new Date(comment.created_at).toLocaleString();
+                        list.innerHTML += `
+                            <div class="comment-item">
+                                <div class="comment-author">🧑‍🌾 ${comment.author}</div>
+                                <div class="comment-text">${comment.content}</div>
+                                <div class="comment-date">${date}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    list.innerHTML = '<div style="color:#888; text-align:center; padding:10px;">아직 작성된 댓글이 없습니다. 첫 댓글을 남겨보세요!</div>';
+                }
+            });
+        }
+
+        // 잔디밭 댓글 등록하기 기능 (비회원 로그인 자동 이동)
+        function submitComment() {
+            const content = document.getElementById('commentInput').value.trim();
+            if (!content) { alert('댓글 내용을 입력해주세요.'); return; }
+
+            fetch('/api/board/comments', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ post_id: currentPostId, content: content })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('commentInput').value = '';
+                    loadComments(); // 댓글 달면 바로 보이게 새로고침
+                } else {
+                    alert(data.message);
+                    // 🌟 확인을 누르면 로그인 페이지로 강제 이동!
+                    if (data.message === '로그인이 필요합니다.') {
+                        location.href = 'login.html';
+                    }
+                }
+            });
         }
     </script>
 </body>
