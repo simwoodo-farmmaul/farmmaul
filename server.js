@@ -23,8 +23,8 @@ const db = mysql.createPool({
     host: 'localhost', 
     port: 3306, 
     user: 'root', 
-    password: 'Farmmaul1234!', 
-    database: 'farmmaul_db',
+    password: 'ALfmrqnf1020@', 
+    database: 'farmaul_db',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0
