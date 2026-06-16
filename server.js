@@ -1052,6 +1052,44 @@ app.get('/api/qna/comments/:postId', (req, res) => {
         });
     });
 });
+// ==========================================
+// 🌟 [추가] 팜마을 알림판(Notice) 수정 및 댓글 API
+// ==========================================
+// 1. 공지사항 수정 창구 (관리자 전용)
+app.put('/api/notices/:id', (req, res) => {
+    const isAdmin = checkIsAdmin(req.session ? req.session.user : null);
+    if (!isAdmin) return res.status(403).json({ success: false, message: '관리자 권한이 없습니다.' });
+    
+    const { title, content } = req.body;
+    db.query(`UPDATE farm_notices SET title=?, content=? WHERE id=?`, [title, content, req.params.id], (err, result) => {
+        if(err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.'});
+        res.json({ success: true, message: '공지사항이 성공적으로 수정되었습니다.' });
+    });
+});
+
+// 2. 공지사항 댓글 등록 창구 (회원용)
+app.post('/api/notices/comments', (req, res) => {
+    if (!req.session || !req.session.user) return res.json({ success: false, message: '로그인이 필요합니다.' });
+    const { post_id, content } = req.body;
+    const author = req.session.user.nickname;
+    
+    db.query('CREATE TABLE IF NOT EXISTS farm_notice_comments (id INT AUTO_INCREMENT PRIMARY KEY, post_id INT, author VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', () => {
+        db.query('INSERT INTO farm_notice_comments (post_id, author, content) VALUES (?, ?, ?)', [post_id, author, content], (err) => {
+            if(err) return res.json({ success: false, message: '댓글 등록 실패' });
+            res.json({ success: true, message: '댓글이 등록되었습니다.' });
+        });
+    });
+});
+
+// 3. 공지사항 댓글 불러오기 창구
+app.get('/api/notices/comments/:postId', (req, res) => {
+    db.query('CREATE TABLE IF NOT EXISTS farm_notice_comments (id INT AUTO_INCREMENT PRIMARY KEY, post_id INT, author VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', () => {
+        db.query('SELECT * FROM farm_notice_comments WHERE post_id = ? ORDER BY created_at ASC', [req.params.postId], (err, results) => {
+            if(err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    });
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
