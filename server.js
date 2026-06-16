@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');  // 🌟 이 줄이 지워져서 난 에러입니다! 다시 꼭 넣어주세요!
 const mysql = require('mysql2');
 const cors = require('cors');
 const path = require('path');
