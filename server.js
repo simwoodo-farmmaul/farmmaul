@@ -138,7 +138,10 @@ app.post('/api/register', (req, res) => {
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
     db.query('SELECT * FROM farm_email_users WHERE email = ? AND password = ?', [email, password], (err, results) => {
-        if (err) return res.status(500).json({ success: false, message: '로그인 처리 중 오류 발생' });
+        if (err) {
+            console.error("🚨 [로그인 DB 에러 원인]:", err); // <--- 에러의 진짜 이유를 출력하는 코드입니다!
+            return res.status(500).json({ success: false, message: '로그인 처리 중 오류 발생' });
+        }
         if (results && results.length > 0) {
             req.session.user = { kakaoId: null, nickname: results[0].name, email: results[0].email };
             res.json({ success: true, message: `${results[0].name}님, 반갑습니다!` });
