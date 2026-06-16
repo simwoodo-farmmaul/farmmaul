@@ -944,6 +944,43 @@ app.delete('/api/notices/:id', (req, res) => {
         res.json({ success: true, message: '해당 공지사항이 안전하게 삭제되었습니다.' });
     });
 });
+// ==========================================
+// 🌟 [추가] 잘키우는법 게시판 - 수정/삭제 및 댓글 기능
+// ==========================================
+// 1. 게시글 수정 창구
+app.put('/api/knowhow/:id', (req, res) => {
+    const postId = req.params.id;
+    const { title, content } = req.body;
+    db.query('UPDATE farm_knowhow SET title = ?, content = ? WHERE id = ?', [title, content, postId], (err) => {
+        if(err) return res.json({ success: false, message: '수정 실패' });
+        res.json({ success: true, message: '게시글이 성공적으로 수정되었습니다.' });
+    });
+});
+
+// 2. 댓글 등록 창구
+app.post('/api/knowhow/comments', (req, res) => {
+    if (!req.session || !req.session.user) return res.json({ success: false, message: '로그인이 필요합니다.' });
+    const { post_id, content } = req.body;
+    const author = req.session.user.nickname;
+    
+    db.query('CREATE TABLE IF NOT EXISTS farm_knowhow_comments (id INT AUTO_INCREMENT PRIMARY KEY, post_id INT, author VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', () => {
+        db.query('INSERT INTO farm_knowhow_comments (post_id, author, content) VALUES (?, ?, ?)', [post_id, author, content], (err) => {
+            if(err) return res.json({ success: false, message: '댓글 등록 실패' });
+            res.json({ success: true, message: '댓글이 등록되었습니다.' });
+        });
+    });
+});
+
+// 3. 댓글 불러오기 창구
+app.get('/api/knowhow/comments/:postId', (req, res) => {
+    const postId = req.params.postId;
+    db.query('CREATE TABLE IF NOT EXISTS farm_knowhow_comments (id INT AUTO_INCREMENT PRIMARY KEY, post_id INT, author VARCHAR(50), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)', () => {
+        db.query('SELECT * FROM farm_knowhow_comments WHERE post_id = ? ORDER BY created_at ASC', [postId], (err, results) => {
+            if(err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    });
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
