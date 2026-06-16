@@ -9,7 +9,9 @@
         body { background-color: #f9fbf9; color: #333; }
         header { background: #fff; padding: 15px 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
         .logo { font-size: 1.5rem; font-weight: bold; color: #87B32E; text-decoration: none; }
-        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        
+        /* 🌟 가로 크기 1000px로 확장 */
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
         .board-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .btn-write { background-color: #a066c0; color: white; padding: 10px 20px; border-radius: 20px; text-decoration: none; font-weight: bold; }
         
@@ -21,6 +23,14 @@
         .post-title { font-size: 1.1rem; font-weight: bold; color: #222; margin-bottom: 5px; }
         .post-meta { font-size: 0.85rem; color: #888; }
         .post-icon { color: #87B32E; font-size: 1.2rem; }
+
+        /* 🌟 모바일 화면 테두리 꽉 차게 넓히기 */
+        @media (max-width: 768px) {
+            .container { padding: 15px 0; }
+            .board-header { padding: 0 15px; }
+            .post-list { border-radius: 0; border-left: none; border-right: none; }
+            div[style*="background: linear-gradient"] { border-radius: 0; border-left: none; border-right: none; }
+        }
     </style>
 </head>
 <body>
@@ -35,7 +45,6 @@
             <a href="javascript:void(0)" onclick="checkLoginForWrite()" class="btn-write">✏️ 글쓰기</a>
         </div>
 
-        <!-- 🌟 새롭게 추가된 팜마을 잔디밭 환영 안내글 🌟 -->
         <div style="background: linear-gradient(135deg, #e8f5e9, #f1f8e9); border: 1px solid #c8e6c9; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
             <h2 style="color: #2e7d32; font-size: 1.3rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
                 <span>🍀</span> 팜마을 잔디밭에 오신 것을 환영합니다!
@@ -55,16 +64,16 @@
     </div>
 
     <script>
-        // 🌟 비회원 글쓰기 차단 기능
+        // 🌟 비회원 글쓰기 누르면 바로 로그인 창으로 이동합니다!
         function checkLoginForWrite() {
             fetch('/api/user')
                 .then(res => res.json())
                 .then(data => {
                     if(data.loggedIn) {
-                        location.href = 'board_write.html'; // 회원이면 글쓰기 화면으로
+                        location.href = 'board_write.html'; 
                     } else {
                         alert('팜마을 회원만 글을 쓸 수 있습니다. 로그인 화면으로 이동합니다.');
-                        location.href = 'login.html'; // 비회원이면 쫓아내기
+                        location.href = 'login.html'; 
                     }
                 });
         }

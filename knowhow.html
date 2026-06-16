@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>팜마을 - 잘키우는법 노하우</title>
     <style>
-        /* 구글 웹 폰트 'Jua' 및 기본 폰트 설정 */
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         
         :root { 
@@ -20,47 +19,35 @@
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-color); margin: 0; padding: 0; color: var(--text-dark); padding-bottom: 80px; }
         a { text-decoration: none; color: inherit; }
 
-        /* 1. 상단 헤더 */
+        /* 🌟 가로 크기 1000px로 확장 */
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header-inner { max-width: 1000px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         
         .farm-logo { flex: 1; display: flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: #87B32E; }
         .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
         .btn-search { flex: 1; text-align: right; text-decoration: none; font-weight: bold; color: #666; font-size: 1.1rem; cursor: pointer; }
 
-        /* 2. 히어로 배너 */
         .board-hero { background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); padding: 35px 20px; text-align: center; border-bottom: 1px solid #b2d8b4; }
         .board-hero h1 { font-family: 'Jua', sans-serif; font-size: 2rem; margin: 0 0 10px; color: #2e7d32; }
         .board-hero p { font-size: 0.95rem; color: #444; margin: 0; line-height: 1.5; font-weight: 700; word-break: keep-all; }
 
-       /* 3. 카테고리 필터 슬라이더 */
         .filter-wrapper { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 61px; z-index: 90; }
-        .filter-scroll { max-width: 800px; margin: 0 auto; display: flex; gap: 10px; padding: 15px 20px; }
-        
-        /* 🌟 flex: 1을 주어 4개의 버튼이 빈 공간 없이 동일하게 길어지도록 맞춤 */
+        .filter-scroll { max-width: 1000px; margin: 0 auto; display: flex; gap: 10px; padding: 15px 20px; }
         .filter-btn { flex: 1; text-align: center; background: #f1f3f5; color: #666; border: 1px solid #ddd; padding: 12px 0; border-radius: 12px; font-size: 1.05rem; font-weight: 800; cursor: pointer; transition: 0.2s; }
-        
         .filter-btn.active { background: var(--primary-green); color: #fff; border-color: var(--primary-green); box-shadow: 0 4px 10px rgba(135,179,46,0.3); }
 
-        /* 4. 게시글 리스트 영역 */
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
 
         .post-card { background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eaeaea; cursor: pointer; transition: transform 0.2s; }
         .post-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); border-color: var(--primary-green); }
-        
         .post-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .badge-group { display: flex; gap: 6px; align-items: center; }
-        
-        /* 뱃지 스타일 */
         .badge-type { font-size: 0.75rem; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
-        .type-tip { background: #ffebee; color: #c62828; } /* 꿀팁 */
-        .type-qna { background: #e3f2fd; color: #1565c0; } /* 질문 */
-        
+        .type-tip { background: #ffebee; color: #c62828; } 
+        .type-qna { background: #e3f2fd; color: #1565c0; } 
         .badge-cat { font-size: 0.75rem; font-weight: 800; color: #888; border: 1px solid #ddd; padding: 2px 8px; border-radius: 6px; }
-
         .post-title { font-size: 1.15rem; font-weight: 900; color: #222; margin: 0 0 10px; line-height: 1.4; word-break: keep-all; }
         .post-preview { font-size: 0.95rem; color: #666; margin: 0 0 15px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        
         .post-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #eee; padding-top: 12px; font-size: 0.85rem; color: #888; font-weight: 600; }
         .author-info { display: flex; align-items: center; gap: 6px; }
         .author-img { width: 24px; height: 24px; border-radius: 50%; background: #ddd; object-fit: cover; }
@@ -68,15 +55,16 @@
         .stat-item { display: flex; align-items: center; gap: 4px; }
         .stat-item.likes { color: #ff5e62; }
 
-        /* 인기글 하이라이트 박스 */
         .best-post-section { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 5px; border: 2px solid var(--primary-orange); box-shadow: 0 5px 15px rgba(230,145,56,0.1); }
         .best-title { font-size: 1.1rem; font-weight: 900; color: var(--primary-orange); margin-bottom: 15px; display: flex; align-items: center; gap: 5px; }
 
-        /* 하단 글쓰기 플로팅 버튼 */
         .btn-write-fab { position: fixed; bottom: 30px; right: 30px; background: var(--primary-green); color: #fff; padding: 15px 25px; border-radius: 30px; font-size: 1.05rem; font-weight: 900; box-shadow: 0 5px 20px rgba(135,179,46,0.4); cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; transition: 0.2s; z-index: 1000; }
         .btn-write-fab:hover { transform: scale(1.05); background: #76a025; }
 
-        @media (max-width: 480px) {
+        /* 🌟 모바일 화면 테두리 꽉 차게 넓히기 */
+        @media (max-width: 768px) {
+            .container { padding: 15px 0; }
+            .post-card, .best-post-section { border-radius: 0; border-left: none; border-right: none; }
             .board-hero { padding: 30px 20px; }
             .board-hero h1 { font-size: 1.7rem; }
             .btn-write-fab { bottom: 20px; right: 20px; padding: 12px 20px; font-size: 1rem; }
@@ -110,99 +98,7 @@
     </div>
 
     <div class="container" id="post-container">
-        
-        <div class="best-post-section" data-category="agri tip" onclick="alert('게시글 상세 페이지로 이동합니다.')">
-            <div class="best-title">🔥 이번 주 명예의 전당 (BEST)</div>
-            <div class="post-header">
-                <div class="badge-group">
-                    <span class="badge-type type-tip">💡 꿀팁</span>
-                    <span class="badge-cat">농산</span>
-                </div>
-            </div>
-            <h2 class="post-title">토마토 배꼽썩음병, 약 안 치고 우유로 해결하는 비법!</h2>
-            <p class="post-preview">여름철만 되면 찾아오는 불청객, 토마토 배꼽썩음병 때문에 고생 많으시죠? 칼슘 부족이 원인인데, 집에 남는 유통기한 지난 우유를 희석해서 뿌려주면 놀랍게도 해결됩니다. 비율은 물 10 : 우유 1로...</p>
-            <div class="post-footer">
-                <div class="author-info">
-                    <img src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=100&auto=format&fit=crop" class="author-img">
-                    <span>지산동 영진농원</span>
-                </div>
-                <div class="stats-info">
-                    <span class="stat-item">👁️ 1,245</span>
-                    <span class="stat-item likes">❤️ 312</span>
-                    <span class="stat-item">💬 45</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="post-card" data-category="bird qna" onclick="alert('게시글 상세 페이지로 이동합니다.')">
-            <div class="post-header">
-                <div class="badge-group">
-                    <span class="badge-type type-qna">❓ 질문</span>
-                    <span class="badge-cat">조류</span>
-                </div>
-                <span style="font-size:0.8rem; color:#aaa; font-weight:700;">10분 전</span>
-            </div>
-            <h2 class="post-title">앵무새 유정란 부화기 온도 설정 어떻게 하시나요?</h2>
-            <p class="post-preview">이번에 모란앵무 알을 부화기에 넣었는데, 적정 온도가 37.5도가 맞나요? 습도는 어느 정도로 유지해야 하는지 선배님들의 조언 부탁드립니다!</p>
-            <div class="post-footer">
-                <div class="author-info">
-                    <img src="https://images.unsplash.com/photo-1582791694773-1081a28a313e?q=80&w=100&auto=format&fit=crop" class="author-img">
-                    <span>초보집사</span>
-                </div>
-                <div class="stats-info">
-                    <span class="stat-item">👁️ 12</span>
-                    <span class="stat-item likes">❤️ 1</span>
-                    <span class="stat-item">💬 2</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="post-card" data-category="fish tip" onclick="alert('게시글 상세 페이지로 이동합니다.')">
-            <div class="post-header">
-                <div class="badge-group">
-                    <span class="badge-type type-tip">💡 꿀팁</span>
-                    <span class="badge-cat">어류</span>
-                </div>
-                <span style="font-size:0.8rem; color:#aaa; font-weight:700;">2시간 전</span>
-            </div>
-            <h2 class="post-title">구피 치어 생존율 90% 이상 높이는 물갈이 루틴</h2>
-            <p class="post-preview">구피 치어들이 자꾸 폐사한다면 환수(물갈이) 주기를 점검해보세요. 한 번에 많이 갈아주는 것보다 매일 10%씩 부분 환수해 주는 것이 수질 스윙을 막아 생존율을 극적으로 높입니다.</p>
-            <div class="post-footer">
-                <div class="author-info">
-                    <img src="https://images.unsplash.com/photo-1531384441138-2736e62e0919?q=80&w=100&auto=format&fit=crop" class="author-img">
-                    <span>물소리 수족관</span>
-                </div>
-                <div class="stats-info">
-                    <span class="stat-item">👁️ 340</span>
-                    <span class="stat-item likes">❤️ 88</span>
-                    <span class="stat-item">💬 12</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="post-card" data-category="livestock qna" onclick="alert('게시글 상세 페이지로 이동합니다.')">
-            <div class="post-header">
-                <div class="badge-group">
-                    <span class="badge-type type-qna">❓ 질문</span>
-                    <span class="badge-cat">축산</span>
-                </div>
-                <span style="font-size:0.8rem; color:#aaa; font-weight:700;">어제</span>
-            </div>
-            <h2 class="post-title">닭 진드기(와구모) 친환경적으로 퇴치하는 약이 있을까요?</h2>
-            <p class="post-preview">날씨가 더워지니 닭장에 진드기가 보이기 시작합니다. 살충제는 계란에 안 좋을 것 같아서 쓰기 꺼려지는데, 규조토 가루 말고 효과적인 친환경 방제법 아시는 분 계신가요?</p>
-            <div class="post-footer">
-                <div class="author-info">
-                    <img src="https://images.unsplash.com/photo-1589923188900-85dae523342b?q=80&w=100&auto=format&fit=crop" class="author-img">
-                    <span>자연꼬꼬 농장</span>
-                </div>
-                <div class="stats-info">
-                    <span class="stat-item">👁️ 156</span>
-                    <span class="stat-item likes">❤️ 12</span>
-                    <span class="stat-item">💬 8</span>
-                </div>
-            </div>
-        </div>
-
+        <!-- DB 데이터 삽입 영역 -->
     </div>
 
     <button class="btn-write-fab" onclick="checkLoginForWrite()">
@@ -210,7 +106,7 @@
     </button>
 
     <script>
-        // 1. 비회원 글쓰기 차단 기능
+        // 🌟 로그인 안 한 사람이 글쓰기 누르면 바로 로그인 창으로 보냅니다!
         function checkLoginForWrite() {
             fetch('/api/user')
                 .then(res => res.json())
@@ -224,17 +120,15 @@
                 });
         }
 
-        // 🌟 2. 서버(DB)에서 내가 쓴 노하우 글 불러와서 화면에 그리기
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/knowhow')
             .then(response => response.json())
             .then(result => {
                 const container = document.getElementById('post-container');
-                container.innerHTML = ''; // 기존에 있던 가짜 샘플 글들을 모두 지웁니다.
+                container.innerHTML = ''; 
 
                 if(result.success && result.data.length > 0) {
                     result.data.forEach(post => {
-                        // 제목 앞에 붙여둔 태그([농산], [축산] 등)를 인식하여 분류용 영문 코드로 변환
                         let catName = "기타";
                         let dataCat = "all"; 
                         if(post.title.includes('[농산]')) { catName = "농산"; dataCat = "agri"; }
@@ -242,14 +136,10 @@
                         else if(post.title.includes('[조류]')) { catName = "조류"; dataCat = "bird"; }
                         else if(post.title.includes('[어류]')) { catName = "어류"; dataCat = "fish"; }
 
-                        // 리스트에 보여줄 때 제목에서 [농산] 같은 태그는 예쁘게 떼어내고 알맹이만 보여줍니다.
                         let cleanTitle = post.title.replace(/\[.*?\]\s*/, '');
-                        
-                        // 내용이 너무 길면 80자에서 자르고 '...'을 붙입니다.
                         let previewText = post.content.length > 80 ? post.content.substring(0, 80) + '...' : post.content;
                         let dateText = new Date(post.created_at).toLocaleDateString();
 
-                        // 화면에 뿌려줄 예쁜 카드 디자인
                         const itemHtml = `
                             <div class="post-card" data-category="${dataCat}" onclick="location.href='knowhow_detail.html?id=${post.id}'">
                                 <div class="post-header">
@@ -280,7 +170,6 @@
             .catch(error => console.error('노하우 게시글 불러오기 실패:', error));
         });
 
-        // 3. 카테고리(버튼) 필터링 기능
         function switchFilter(btn, category) {
             document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');

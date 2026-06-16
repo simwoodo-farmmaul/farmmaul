@@ -14,30 +14,26 @@
         .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
         .btn-home { flex: 1; text-align: right; font-weight: bold; color: #666; font-size: 1rem; }
 
-        .container { max-width: 800px; margin: 30px auto; padding: 0 20px; }
+        /* 🌟 가로 크기 1000px로 확장 */
+        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
 
-        /* 🌟 배너 내용 고객센터에 맞게 전면 수정 */
         .qna-banner { background: linear-gradient(135deg, #87B32E, #6b9122); border-radius: 15px; padding: 30px; text-align: center; color: white; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(135, 179, 46, 0.3); }
         .qna-banner h2 { font-size: 1.4rem; font-weight: 900; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .qna-banner p { font-size: 1rem; line-height: 1.6; opacity: 0.95; margin-bottom: 0; }
 
-        /* 🌟 좌/우 탭 메뉴 원상 복구 */
         .tabs { display: flex; background: #fff; border-radius: 12px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); border: 1px solid #eaeaea; }
         .tab { flex: 1; text-align: center; padding: 18px; font-weight: 900; font-size: 1.1rem; color: #888; cursor: pointer; border-bottom: 3px solid transparent; transition: 0.2s; }
         .tab.active { color: var(--primary-orange, #E69138); border-bottom-color: var(--primary-orange, #E69138); background: #fffaf0; }
 
-        /* 탭 내용 제어 */
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* FAQ 스타일 */
         .faq-item { background: #fff; border-radius: 12px; margin-bottom: 15px; padding: 25px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
         .faq-q { font-weight: 900; font-size: 1.15rem; color: #222; margin-bottom: 12px; display: flex; gap: 8px; }
         .faq-q::before { content: 'Q.'; color: var(--primary-orange, #E69138); }
         .faq-a { font-size: 1.05rem; color: #444; line-height: 1.6; display: flex; gap: 8px; padding-top: 15px; border-top: 1px dashed #ddd; }
         .faq-a::before { content: 'A.'; color: var(--primary-green, #87B32E); font-weight: 900; }
 
-        /* 질문있어요 (QnA) 게시판 스타일 (기존 유지) */
         .qna-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #eaeaea; padding-bottom: 15px; }
         .btn-write { background: var(--primary-green, #87B32E); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .qna-write-box { background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 25px; display: none; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -58,6 +54,14 @@
         .admin-reply-form { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; }
         .admin-reply-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; outline: none; resize: none; height: 80px; font-size: 0.95rem; }
         .btn-reply { background: var(--primary-blue, #4B9AD2); color: white; border: none; padding: 10px; border-radius: 8px; font-weight: bold; cursor: pointer; align-self: flex-end; }
+
+        /* 🌟 모바일 화면 테두리 꽉 차게 넓히기 */
+        @media (max-width: 768px) {
+            .container { padding: 15px 0; }
+            .qna-banner, .tabs { border-radius: 0; border-left: none; border-right: none; }
+            .qna-header { padding: 0 15px; }
+            .faq-item, .qna-write-box, .qna-item { border-radius: 0; border-left: none; border-right: none; }
+        }
     </style>
 </head>
 <body>
@@ -69,39 +73,31 @@
     </div>
 
     <div class="container">
-        <!-- 🌟 고객센터 전용 배너로 수정 -->
         <div class="qna-banner">
             <h2>🤝 팜마을 고객센터</h2>
             <p>이용 중 궁금하신 점이나 불편하신 점을 남겨주시면,<br>팜마을 관리자가 빠르고 친절하게 해결해 드리겠습니다.</p>
         </div>
 
-        <!-- 🌟 좌/우 탭 메뉴 복원 -->
         <div class="tabs">
             <div class="tab active" onclick="switchTab('faqTab', this)">❓ 자주 묻는 질문 (FAQ)</div>
             <div class="tab" onclick="switchTab('qnaTab', this)">🙋 질문있어요</div>
         </div>
 
-        <!-- 1. 🌟 FAQ 영역 (DB에서 불러옴) -->
         <div id="faqTab" class="tab-content active">
-            
-            <!-- 🌟 관리자용 FAQ 관리 버튼 (일반 회원에게는 숨겨짐) -->
             <div id="adminFaqBtnWrap" style="text-align: right; margin-bottom: 15px; display: none;">
                 <button onclick="location.href='admin_faq.html'" style="background: var(--primary-orange, #E69138); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">🛠️ FAQ 작성 및 관리 페이지로 가기</button>
             </div>
-
             <div id="faqListArea">
                 <div style="text-align:center; padding:50px; color:#888;">자주 묻는 질문을 불러오는 중입니다... ⏳</div>
             </div>
         </div>
 
-        <!-- 2. 🌟 질문있어요 게시판 영역 (기존 유지) -->
         <div id="qnaTab" class="tab-content">
             <div class="qna-header">
                 <h3 style="color:#222; font-size:1.3rem;">동네 이웃 질문 게시판</h3>
                 <button class="btn-write" onclick="toggleWriteForm()">✏️ 질문 작성하기</button>
             </div>
 
-            <!-- 글쓰기 폼 -->
             <div id="writeForm" class="qna-write-box">
                 <h4 style="margin-bottom: 15px; color: #333;">어떤 점이 궁금하신가요?</h4>
                 <input type="text" id="qTitle" placeholder="제목을 입력해주세요" required>
@@ -109,7 +105,6 @@
                 <button class="btn-submit" onclick="submitQuestion()">질문 등록하기</button>
             </div>
 
-            <!-- 질문 목록 -->
             <div id="qnaList">
                 <div style="text-align:center; padding:50px; color:#888;">서버에서 질문 목록을 불러오는 중입니다... ⏳</div>
             </div>
@@ -118,9 +113,8 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            loadFaqList(); // 페이지 로드 시 FAQ 불러오기
+            loadFaqList(); 
             
-            // 🌟 현재 접속자가 관리자인지 확인하고 FAQ 관리 버튼 보여주기
             fetch('/api/user').then(res => res.json()).then(data => {
                 if(data.loggedIn) {
                     const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
@@ -131,7 +125,6 @@
             });
         });
 
-        // 탭 전환 기능
         function switchTab(tabId, btn) {
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -142,7 +135,6 @@
             if(tabId === 'faqTab') loadFaqList();
         }
 
-        // 🌟 FAQ 목록 불러오기
         function loadFaqList() {
             fetch('/api/faqs')
             .then(res => res.json())
@@ -167,7 +159,7 @@
             });
         }
 
-        // --- 이하 질문있어요 (QnA) 게시판 기능 ---
+        // 🌟 비회원이 글쓰기 버튼을 누르면 로그인 창으로 강제 이동합니다!
         function toggleWriteForm() {
             fetch('/api/user').then(res => res.json()).then(data => {
                 if(!data.loggedIn) {
