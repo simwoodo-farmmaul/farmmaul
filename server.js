@@ -1,4 +1,3 @@
-const session = require('express-session');
 require('./setup.js'); 
 const express = require('express');
 const mysql = require('mysql2');
