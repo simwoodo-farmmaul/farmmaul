@@ -706,8 +706,30 @@
                 }
 
                 // 주소로 좌표를 검색하는 마법의 기능
+                // 주소로 좌표를 검색하는 마법의 기능
                 const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(hub.hub_address, function(result, status) {
+                
+                // 🌟 핵심 해결책: 주소 앞에 있는 '[17762]' 같은 우편번호 괄호를 자동으로 지워줍니다!
+                let cleanAddress = hub.hub_address.replace(/\[.*?\]\s*/g, '');
+
+                geocoder.addressSearch(cleanAddress, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                        if (modalMapMarker) modalMapMarker.setMap(null); // 기존 핀 지우기
+                        
+                        // 새 핀 꽂기
+                        modalMapMarker = new kakao.maps.Marker({ 
+                            map: modalMapInstance, 
+                            position: coords 
+                        });
+                        
+                        // 지도를 검색된 위치로 이동
+                        modalMapInstance.setCenter(coords);
+                    } else {
+                        // 상세 주소를 도저히 못 찾더라도 지도를 숨기지 않고 빈 지도를 보여줍니다.
+                        mapContainer.style.display = 'block'; 
+                    }
+                });
                     if (status === kakao.maps.services.Status.OK) {
                         const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                         if (modalMapMarker) modalMapMarker.setMap(null); // 기존 핀 지우기
