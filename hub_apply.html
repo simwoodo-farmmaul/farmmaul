@@ -6,6 +6,10 @@
     <title>팜마을 - 마을 HUB 거점 신청</title>
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         :root { --primary-green: #87B32E; --primary-orange: #E69138; --primary-blue: #4B9AD2; --bg-color: #f1f3f5; --text-dark: #333; }
@@ -13,12 +17,10 @@
         body { background-color: var(--bg-color); color: var(--text-dark); padding-bottom: 120px; }
         
         .header { background: #fff; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-        /* 🌟 헤더 폭 800px로 수정 */
         .header-inner { max-width: 800px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         .btn-icon { font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #333; font-weight: 900; }
         .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-blue); }
         
-        /* 🌟 전체 컨테이너 폭 800px로 수정 */
         .container { max-width: 800px; margin: 20px auto 0; padding: 0 20px; }
         
         .info-banner { background: linear-gradient(135deg, #e1f5fe, #b3e5fc); border: 1px solid #81d4fa; border-radius: 15px; padding: 25px 20px; margin-bottom: 25px; text-align: center; }
@@ -48,7 +50,6 @@
         .edit-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
         
         .submit-btn-wrap { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; padding: 15px 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 1000; }
-        /* 🌟 하단 버튼 폭 800px로 수정 */
         .submit-btn { max-width: 800px; margin: 0 auto; width: 100%; padding: 16px; background: var(--primary-blue); color: white; border: none; font-size: 1.2rem; font-weight: 900; border-radius: 12px; cursor: pointer; display: block; text-align: center; }
 
         @media (max-width: 768px) {
@@ -108,6 +109,8 @@
                     </div>
                     <input type="text" id="hub_address_main" class="form-input" placeholder="기본 주소가 여기에 자동 입력됩니다" style="margin-bottom: 10px;" readonly required>
                     <input type="text" id="hub_address_detail" class="form-input" placeholder="나머지 상세 주소를 입력해주세요 (예: 101동 202호)" required>
+                    
+                    <div id="apply_map" style="width: 100%; height: 250px; border-radius: 10px; margin-top: 15px; border: 2px solid #ddd; display: none;"></div>
                 </div>
                 
                 <div class="form-group">
@@ -162,10 +165,12 @@
         </form>
     </div>
 
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script>
-        // 사진을 배열(목록)로 저장합니다. 0번째가 대표사진, 1번째부터가 추가사진입니다.
         let hubImages = []; 
+
+        // 🌟 지도 기능을 위한 변수 세팅
+        let applyMapInstance = null;
+        let applyMapMarker = null;
 
         function execDaumPostcode() {
             new daum.Postcode({
@@ -178,15 +183,50 @@
                     document.getElementById('hub_zipcode').value = data.zonecode;
                     document.getElementById('hub_address_main').value = fullAddress;
                     document.getElementById('hub_address_detail').focus();
+
+                    // 🌟 주소를 검색하면 지도도 함께 그려주기
+                    drawApplyMap(fullAddress);
                 }
             }).open();
         }
 
-        // 고효율 자동 압축 기능 (640px 제한, 화질 50%)
+        // 🌟 지도를 실시간으로 그리는 마법의 기능
+        function drawApplyMap(address) {
+            const mapContainer = document.getElementById('apply_map');
+            mapContainer.style.display = 'block';
+
+            if (!applyMapInstance) {
+                applyMapInstance = new kakao.maps.Map(mapContainer, {
+                    center: new kakao.maps.LatLng(33.450701, 126.570667),
+                    level: 3
+                });
+            } else {
+                applyMapInstance.relayout();
+            }
+
+            const geocoder = new kakao.maps.services.Geocoder();
+            
+            // 괄호 제거 후 깔끔하게 검색
+            let cleanAddress = address.replace(/\[.*?\]\s*/g, '');
+
+            geocoder.addressSearch(cleanAddress, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    if (applyMapMarker) applyMapMarker.setMap(null); // 기존 핀 걷어내기
+                    
+                    applyMapMarker = new kakao.maps.Marker({ 
+                        map: applyMapInstance, 
+                        position: coords 
+                    });
+                    
+                    applyMapInstance.setCenter(coords); // 부드럽게 중앙으로 이동
+                }
+            });
+        }
+
         function processImage(input, startIndex) {
             if (!input.files || input.files.length === 0) return;
             
-            // 대표 사진 교체 시 0번째 인덱스 초기화
             if (startIndex === 0) {
                 if(hubImages.length === 0) hubImages.push("");
             }
@@ -211,16 +251,16 @@
                         const base64 = canvas.toDataURL('image/jpeg', 0.5);
                         
                         if (startIndex === 0) {
-                            hubImages[0] = base64; // 메인은 무조건 0번
+                            hubImages[0] = base64; 
                         } else {
-                            hubImages.push(base64); // 추가는 배열 뒤에 붙임
+                            hubImages.push(base64); 
                         }
                         renderGallery();
                     }
                 }
                 reader.readAsDataURL(file);
             });
-            input.value = ''; // 재업로드를 위해 초기화
+            input.value = ''; 
         }
 
         function renderGallery() {
@@ -241,9 +281,9 @@
 
         function removeImage(index) {
             if(index === 0) {
-                hubImages[0] = ""; // 대표 사진 지우기
+                hubImages[0] = ""; 
             } else {
-                hubImages.splice(index, 1); // 추가 사진 지우기
+                hubImages.splice(index, 1); 
             }
             renderGallery();
         }
@@ -257,8 +297,6 @@
             }
 
             const fullAddress = `[${document.getElementById('hub_zipcode').value}] ${document.getElementById('hub_address_main').value} ${document.getElementById('hub_address_detail').value}`;
-
-            // 배열에 담긴 사진들을 JSON 텍스트 형태로 묶어서 전송합니다!
             const finalImageString = JSON.stringify(hubImages.filter(img => img !== ""));
 
             const data = {
@@ -266,7 +304,7 @@
                 hub_type: document.querySelector('input[name="hub_type"]:checked').value,
                 hub_address: fullAddress,
                 hub_desc: document.getElementById('hub_desc').value,
-                hub_image: finalImageString // 🌟 여러 장의 사진이 담긴 보따리
+                hub_image: finalImageString 
             };
 
             fetch('/api/hub-apply', {

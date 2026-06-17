@@ -6,6 +6,9 @@
     <title>팜마을 - 마을 HUB 홈페이지</title>
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         :root { --primary-green: #87B32E; --primary-orange: #E69138; --primary-blue: #4B9AD2; --bg-color: #f8f9fa; }
@@ -15,19 +18,15 @@
         
         .header { background: rgba(255,255,255,0.9); backdrop-filter: blur(5px); border-bottom: 1px solid rgba(0,0,0,0.05); position: fixed; top: 0; width: 100%; z-index: 1000; }
         
-        /* 🌟 헤더 폭 1200px */
         .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; }
         
-        /* 🌟 팜마을 로고 디자인 */
         .logo-btn { display: flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 900; font-size: 1.2rem; color: var(--primary-green); }
         .logo-img { height: 28px; width: auto; border-radius: 6px; }
 
         .title { font-weight: 900; font-size: 1.15rem; color: var(--primary-blue); }
         
-        /* 🌟 전체 컨테이너 폭 1200px */
         .container { max-width: 1200px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 30px rgba(0,0,0,0.05); }
         
-        /* 대형 히어로 비주얼 */
         .hero-section { position: relative; width: 100%; height: 450px; background: #222; }
         .hero-bg { width: 100%; height: 100%; object-fit: cover; opacity: 0.7; }
         .hero-content { position: absolute; bottom: 0; left: 0; width: 100%; padding: 50px 40px; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; }
@@ -35,16 +34,13 @@
         .hero-title { font-size: 2.8rem; font-weight: 900; margin-bottom: 10px; line-height: 1.3; }
         .hero-sub { font-size: 1.1rem; color: #ddd; font-weight: 600; }
 
-        /* 탭 (Tab) 내비게이션 */
         .sticky-tabs { position: sticky; top: 55px; background: #fff; display: flex; border-bottom: 1px solid #eee; z-index: 999; }
         .tab-item { flex: 1; text-align: center; padding: 18px 0; font-weight: 900; font-size: 1.05rem; color: #888; border-bottom: 4px solid transparent; cursor: pointer; transition: 0.2s; }
         .tab-item:hover, .tab-item.active { color: var(--primary-blue); border-bottom-color: var(--primary-blue); }
 
-        /* 섹션 공통 */
         .page-section { padding: 50px 40px; border-bottom: 15px solid #f1f3f5; }
         .sec-title { font-size: 1.6rem; font-weight: 900; color: #111; margin-bottom: 25px; }
 
-        /* 1. 홈 섹션 (정보) */
         .info-card { background: #f8f9fa; border: 1px solid #eee; border-radius: 15px; padding: 25px; margin-bottom: 20px; }
         .info-row { display: flex; margin-bottom: 15px; font-size: 1.05rem; line-height: 1.5; }
         .info-row:last-child { margin-bottom: 0; }
@@ -52,19 +48,16 @@
         .info-value { font-weight: 700; color: #333; }
         .desc-text { font-size: 1.1rem; color: #444; line-height: 1.8; font-weight: 500; white-space: pre-wrap; }
 
-        /* 2. 활동/메뉴 섹션 */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .menu-card { background: #fff; border: 1px solid #eaeaea; border-radius: 15px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.02); text-align: center; }
         .menu-icon { font-size: 3rem; margin-bottom: 15px; }
         .menu-title { font-weight: 900; font-size: 1.3rem; color: #222; margin-bottom: 10px; }
         .menu-desc { font-size: 1rem; color: #666; line-height: 1.5; }
 
-        /* 3. 갤러리 섹션 */
         .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
         .gallery-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; background: #eee; cursor: pointer; transition: 0.2s; }
         .gallery-img:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        /* 4. 오시는 길 (지도) */
         .google-map-area { width: 100%; height: 450px; background: #eee; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .map-action-card { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #90caf9; border-radius: 20px; padding: 30px; text-align: center; }
         .map-action-title { font-weight: 900; color: #0d47a1; font-size: 1.3rem; margin-bottom: 10px; }
@@ -74,12 +67,10 @@
         .btn-kakao-map { background: #fee500; color: #3c1e1e; }
         .btn-naver-map { background: #03c75a; color: white; }
 
-        /* 하단 액션바 폭 1200px */
         .bottom-action-wrap { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 1200px; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); padding: 20px 40px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000; border-top: 1px solid #eee; }
         .bottom-btn { width: 100%; padding: 20px; background: var(--primary-green); color: white; border: none; font-size: 1.3rem; font-weight: 900; border-radius: 15px; cursor: pointer; text-align: center; box-shadow: 0 5px 15px rgba(135,179,46,0.3); transition: 0.2s; }
         .bottom-btn:hover { background: #769e26; }
 
-        /* 모바일 화면 대응 */
         @media (max-width: 768px) {
             .hero-section { height: 300px; }
             .hero-content { padding: 30px 20px; }
@@ -97,7 +88,6 @@
 
     <div class="header">
         <div class="header-inner">
-            <!-- 🌟 닫기 버튼 대신 팜마을 로고로 원상 복구 -->
             <a href="index.html" class="logo-btn">
                 <img src="farmmaul.webp" alt="팜마을 로고" class="logo-img" onerror="this.style.display='none'">
                 팜마을
@@ -108,7 +98,6 @@
     </div>
 
     <div class="container">
-        <!-- 대형 히어로 비주얼 -->
         <div class="hero-section">
             <img id="hero-bg" src="" class="hero-bg" alt="HUB 메인 배경" onerror="this.src='https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=1200&auto=format&fit=crop'">
             <div class="hero-content">
@@ -118,7 +107,6 @@
             </div>
         </div>
 
-        <!-- 탭 메뉴 -->
         <div class="sticky-tabs">
             <a href="#tab-home" class="tab-item active" onclick="activateTab(this)">홈</a>
             <a href="#tab-menu" class="tab-item" onclick="activateTab(this)">활동/서비스</a>
@@ -126,7 +114,6 @@
             <a href="#tab-map" class="tab-item" onclick="activateTab(this)">오시는길</a>
         </div>
 
-        <!-- 1. 홈 섹션 -->
         <div id="tab-home" class="page-section">
             <h2 class="sec-title">🏪 매장 소개</h2>
             <div class="desc-text" id="hub-desc-text" style="margin-bottom: 30px;">매장 소개글이 여기에 실시간으로 표시됩니다.</div>
@@ -147,7 +134,6 @@
             </div>
         </div>
 
-        <!-- 2. 활동/서비스 섹션 -->
         <div id="tab-menu" class="page-section">
             <h2 class="sec-title">💡 거점 제공 서비스</h2>
             <div class="menu-grid">
@@ -164,7 +150,6 @@
             </div>
         </div>
 
-        <!-- 3. 갤러리 섹션 -->
         <div id="tab-gallery" class="page-section">
             <h2 class="sec-title">📸 매장 갤러리</h2>
             <div id="gallery-container" class="gallery-grid">
@@ -172,14 +157,10 @@
             </div>
         </div>
 
-        <!-- 4. 오시는 길 섹션 -->
         <div id="tab-map" class="page-section" style="border-bottom: none;">
             <h2 class="sec-title">📍 찾아오시는 길</h2>
             
-            <!-- 🌟 구글 지도 기본 탑재 영역 -->
-            <div id="google-map-container" class="google-map-area">
-                <!-- 자바스크립트로 구글 지도가 삽입됩니다 -->
-            </div>
+            <div id="kakao-map-container" class="google-map-area"></div>
 
             <div class="map-action-card">
                 <div class="map-action-title">🗺️ 스마트폰 전용 길 안내 앱 열기</div>
@@ -197,7 +178,6 @@
     </div>
 
     <script>
-        // 탭 메뉴 활성화 시각 효과
         function activateTab(element) {
             document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
@@ -209,7 +189,7 @@
 
             if(!hubId) {
                 alert("잘못된 접근입니다.");
-                location.href = 'index.html'; // 🌟 에러 시 메인 화면으로 돌아가도록 수정
+                location.href = 'index.html'; 
                 return;
             }
 
@@ -219,7 +199,6 @@
                 if(result.success && result.data) {
                     const hub = result.data;
 
-                    // 텍스트 정보 반영
                     document.getElementById('header-hub-name').innerText = hub.hub_name;
                     document.getElementById('hub-title-text').innerText = hub.hub_name;
                     document.getElementById('hub-type').innerText = hub.hub_type;
@@ -227,43 +206,56 @@
                     document.getElementById('hub-address-sub').innerText = hub.hub_address.replace(/\[\d+\]\s*/, '');
                     document.getElementById('hub-desc-text').innerText = hub.hub_desc || "우리 동네 상생을 위한 팜마을 안심 허브 거점입니다.";
                     
-                    // 사진 데이터 분리
                     let images = [];
-                    try {
-                        images = JSON.parse(hub.hub_image);
-                    } catch(e) {
-                        if (hub.hub_image) images = [hub.hub_image]; 
-                    }
+                    try { images = JSON.parse(hub.hub_image); } catch(e) { if (hub.hub_image) images = [hub.hub_image]; }
 
-                    // 대표 사진(0번째) 처리
                     if(images.length > 0 && images[0]) {
                         document.getElementById('hero-bg').src = images[0];
                     }
 
-                    // 갤러리(나머지 사진들) 처리 (클릭 시 새 창 열림)
                     if(images.length > 1) {
                         const galleryContainer = document.getElementById('gallery-container');
                         galleryContainer.innerHTML = ''; 
-                        
                         images.forEach(imgSrc => {
-                            if(imgSrc) {
-                                // 갤러리 이미지 클릭 시 새 창(_blank)에서 원본 열기
-                                galleryContainer.innerHTML += `<img src="${imgSrc}" class="gallery-img" onclick="window.open('${imgSrc}', '_blank')">`;
-                            }
+                            if(imgSrc) galleryContainer.innerHTML += `<img src="${imgSrc}" class="gallery-img" onclick="window.open('${imgSrc}', '_blank')">`;
                         });
                     }
 
-                    const cleanAddress = hub.hub_address.replace(/\[\d+\]\s*/, '');
+                    // 🌟 우편번호 등 불필요한 기호 제거
+                    const cleanAddress = hub.hub_address.replace(/\[.*?\]\s*/g, '');
                     
-                    // 🌟 1. 구글 지도 기본 탑재 삽입
-                    document.getElementById('google-map-container').innerHTML = `<iframe src="https://maps.google.com/maps?q=${encodeURIComponent(cleanAddress)}&t=&z=16&ie=UTF8&iwloc=&output=embed" width="100%" height="100%" frameborder="0" style="border:0;"></iframe>`;
+                    // 🌟 카카오 지도 생성 및 마커 찍기 로직 추가
+                    const mapContainer = document.getElementById('kakao-map-container');
+                    const mapOption = { 
+                        center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 중심좌표
+                        level: 3 // 확대 레벨
+                    };
+                    const map = new kakao.maps.Map(mapContainer, mapOption);
+                    const geocoder = new kakao.maps.services.Geocoder();
 
-                    // 🌟 2. 길찾기 링크 처리
+                    geocoder.addressSearch(cleanAddress, function(result, status) {
+                        if (status === kakao.maps.services.Status.OK) {
+                            const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                            const marker = new kakao.maps.Marker({ map: map, position: coords });
+                            
+                            // 핀 위에 예쁜 허브 이름 말풍선 띄우기
+                            const infowindow = new kakao.maps.InfoWindow({
+                                content: `<div style="padding:5px;font-size:0.95rem;color:#87B32E;font-weight:900;text-align:center;">${hub.hub_name}</div>`
+                            });
+                            infowindow.open(map, marker);
+                            
+                            map.setCenter(coords); // 지도 중심 이동
+                        } else {
+                            mapContainer.innerHTML = '<div style="padding:40px; text-align:center; color:#888; font-weight:800;">지도를 불러올 수 없는 주소입니다.</div>';
+                        }
+                    });
+
+                    // 네비게이션 앱 링크 설정
                     document.getElementById('kakao-nav-link').href = `https://map.kakao.com/link/search/${encodeURIComponent(cleanAddress)}`;
                     document.getElementById('naver-nav-link').href = `https://map.naver.com/v5/search/${encodeURIComponent(cleanAddress)}`;
                 } else {
                     alert("거점 정보를 찾을 수 없습니다.");
-                    location.href = 'index.html'; // 🌟 에러 시 메인 화면으로 돌아가도록 수정
+                    location.href = 'index.html'; 
                 }
             })
             .catch(error => {

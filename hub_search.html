@@ -6,6 +6,9 @@
     <title>팜마을 - 우리 동네 HUB 검색</title>
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         
@@ -37,7 +40,6 @@
         .search-btn:hover { background: #3a82b8; }
 
         .map-container { width: 100%; height: 250px; background: #e0e0e0; position: relative; border-bottom: 1px solid #ddd; }
-        .map-container iframe { width: 100%; height: 100%; border: none; }
         .map-overlay-info { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.9); padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: 800; color: var(--primary-blue); box-shadow: 0 4px 10px rgba(0,0,0,0.1); backdrop-filter: blur(4px); z-index: 10; white-space: nowrap; }
 
         .list-header { padding: 20px 20px 10px; display: flex; justify-content: space-between; align-items: center; }
@@ -101,7 +103,7 @@
 
         <div class="map-container">
             <div class="map-overlay-info">선택된 동네 주변 실시간 HUB 지도</div>
-            <iframe id="searchMapIframe" src="about:blank" allowfullscreen="" loading="lazy"></iframe>
+            <div id="kakao-search-map" style="width: 100%; height: 100%;"></div>
         </div>
 
         <div class="list-header">
@@ -131,15 +133,24 @@
     <script>
         const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
         let allHubs = []; 
+        
+        // 🌟 카카오 지도를 제어하기 위한 변수
+        let searchMapInstance = null;
+        let searchMapMarker = null;
 
         document.addEventListener("DOMContentLoaded", async function() {
-            // 🌟 1. 메인 페이지 주소창에서 전달받은 '동네 정보'를 읽어냅니다.
+            // 🌟 0. 카카오 지도 기본 세팅 (페이지 로딩 시 바로 그림)
+            const mapContainer = document.getElementById('kakao-search-map');
+            searchMapInstance = new kakao.maps.Map(mapContainer, {
+                center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 위치
+                level: 5 // 넓게 보기 위해 5레벨로 설정
+            });
+
             const urlParams = new URLSearchParams(window.location.search);
             const pSido = urlParams.get('sido');
             const pSigungu = urlParams.get('sigungu');
             const pDong = urlParams.get('dong');
 
-            // 🌟 2. 우선 전국 시/도 목록을 API로 불러와 채웁니다 (완료될 때까지 기다림)
             await fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
                 .then(response => response.json())
                 .then(data => {
@@ -153,13 +164,11 @@
                     });
                 });
 
-            // 🌟 3. 만약 메인에서 전달받은 지역(sido)이 있다면, 자동으로 세팅을 시작합니다.
             if (pSido) {
                 document.getElementById('sidoSelect').value = pSido;
-                await executeAutoSet(pSigungu, pDong); // 하위 지역(시군구, 동) 자동 설정 기능 호출
+                await executeAutoSet(pSigungu, pDong); 
             }
 
-            // 🌟 4. 허브 데이터 불러오기 및 최종 화면 출력
             fetch('/api/hubs')
             .then(response => response.json())
             .then(result => {
@@ -174,9 +183,6 @@
             });
         });
 
-        // ==================================================
-        // 🚀 초기 로딩 시 지역을 자동으로 맞춰주는 전용 마법사 함수
-        // ==================================================
         async function executeAutoSet(pSigungu, pDong) {
             const sidoSelect = document.getElementById('sidoSelect');
             const sigunguSelect = document.getElementById('sigunguSelect');
@@ -185,7 +191,6 @@
             const sidoCode = sidoSelect.options[sidoSelect.selectedIndex]?.dataset.code;
             if(!sidoCode) return;
 
-            // 시/군/구 데이터 가져오기
             await fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
                 .then(res => res.json())
                 .then(data => {
@@ -200,12 +205,10 @@
                     });
                 });
 
-            // 전달받은 시군구가 있다면 세팅
             if (pSigungu && Array.from(sigunguSelect.options).some(opt => opt.value === pSigungu)) {
                 sigunguSelect.value = pSigungu;
                 const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex]?.dataset.code;
                 
-                // 읍/면/동 데이터 가져오기
                 await fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
                     .then(res => res.json())
                     .then(data => {
@@ -220,16 +223,12 @@
                         });
                     });
 
-                // 전달받은 동이 있다면 세팅
                 if (pDong && Array.from(dongSelect.options).some(opt => opt.value === pDong)) {
                     dongSelect.value = pDong;
                 }
             }
         }
 
-        // ==================================================
-        // 🌟 아래는 검색 화면에서 사용자가 직접 바꿀 때 쓰이는 기본 함수 (유지)
-        // ==================================================
         function changeSido() {
             const sidoSelect = document.getElementById('sidoSelect');
             const sigunguSelect = document.getElementById('sigunguSelect');
@@ -318,22 +317,21 @@
             if(dataList.length === 0) {
                 container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">선택하신 동네와 일치하는 마을 HUB 거점이 없습니다.</div>';
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기 평택시 지산동';
-                document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(fallbackAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                updateSearchMap(fallbackAddress); // 🌟 결과가 없으면 동네 중심으로 지도 이동
                 return;
             }
 
-            const firstHubAddr = dataList[0].hub_address.replace(/\[\d+\]\s*/, '');
-            document.getElementById('searchMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+            const firstHubAddr = dataList[0].hub_address.replace(/\[.*?\]\s*/g, '');
+            updateSearchMap(firstHubAddr); // 🌟 첫 번째 결과물 중심으로 지도 이동
 
             dataList.forEach(hub => {
-                // 🌟 [수정됨] JSON 형식으로 저장된 여러 장의 사진 중 0번째(대표 사진)를 썸네일로 가져옴
                 let imgUrl = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop";
                 if (hub.hub_image) {
                     try {
                         const parsedImages = JSON.parse(hub.hub_image);
                         if (parsedImages.length > 0) imgUrl = parsedImages[0];
                     } catch (e) {
-                        imgUrl = hub.hub_image; // 옛날 방식으로 저장된 1장짜리 데이터 호환
+                        imgUrl = hub.hub_image; 
                     }
                 }
                 
@@ -342,9 +340,8 @@
                     badgeClass = "badge-cafe";
                 }
 
-                const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
+                const cleanAddr = hub.hub_address.replace(/\[.*?\]\s*/g, '');
 
-                // 🌟 [수정됨] onclick 속성에 window.open을 적용하여 새 창(새 탭)에서 허브 상세 페이지가 열리도록 변경
                 const cardHtml = `
                     <div class="hub-card" 
                          onclick="window.open('hub.html?id=${hub.id}', '_blank')"
@@ -363,12 +360,25 @@
             });
         }
 
+        // 🌟 카카오 지도 검색 및 마커 갱신 함수 추가
         function updateSearchMap(address) {
-            const iframe = document.getElementById('searchMapIframe');
-            const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-            if(iframe.src !== newSrc) {
-                iframe.src = newSrc;
-            }
+            if (!searchMapInstance) return;
+            
+            const geocoder = new kakao.maps.services.Geocoder();
+            geocoder.addressSearch(address, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    
+                    if (searchMapMarker) searchMapMarker.setMap(null); // 기존 마커 지우기
+                    
+                    searchMapMarker = new kakao.maps.Marker({ 
+                        map: searchMapInstance, 
+                        position: coords 
+                    });
+                    
+                    searchMapInstance.setCenter(coords); // 부드럽게 화면 이동
+                }
+            });
         }
     </script>
 </body>
