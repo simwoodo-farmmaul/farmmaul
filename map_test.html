@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>팜마을 지도 테스트</title>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
+    
+    <style>
+        body { padding: 30px; font-family: 'Pretendard', sans-serif; background: #f4f7f6; }
+        .map-box { width: 100%; max-width: 600px; height: 400px; border-radius: 12px; margin-top: 20px; border: 2px solid #87B32E; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        input { padding: 12px; font-size: 1rem; border: 1px solid #ddd; border-radius: 8px; outline: none; }
+        button { padding: 12px 20px; font-size: 1rem; background: #87B32E; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h2 style="color: #333;">🗺️ 팜마을 자동 지도 테스트</h2>
+    <p style="color: #666; margin-bottom: 20px;">주소를 입력하고 검색을 누르면 지도가 자동으로 이동합니다!</p>
+
+    <input type="text" id="addressInput" value="제주특별자치도 제주시 첨단로 242" style="width: 300px;">
+    <button onclick="searchAddress()">지도에서 찾기 🔍</button>
+
+    <div id="map" class="map-box"></div>
+
+    <script>
+        // 🌟 4. 기본 지도 세팅
+        var mapContainer = document.getElementById('map'); 
+        var mapOption = {
+            center: new kakao.maps.LatLng(33.450701, 126.570667), // 기본 시작 좌표
+            level: 3 // 지도의 확대 레벨 (숫자가 작을수록 확대됨)
+        };
+        var map = new kakao.maps.Map(mapContainer, mapOption); 
+
+        // 🌟 주소를 좌표로 바꿔주는 기계(Geocoder) 생성 (이게 핵심입니다!)
+        var geocoder = new kakao.maps.services.Geocoder();
+
+        // 🌟 5. 주소로 검색해서 마커를 찍어주는 함수
+        function searchAddress() {
+            var address = document.getElementById('addressInput').value;
+
+            // 카카오에게 주소를 주고 좌표를 찾아달라고 부탁합니다.
+            geocoder.addressSearch(address, function(result, status) {
+                // 정상적으로 주소를 찾았다면!
+                if (status === kakao.maps.services.Status.OK) {
+                    var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                    // 1. 기존 마커 지우고 새 마커 꽂기
+                    var marker = new kakao.maps.Marker({
+                        map: map,
+                        position: coords
+                    });
+
+                    // 2. 예쁜 팜마을 전용 말풍선(인포윈도우) 띄우기
+                    var infowindow = new kakao.maps.InfoWindow({
+                        content: '<div style="width:150px; text-align:center; padding:8px 0; font-weight:900; color:#87B32E; border-radius:8px;">🌱 팜마을 도착!</div>'
+                    });
+                    infowindow.open(map, marker);
+
+                    // 3. 지도의 화면 중심을 방금 찾은 곳으로 스윽 이동시키기
+                    map.setCenter(coords);
+                } else {
+                    alert('주소를 정확히 찾을 수 없습니다. 도로명 주소나 지번 주소를 확인해주세요!');
+                }
+            });
+        }
+
+        // 페이지가 열리자마자 기본 주소로 한번 지도를 그려줍니다.
+        searchAddress();
+    </script>
+</body>
+</html>
