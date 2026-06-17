@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팜마을 - 총괄 마스터 관리자</title>
+    
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
         
@@ -18,7 +21,6 @@
         }
         body { font-family: 'Pretendard', sans-serif; background: var(--bg-light); margin: 0; padding: 0; color: #333; display: flex; height: 100vh; overflow: hidden; }
         
-        /* 1. 좌측 사이드바 스타일 */
         .sidebar { width: 260px; background: var(--master-dark); color: #fff; display: flex; flex-direction: column; flex-shrink: 0; }
         .sidebar-header { padding: 25px 20px; font-family: 'Jua', sans-serif; font-size: 1.8rem; color: var(--master-green); border-bottom: 1px solid #333; text-align: center; }
         .sidebar-header span { color: #fff; font-size: 1rem; font-family: 'Pretendard', sans-serif; font-weight: 800; display: block; margin-top: 5px; }
@@ -27,7 +29,6 @@
         .menu-item:hover, .menu-item.active { background: #2d2f39; color: #fff; border-left-color: var(--master-green); }
         .menu-item.herb:hover, .menu-item.herb.active { border-left-color: var(--herb-dark); color: #a5d6a7; }
 
-        /* 2. 메인 콘텐츠 및 상단바 스타일 */
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; min-width: 0; }
         .top-bar { background: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); position: sticky; top: 0; z-index: 10; }
         .page-title-text { font-size: 1.3rem; font-weight: 900; color: #111; margin: 0; }
@@ -38,7 +39,6 @@
         .view-section.active { display: block; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 3. 공통 카드 및 테이블 스타일 */
         .card { background: #fff; border-radius: 15px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #eee; margin-bottom: 25px; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .card-title { font-size: 1.15rem; font-weight: 900; color: #333; margin: 0; }
@@ -58,7 +58,6 @@
         .btn-sm.profile { color: var(--master-blue); border-color: #bbdefb; }
         .btn-sm.approve { color: #2e7d32; border-color: #c8e6c9; }
 
-        /* 4. 마스터 대시보드 통계 및 주문관리 통계 박스 */
         .master-stats, .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
         .stat-box, .stat-card { background: #fff; padding: 25px; border-radius: 15px; border: 1px solid #eee; display: flex; flex-direction: column; gap: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .stat-card { border-bottom: 4px solid #eee; border-top: none; border-left: none; border-right: none; }
@@ -67,7 +66,6 @@
         .stat-value, .stat-card .value { font-size: 1.8rem; font-weight: 900; color: #222; }
         .stat-card .value.green { color: var(--master-green); }
 
-        /* 5. 주문 관리 필터 및 모바일 리스트 스타일 */
         .filter-bar { background: #fff; padding: 20px; border-radius: 15px; margin-bottom: 20px; display: flex; gap: 15px; align-items: center; flex-wrap: wrap; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
         .filter-bar select, .filter-bar input { padding: 10px 15px; border: 1px solid #ddd; border-radius: 8px; font-weight: 700; outline: none; }
         .btn-search { background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 800; cursor: pointer; }
@@ -81,7 +79,6 @@
         .card-body { font-size: 0.95rem; line-height: 1.6; color: #555; margin: 15px 0; }
         .card-footer { padding-top: 15px; border-top: 1px dashed #eee; display: flex; justify-content: space-between; align-items: center; }
 
-        /* 6. 약초관 특화 스타일 */
         .herb-admin-wrap { max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 30px; }
         .herb-card { background: #fff; border-radius: 15px; padding: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-top: 5px solid var(--herb-dark); border-left: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee; }
         .herb-card-title { font-size: 1.3rem; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #222; }
@@ -95,7 +92,6 @@
         .link-btn { display: block; background: #e8f5e9; color: var(--herb-dark); text-align: center; padding: 15px; border-radius: 8px; font-weight: 900; text-decoration: none; font-size: 1.1rem; border: 1px solid #c8e6c9; }
         .link-btn:hover { background: #c8e6c9; }
 
-        /* 7. 모달 스타일 */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
         .modal-overlay.active { display: flex; }
         .modal-content { background: #fff; width: 450px; max-height: 85vh; border-radius: 20px; padding: 30px; position: relative; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
@@ -107,7 +103,6 @@
         .modal-info-row span:first-child { font-weight: 800; color: #888; }
         .modal-info-row span:last-child { font-weight: 700; color: #333; text-align: right; }
 
-        /* 8. 반응형 */
         @media (max-width: 1024px) {
             .order-table { display: none; }
             .mobile-order-list { display: flex; }
@@ -115,7 +110,6 @@
             .filter-bar { flex-direction: column; align-items: stretch; }
         }
 
-        /* 9. 모바일 화면 최적화 */
         @media (max-width: 768px) {
             body { flex-direction: column; overflow: auto; }
             .sidebar { width: 100%; height: auto; border-bottom: 2px solid var(--master-green); }
@@ -147,13 +141,10 @@
             <li class="menu-item" onclick="switchView('finance', this, '💰 정산 및 수익관리')">💰 정산 및 수익관리</li>
             <li class="menu-item" onclick="switchView('content', this, '🖼️ 사이트 콘텐츠 관리')">🖼️ 사이트 콘텐츠 관리</li>
             <li class="menu-item" onclick="switchView('shop', this, '🛠️ 생산용품관 관리')">🛠️ 생산용품관 관리</li>
-            <!-- 🌟 잘키우는법 관리 메뉴 -->
             <li class="menu-item" onclick="switchView('board', this, '📖 잘키우는법(노하우) 관리')">📖 잘키우는법 관리</li>
             <li class="menu-item" onclick="switchView('qna', this, '💬 질문있어요 관리')">💬 질문있어요 관리</li>
             <li class="menu-item" onclick="switchView('approval', this, '👨‍🌾 가입/승인 관리')">👨‍🌾 가입/승인 관리</li>
-            
             <li class="menu-item" id="roleMenuTab" style="display: none;" onclick="switchView('role', this, '⚙️ 운영진 권한 설정')">⚙️ 운영진 권한 관리</li>
-            
             <li class="menu-item" onclick="switchView('notice', this, '📢 공지 및 알림 발송')">📢 공지 및 알림 발송</li>
         </ul>
     </aside>
@@ -333,7 +324,6 @@
         
         <div id="view-shop" class="view-section"><div class="card"><h2 class="card-title">본사 직영 용품 리스트</h2></div></div>
         
-        <!-- 🌟 새롭게 추가된 잘키우는법 관리 화면 🌟 -->
         <div id="view-board" class="view-section">
             <div class="card">
                 <div class="card-header"><h2 class="card-title">📖 잘키우는법(노하우) 관리</h2></div>
@@ -460,7 +450,6 @@
         </div>
     </main>
 
-    <!-- 🌟 잘키우는법 수정 모달 (관리자용) 🌟 -->
     <div class="modal-overlay" id="adminEditKnowhowModal">
         <div class="modal-content" style="width: 600px;">
             <button class="modal-close" onclick="closeModal('adminEditKnowhowModal')">×</button>
@@ -480,7 +469,6 @@
         </div>
     </div>
 
-    <!-- HUB 승인 모달 -->
     <div class="modal-overlay" id="dynamicHubModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('dynamicHubModal')">×</button>
@@ -492,14 +480,16 @@
             <div class="modal-desc" id="modal-hub-desc">설명글 내용</div>
             <div class="modal-info-row"><span>공간 형태</span><span id="modal-hub-type">종류</span></div>
             <div class="modal-info-row"><span>신청 일시</span><span id="modal-hub-date">날짜</span></div>
-            <div class="modal-info-row" style="border:none;"><span>매장 주소</span><span id="modal-hub-address" style="text-align: right;">주소</span></div>
-            <div style="text-align: center; margin-top: 20px;">
-                <button class="btn-sm approve" style="padding: 10px 20px; font-size: 1rem;" id="modal-approve-btn">이 HUB 최종 승인하기</button>
+            <div class="modal-info-row" style="border:none;"><span>매장 주소</span><span id="modal-hub-address" style="text-align: right; font-weight: 900; color: #87B32E;">주소</span></div>
+            
+            <div id="modal-map" style="width: 100%; height: 200px; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; display: none;"></div>
+
+            <div style="text-align: center; margin-top: 25px;">
+                <button class="btn-sm approve" style="padding: 12px 25px; font-size: 1.1rem; font-weight: 900; background: #87B32E; color: white; border: none; border-radius: 8px;" id="modal-approve-btn">이 HUB 최종 승인하기</button>
             </div>
         </div>
     </div>
 
-    <!-- 1:1 채팅 답변 모달 -->
     <div class="modal-overlay" id="chatReplyModal">
         <div class="modal-content" style="width: 500px; padding: 0; display: flex; flex-direction: column; height: 600px; background: #fff; overflow: hidden;">
             <div style="background: var(--master-green); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -523,7 +513,10 @@
         let globalAdminKnowhowList = []; 
         let currentAdminEditKnowhowId = null;
 
-        // 🌟 1. 페이지 로딩 시: 권한 확인 및 모든 데이터 동시 로드
+        // 🌟 지도 기능을 위한 변수 추가
+        let modalMapInstance = null; 
+        let modalMapMarker = null;
+
         document.addEventListener("DOMContentLoaded", function() {
             loadManagers(); 
             loadHubList();
@@ -533,7 +526,7 @@
             loadPolicy();  
             loadQnaList();     
             loadAiInquiries(); 
-            loadAdminKnowhow(); // 잘키우는법 로드 실행!
+            loadAdminKnowhow(); 
         });
 
         function loadManagers() {
@@ -682,10 +675,12 @@
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         window.onclick = function(event) { if (event.target.classList.contains('modal-overlay')) { event.target.classList.remove('active'); } }
 
+        // 🌟 HUB 상세 모달 열기 및 지도 띄우기 함수
         function openHubDetail(index) {
             const hub = globalHubList[index];
             if(!hub) return;
             const date = new Date(hub.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit' });
+            
             document.getElementById('modal-hub-name').innerText = hub.hub_name;
             document.getElementById('modal-hub-type').innerText = hub.hub_type;
             document.getElementById('modal-hub-address').innerText = hub.hub_address;
@@ -693,7 +688,43 @@
             document.getElementById('modal-hub-desc').innerText = hub.hub_desc || "등록된 매장 소개 설명글이 없습니다.";
             document.getElementById('modal-hub-img').src = hub.hub_image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop";
             document.getElementById('modal-approve-btn').onclick = function() { alert(`[${hub.hub_name}] 거점을 최종 승인 완료했습니다.`); };
+            
             document.getElementById('dynamicHubModal').classList.add('active');
+
+            // 🌟 지도 그리기 (모달이 화면에 나타난 후 0.1초 뒤에 그려야 크기가 안 깨집니다!)
+            setTimeout(() => {
+                const mapContainer = document.getElementById('modal-map');
+                mapContainer.style.display = 'block';
+
+                if (!modalMapInstance) {
+                    modalMapInstance = new kakao.maps.Map(mapContainer, {
+                        center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 시작 좌표
+                        level: 3
+                    });
+                } else {
+                    modalMapInstance.relayout(); // 창 크기에 맞게 재정렬
+                }
+
+                // 주소로 좌표를 검색하는 마법의 기능
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(hub.hub_address, function(result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                        if (modalMapMarker) modalMapMarker.setMap(null); // 기존 핀 지우기
+                        
+                        // 새 핀 꽂기
+                        modalMapMarker = new kakao.maps.Marker({ 
+                            map: modalMapInstance, 
+                            position: coords 
+                        });
+                        
+                        // 지도를 검색된 위치로 이동
+                        modalMapInstance.setCenter(coords);
+                    } else {
+                        mapContainer.style.display = 'none'; // 주소가 이상하면 지도를 숨깁니다.
+                    }
+                });
+            }, 100);
         }
 
         function loadHubList() {
@@ -704,7 +735,7 @@
                     if(globalHubList.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">아직 접수된 마을 HUB 신청 내역이 없습니다.</td></tr>'; return; }
                     globalHubList.forEach((hub, index) => {
                         const date = new Date(hub.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-                        const row = `<tr><td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td><td>${hub.hub_type}</td><td style="font-size:0.85rem; color:#555;">${hub.hub_address}</td><td style="font-size:0.85rem;">${date}</td><td><span class="badge bg-blue">신청완료</span></td><td class="action-btns"><button class="btn-sm profile" onclick="openHubDetail(${index})">보기</button><button class="btn-sm approve" onclick="alert('${hub.hub_name} 거점을 최종 승인했습니다!')">승인</button></td></tr>`;
+                        const row = `<tr><td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td><td>${hub.hub_type}</td><td style="font-size:0.85rem; color:#555;">${hub.hub_address}</td><td style="font-size:0.85rem;">${date}</td><td><span class="badge bg-blue">신청완료</span></td><td class="action-btns"><button class="btn-sm profile" onclick="openHubDetail(${index})">보기 및 지도확인</button><button class="btn-sm approve" onclick="alert('${hub.hub_name} 거점을 최종 승인했습니다!')">승인</button></td></tr>`;
                         tbody.insertAdjacentHTML('beforeend', row);
                     });
                 }
@@ -779,7 +810,6 @@
             .then(res => res.json()).then(data => { if(data.success) { input.value = ''; loadChatHistory(); } else { alert('전송 실패: ' + (data.message || '오류')); } });
         }
 
-        // 🌟 [추가 기능] 잘키우는법 (노하우) 관리 기능 구현 🌟
         function loadAdminKnowhow() {
             fetch('/api/knowhow')
             .then(res => res.json())
@@ -789,7 +819,7 @@
                 tbody.innerHTML = '';
                 
                 if (result.success && result.data.length > 0) {
-                    globalAdminKnowhowList = result.data; // 수정을 위해 배열에 저장
+                    globalAdminKnowhowList = result.data;
                     result.data.forEach(post => {
                         const date = new Date(post.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
                         
@@ -825,7 +855,6 @@
         function saveAdminKnowhow() {
             const title = document.getElementById('adminEditKnowhowTitle').value;
             const content = document.getElementById('adminEditKnowhowContent').value;
-            
             if(!title || !content) { alert('제목과 내용을 모두 입력해주세요.'); return; }
             
             fetch('/api/knowhow/' + currentAdminEditKnowhowId, {
@@ -836,10 +865,7 @@
             .then(res => res.json())
             .then(data => {
                 alert(data.message);
-                if(data.success) {
-                    closeModal('adminEditKnowhowModal');
-                    loadAdminKnowhow(); // 화면 새로고침
-                }
+                if(data.success) { closeModal('adminEditKnowhowModal'); loadAdminKnowhow(); }
             });
         }
 
@@ -849,7 +875,7 @@
                 .then(res => res.json())
                 .then(data => {
                     alert(data.message);
-                    if(data.success) loadAdminKnowhow(); // 삭제 후 목록 갱신
+                    if(data.success) loadAdminKnowhow(); 
                 });
             }
         }
