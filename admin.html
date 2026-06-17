@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>팜마을 - 총괄 마스터 관리자</title>
     
+    <!-- 🌟 대표님의 카카오 지도 열쇠 -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
 
     <style>
@@ -450,6 +451,7 @@
         </div>
     </main>
 
+    <!-- 노하우 수정 모달 -->
     <div class="modal-overlay" id="adminEditKnowhowModal">
         <div class="modal-content" style="width: 600px;">
             <button class="modal-close" onclick="closeModal('adminEditKnowhowModal')">×</button>
@@ -469,6 +471,7 @@
         </div>
     </div>
 
+    <!-- 🌟 HUB 승인 모달 (지도가 여기에 들어갑니다!) -->
     <div class="modal-overlay" id="dynamicHubModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('dynamicHubModal')">×</button>
@@ -482,6 +485,7 @@
             <div class="modal-info-row"><span>신청 일시</span><span id="modal-hub-date">날짜</span></div>
             <div class="modal-info-row" style="border:none;"><span>매장 주소</span><span id="modal-hub-address" style="text-align: right; font-weight: 900; color: #87B32E;">주소</span></div>
             
+            <!-- 🌟 새롭게 추가된 지도 도화지 공간 -->
             <div id="modal-map" style="width: 100%; height: 200px; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; display: none;"></div>
 
             <div style="text-align: center; margin-top: 25px;">
@@ -490,6 +494,7 @@
         </div>
     </div>
 
+    <!-- 1:1 채팅 답변 모달 -->
     <div class="modal-overlay" id="chatReplyModal">
         <div class="modal-content" style="width: 500px; padding: 0; display: flex; flex-direction: column; height: 600px; background: #fff; overflow: hidden;">
             <div style="background: var(--master-green); color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
@@ -513,9 +518,16 @@
         let globalAdminKnowhowList = []; 
         let currentAdminEditKnowhowId = null;
 
-        // 🌟 지도 기능을 위한 변수 추가
         let modalMapInstance = null; 
         let modalMapMarker = null;
+
+        function switchView(viewId, element, titleText) {
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
+            document.getElementById('view-' + viewId).classList.add('active');
+            document.getElementById('header-title').innerText = titleText;
+        }
 
         document.addEventListener("DOMContentLoaded", function() {
             loadManagers(); 
@@ -664,18 +676,10 @@
             }
         }
 
-        function switchView(viewId, element, titleText) {
-            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
-            element.classList.add('active');
-            document.querySelectorAll('.view-section').forEach(view => view.classList.remove('active'));
-            document.getElementById('view-' + viewId).classList.add('active');
-            document.getElementById('header-title').innerText = titleText;
-        }
-
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
         window.onclick = function(event) { if (event.target.classList.contains('modal-overlay')) { event.target.classList.remove('active'); } }
 
-        // 🌟 HUB 상세 모달 열기 및 지도 띄우기 함수
+        // 🌟 HUB 상세 모달 열기 및 지도 띄우기 함수 (안전 코드 적용 완료)
         function openHubDetail(index) {
             const hub = globalHubList[index];
             if(!hub) return;
@@ -691,59 +695,38 @@
             
             document.getElementById('dynamicHubModal').classList.add('active');
 
-            // 🌟 지도 그리기 (모달이 화면에 나타난 후 0.1초 뒤에 그려야 크기가 안 깨집니다!)
             setTimeout(() => {
                 const mapContainer = document.getElementById('modal-map');
                 mapContainer.style.display = 'block';
 
                 if (!modalMapInstance) {
                     modalMapInstance = new kakao.maps.Map(mapContainer, {
-                        center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 시작 좌표
+                        center: new kakao.maps.LatLng(33.450701, 126.570667), 
                         level: 3
                     });
                 } else {
-                    modalMapInstance.relayout(); // 창 크기에 맞게 재정렬
+                    modalMapInstance.relayout(); 
                 }
 
-                // 주소로 좌표를 검색하는 마법의 기능
-                // 주소로 좌표를 검색하는 마법의 기능
                 const geocoder = new kakao.maps.services.Geocoder();
                 
-                // 🌟 핵심 해결책: 주소 앞에 있는 '[17762]' 같은 우편번호 괄호를 자동으로 지워줍니다!
-                let cleanAddress = hub.hub_address.replace(/\[.*?\]\s*/g, '');
+                // 🌟 우편번호 괄호를 안전하게 제거합니다.
+                const addressStr = hub.hub_address || "";
+                let cleanAddress = addressStr.replace(/\[.*?\]\s*/g, '');
 
                 geocoder.addressSearch(cleanAddress, function(result, status) {
                     if (status === kakao.maps.services.Status.OK) {
                         const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        if (modalMapMarker) modalMapMarker.setMap(null); // 기존 핀 지우기
+                        if (modalMapMarker) modalMapMarker.setMap(null); 
                         
-                        // 새 핀 꽂기
                         modalMapMarker = new kakao.maps.Marker({ 
                             map: modalMapInstance, 
                             position: coords 
                         });
                         
-                        // 지도를 검색된 위치로 이동
                         modalMapInstance.setCenter(coords);
                     } else {
-                        // 상세 주소를 도저히 못 찾더라도 지도를 숨기지 않고 빈 지도를 보여줍니다.
                         mapContainer.style.display = 'block'; 
-                    }
-                });
-                    if (status === kakao.maps.services.Status.OK) {
-                        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        if (modalMapMarker) modalMapMarker.setMap(null); // 기존 핀 지우기
-                        
-                        // 새 핀 꽂기
-                        modalMapMarker = new kakao.maps.Marker({ 
-                            map: modalMapInstance, 
-                            position: coords 
-                        });
-                        
-                        // 지도를 검색된 위치로 이동
-                        modalMapInstance.setCenter(coords);
-                    } else {
-                        mapContainer.style.display = 'none'; // 주소가 이상하면 지도를 숨깁니다.
                     }
                 });
             }, 100);
