@@ -7,8 +7,7 @@
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <!-- 🌟 카카오 지도 API 장착 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -161,7 +160,6 @@
         <div id="tab-map" class="page-section" style="border-bottom: none;">
             <h2 class="sec-title">📍 찾아오시는 길</h2>
             
-            <!-- 🌟 카카오 지도 컨테이너 🌟 -->
             <div id="kakao-map-container" class="google-map-area"></div>
 
             <div class="map-action-card">
@@ -201,11 +199,11 @@
                 if(result.success && result.data) {
                     const hub = result.data;
 
-                    document.getElementById('header-hub-name').innerText = hub.hub_name;
-                    document.getElementById('hub-title-text').innerText = hub.hub_name;
-                    document.getElementById('hub-type').innerText = hub.hub_type;
-                    document.getElementById('hub-address-text').innerText = hub.hub_address;
-                    document.getElementById('hub-address-sub').innerText = hub.hub_address.replace(/\[\d+\]\s*/, '');
+                    document.getElementById('header-hub-name').innerText = hub.hub_name || "이름없음";
+                    document.getElementById('hub-title-text').innerText = hub.hub_name || "이름없음";
+                    document.getElementById('hub-type').innerText = hub.hub_type || "일반거점";
+                    document.getElementById('hub-address-text').innerText = hub.hub_address || "";
+                    document.getElementById('hub-address-sub').innerText = (hub.hub_address || "").replace(/\[\d+\]\s*/, '');
                     document.getElementById('hub-desc-text').innerText = hub.hub_desc || "우리 동네 상생을 위한 팜마을 안심 허브 거점입니다.";
                     
                     let images = [];
@@ -223,14 +221,14 @@
                         });
                     }
 
-                    // 🌟 우편번호 등 불필요한 기호 제거
-                    const cleanAddress = hub.hub_address.replace(/\[.*?\]\s*/g, '');
+                    // 🌟 주소가 비어있어도 에러나지 않게 안전장치 추가
+                    const cleanAddress = (hub.hub_address || "경기도 평택시 지산동").replace(/\[.*?\]\s*/g, '');
                     
                     // 🌟 카카오 지도 생성 및 마커 찍기
                     const mapContainer = document.getElementById('kakao-map-container');
                     const mapOption = { 
                         center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 중심좌표
-                        level: 3 // 확대 레벨
+                        level: 3 
                     };
                     const map = new kakao.maps.Map(mapContainer, mapOption);
                     const geocoder = new kakao.maps.services.Geocoder();
@@ -240,9 +238,8 @@
                             const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                             const marker = new kakao.maps.Marker({ map: map, position: coords });
                             
-                            // 핀 위에 예쁜 허브 이름 말풍선 띄우기
                             const infowindow = new kakao.maps.InfoWindow({
-                                content: `<div style="padding:5px;font-size:0.95rem;color:#87B32E;font-weight:900;text-align:center;">${hub.hub_name}</div>`
+                                content: `<div style="padding:5px;font-size:0.95rem;color:#87B32E;font-weight:900;text-align:center;">${hub.hub_name || 'HUB'}</div>`
                             });
                             infowindow.open(map, marker);
                             
@@ -261,7 +258,8 @@
                 }
             })
             .catch(error => {
-                alert("서버 연결에 실패했습니다.");
+                console.error("Hub 상세페이지 오류:", error);
+                alert("상세 정보를 불러오는 중 오류가 발생했습니다.");
             });
         });
     </script>

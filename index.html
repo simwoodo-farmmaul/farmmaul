@@ -12,6 +12,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="팜마을">
 
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
 
@@ -112,7 +114,6 @@
         
         .hub-display-area { display: flex; gap: 20px; padding: 25px; background: #fff; }
         .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; height: 320px; }
-        .hub-map-img-box iframe { width: 100%; height: 100%; border: none; display: block; }
         
         .hub-list { flex: 1; display: flex; flex-direction: column; gap: 15px; justify-content: center; }
         .hub-list-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; }
@@ -170,11 +171,6 @@
         .footer-links a:hover { color: var(--primary-green); }
         
         .footer-logo-zone { display: flex; align-items: center; gap: 25px; margin-bottom: 5px; flex-wrap: wrap; }
-        .footer-nav-link { font-size: 0.95rem; font-weight: 700; color: #444; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; transition: color 0.2s; }
-        .footer-nav-link:hover { color: var(--primary-blue); }
-        .footer-btn-producer { background-color: var(--primary-green); color: white !important; padding: 5px 14px; border-radius: 6px; font-size: 0.85rem; font-weight: 700; transition: background 0.2s; text-decoration: none; }
-        .footer-btn-producer:hover { background-color: #719626; }
-        
         .footer-copyright { font-size: 0.85rem; color: #999; margin-top: 10px; }
 
         .floating-menu { position: fixed; bottom: 40px; right: 30px; display: flex; flex-direction: column; gap: 10px; z-index: 999; }
@@ -438,7 +434,7 @@
         </div>            
             <div class="hub-display-area">
                 <div class="hub-map-img-box">
-                    <iframe id="mainMapIframe" src="about:blank" allowfullscreen="" loading="lazy"></iframe>
+                    <div id="mainKakaoMap" style="width: 100%; height: 100%;"></div>
                 </div>
                 <div class="hub-list" id="mainHubListContainer">
                     <div style="text-align:center; color:#888; padding:20px;">마을 HUB 거점을 불러오는 중입니다...</div>
@@ -548,15 +544,8 @@
                 <div onclick="toggleMap()" style="font-weight: 800; cursor: pointer; display: inline-block; padding: 6px 14px; background: #e8f5e9; color: #2e7d32; border-radius: 8px; border: 1px solid #c8e6c9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">📍 오시는 길 (클릭하여 지도 보기) ⬇️</div>
             </div>
 
-            <div id="map-wrapper" style="display: none; width: 100%; max-width: 400px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
-                <iframe 
-                    src="https://maps.google.com/maps?q=경기도 안산시 상록구 사사안골길 106&t=&z=16&ie=UTF8&iwloc=&output=embed" 
-                    width="100%" 
-                    height="250" 
-                    frameborder="0" 
-                    style="border:0;" 
-                    allowfullscreen>
-                </iframe>
+            <div id="map-wrapper" style="display: none; width: 100%; max-width: 400px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd; height: 250px;">
+                <div id="footerKakaoMap" style="width: 100%; height: 100%;"></div>
             </div>
             
             <div class="footer-details">
@@ -626,8 +615,17 @@
     <script>
         const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
         let allHubs = [];
+        let mainKakaoMapInstance = null;
+        let mainKakaoMapMarker = null;
 
         document.addEventListener("DOMContentLoaded", function() {
+            // 메인 카카오 맵 초기화
+            const mainMapContainer = document.getElementById('mainKakaoMap');
+            mainKakaoMapInstance = new kakao.maps.Map(mainMapContainer, {
+                center: new kakao.maps.LatLng(33.450701, 126.570667), // 초기 임시 좌표
+                level: 5
+            });
+
             fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
                 .then(response => response.json())
                 .then(data => {
@@ -741,12 +739,13 @@
             if(filteredHubs.length === 0) {
                 container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">선택하신 지역에 아직 승인된 우리동네 HUB 거점이 없습니다.</div>';
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기도 평택시 지산동';
-                document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(fallbackAddress)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+                updateMainMap(fallbackAddress); // 🌟 카카오맵으로 위치 이동
                 return;
             }
 
+            // 가장 첫 번째 검색결과의 위치로 맵 이동
             const firstHubAddr = filteredHubs[0].hub_address.replace(/\[\d+\]\s*/, '');
-            document.getElementById('mainMapIframe').src = `https://maps.google.com/maps?q=${encodeURIComponent(firstHubAddr)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
+            updateMainMap(firstHubAddr);
 
             filteredHubs.slice(0, 3).forEach(hub => {
                 const cleanAddr = hub.hub_address.replace(/\[\d+\]\s*/, '');
@@ -762,12 +761,18 @@
             });
         }
 
+        // 🌟 지도를 부드럽게 이동시키고 핀을 꽂는 함수
         function updateMainMap(address) {
-            const iframe = document.getElementById('mainMapIframe');
-            const newSrc = `https://maps.google.com/maps?q=${encodeURIComponent(address)}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
-            if(iframe.src !== newSrc) {
-                iframe.src = newSrc;
-            }
+            if(!mainKakaoMapInstance) return;
+            const geocoder = new kakao.maps.services.Geocoder();
+            geocoder.addressSearch(address, function(result, status) {
+                if (status === kakao.maps.services.Status.OK) {
+                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                    if(mainKakaoMapMarker) mainKakaoMapMarker.setMap(null); // 기존 마커 지우기
+                    mainKakaoMapMarker = new kakao.maps.Marker({ map: mainKakaoMapInstance, position: coords });
+                    mainKakaoMapInstance.setCenter(coords); // 화면 이동
+                }
+            });
         }
     </script>    
 
@@ -894,39 +899,37 @@
    });
 </script>
 
-<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
 <script>
-    var map; 
-    var isMapLoaded = false;
+    var footerMap; 
+    var isFooterMapLoaded = false;
 
     function toggleMap() {
         var wrapper = document.getElementById('map-wrapper');
         
         if (wrapper.style.display === 'block') {
             wrapper.style.display = 'none';
-        } 
-        else {
+        } else {
             wrapper.style.display = 'block';
             
-            if (!isMapLoaded) {
-                var mapContainer = document.getElementById('kakao-map'); 
+            if (!isFooterMapLoaded) {
+                var mapContainer = document.getElementById('footerKakaoMap'); 
                 var mapOption = {
                     center: new kakao.maps.LatLng(37.288283, 126.883709), 
                     level: 4 
                 };
-                map = new kakao.maps.Map(mapContainer, mapOption); 
+                footerMap = new kakao.maps.Map(mapContainer, mapOption); 
                 
                 var geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch('경기도 안산시 상록구 사사안골길 106', function(result, status) {
                     if (status === kakao.maps.services.Status.OK) {
                         var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        var marker = new kakao.maps.Marker({ map: map, position: coords });
-                        map.setCenter(coords); 
+                        var marker = new kakao.maps.Marker({ map: footerMap, position: coords });
+                        footerMap.setCenter(coords); 
                     } 
                 });
-                isMapLoaded = true;
+                isFooterMapLoaded = true;
             } else {
-                map.relayout();
+                footerMap.relayout();
             }
         }
     }
