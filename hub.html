@@ -7,7 +7,8 @@
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+    <!-- 🌟 카카오 지도 API 장착 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -160,6 +161,7 @@
         <div id="tab-map" class="page-section" style="border-bottom: none;">
             <h2 class="sec-title">📍 찾아오시는 길</h2>
             
+            <!-- 🌟 카카오 지도 컨테이너 🌟 -->
             <div id="kakao-map-container" class="google-map-area"></div>
 
             <div class="map-action-card">
@@ -224,7 +226,7 @@
                     // 🌟 우편번호 등 불필요한 기호 제거
                     const cleanAddress = hub.hub_address.replace(/\[.*?\]\s*/g, '');
                     
-                    // 🌟 카카오 지도 생성 및 마커 찍기 로직 추가
+                    // 🌟 카카오 지도 생성 및 마커 찍기
                     const mapContainer = document.getElementById('kakao-map-container');
                     const mapOption = { 
                         center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 중심좌표

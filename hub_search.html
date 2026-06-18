@@ -7,7 +7,8 @@
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+    <!-- 🌟 카카오 지도 API 장착 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -103,6 +104,7 @@
 
         <div class="map-container">
             <div class="map-overlay-info">선택된 동네 주변 실시간 HUB 지도</div>
+            <!-- 🌟 카카오 지도 컨테이너 🌟 -->
             <div id="kakao-search-map" style="width: 100%; height: 100%;"></div>
         </div>
 
@@ -360,7 +362,7 @@
             });
         }
 
-        // 🌟 카카오 지도 검색 및 마커 갱신 함수 추가
+        // 🌟 카카오 지도 검색 및 마커 갱신 함수
         function updateSearchMap(address) {
             if (!searchMapInstance) return;
             

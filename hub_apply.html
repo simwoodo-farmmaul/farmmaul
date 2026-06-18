@@ -7,7 +7,8 @@
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+    <!-- 🌟 카카오 지도 API 및 우편번호 API 장착 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
     <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <style>
@@ -61,7 +62,7 @@
 
     <div class="header">
         <div class="header-inner">
-            <a href="index.html" class="btn-icon">←</a>
+            <a href="mypage.html" class="btn-icon">←</a>
             <div class="title">마을 HUB 거점 신청</div>
             <div style="width: 24px;"></div>
         </div>
@@ -110,6 +111,7 @@
                     <input type="text" id="hub_address_main" class="form-input" placeholder="기본 주소가 여기에 자동 입력됩니다" style="margin-bottom: 10px;" readonly required>
                     <input type="text" id="hub_address_detail" class="form-input" placeholder="나머지 상세 주소를 입력해주세요 (예: 101동 202호)" required>
                     
+                    <!-- 🌟 카카오 지도 컨테이너 🌟 -->
                     <div id="apply_map" style="width: 100%; height: 250px; border-radius: 10px; margin-top: 15px; border: 2px solid #ddd; display: none;"></div>
                 </div>
                 
@@ -197,6 +199,7 @@
             }).open();
         }
 
+        // 🌟 카카오 지도 실시간 그리기 기능
         function drawApplyMap(address) {
             const mapContainer = document.getElementById('apply_map');
             mapContainer.style.display = 'block';
@@ -319,7 +322,7 @@
             .then(result => {
                 if(result.success) {
                     alert('성공적으로 마을 HUB 거점 신청이 접수되었습니다! 🎉');
-                    location.href = 'mypage.html'; // 🌟 접수 후 마이페이지로 이동!
+                    location.href = 'mypage.html'; 
                 } else {
                     alert('신청 중 오류가 발생했습니다: ' + (result.message || ''));
                 }
