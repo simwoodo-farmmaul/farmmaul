@@ -1108,6 +1108,70 @@ app.post('/api/find-password', (req, res) => {
         }
     });
 });
+// ==========================================
+// 🌟 [추가] 생산자 전용 대시보드(마이페이지) API
+// ==========================================
+
+// 1. 내가 등록한 상품 목록 불러오기
+app.get('/api/producer/products', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const nickname = req.session.user.nickname;
+    
+    // owner_nickname이 내 닉네임과 똑같은 상품만 조회합니다.
+    db.query(`SELECT * FROM farm_products WHERE owner_nickname = ? ORDER BY created_at DESC`, [nickname], (err, results) => {
+        if (err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
+
+// 2. 내 상품에 달린 AI 고객센터 문의 불러오기
+app.get('/api/producer/ai-inquiries', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const nickname = req.session.user.nickname;
+    
+    // 상품 테이블과 AI 문의 테이블을 연결해서, 내 상품에 달린 질문만 쏙 뽑아옵니다.
+    const query = `
+        SELECT a.id, a.message, a.created_at, p.title, p.farm_name 
+        FROM farm_ai_inquiries a
+        JOIN farm_products p ON a.product_id = p.id
+        WHERE p.owner_nickname = ?
+        ORDER BY a.created_at DESC
+    `;
+    
+    db.query(query, [nickname], (err, results) => {
+        if (err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
+// ==========================================
+// 🌟 [추가] 생산자 대시보드 전용 (AI 답변 및 일기 관리) API
+// ==========================================
+
+// AI 문의 테이블에 '답변(reply)' 칸 안전하게 추가
+db.query(`ALTER TABLE farm_ai_inquiries ADD COLUMN reply TEXT`, () => {});
+
+// 1. 내 상품에 달린 AI 문의 '답변 달기'
+app.post('/api/producer/ai-inquiries/:id/reply', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false });
+    const { reply } = req.body;
+    db.query(`UPDATE farm_ai_inquiries SET reply = ? WHERE id = ?`, [reply, req.params.id], (err) => {
+        if(err) return res.status(500).json({ success: false, message: '답변 저장 오류' });
+        res.json({ success: true, message: '고객 문의에 답변이 성공적으로 등록되었습니다!' });
+    });
+});
+
+// 2. 내 농장 소식(일기) 불러오기
+app.get('/api/producer/stories', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false });
+    const nickname = req.session.user.nickname;
+    // farm_knowhow(또는 새로 만든 farm_stories) 테이블 활용
+    db.query(`SELECT id, title, views, created_at FROM farm_knowhow WHERE nickname = ? ORDER BY created_at DESC`, [nickname], (err, results) => {
+        if(err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
