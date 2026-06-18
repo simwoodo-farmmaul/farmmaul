@@ -18,10 +18,8 @@
         
         * { box-sizing: border-box; font-family: 'Pretendard', sans-serif; }
         
-        /* 🌟 전체 여백 축소 */
         body { background: var(--bg-color); margin: 0; padding: 16px; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
 
-        /* 🌟 로고 하단 간격 축소 (30px -> 20px) */
         .logo-container { text-align: center; margin-bottom: 20px; }
         .logo-text {
             font-family: 'Jua', sans-serif;
@@ -43,17 +41,14 @@
 
         .auth-box { background: #fff; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; }
         
-        /* 🌟 탭 위아래 여백 축소 (18px -> 14px) */
         .auth-tabs { display: flex; border-bottom: 2px solid #eee; }
         .auth-tab { flex: 1; padding: 14px 0; text-align: center; font-size: 1.1rem; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.2s; background: #fafafa; }
         .auth-tab.active { color: var(--primary-green); background: #fff; border-bottom: 3px solid var(--primary-green); margin-bottom: -2px; }
 
-        /* 🌟 내부 폼 패딩 축소 (35px -> 25px) */
         .form-container { padding: 25px 20px; display: none; }
         .form-container.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 입력창 간격 및 내부 여백 축소 (15px -> 10px, 12px) */
         .input-group { margin-bottom: 10px; width: 100%; position: relative; }
         .input-group input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
         .input-group input:focus { border-color: var(--primary-green); box-shadow: 0 0 0 3px rgba(135,179,46,0.1); }
@@ -61,7 +56,6 @@
 
         .password-toggle { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; color: #999; cursor: pointer; user-select: none; }
 
-        /* 🌟 버튼 여백 축소 (15px -> 13px) */
         .btn-submit { width: 100%; padding: 13px; background: var(--primary-green); color: #fff; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: 900; cursor: pointer; transition: 0.2s; margin-top: 8px; display: block; }
         .btn-submit:hover { background: #76a025; }
         
@@ -69,18 +63,27 @@
         .btn-kakao:hover { background: #f4dc00; }
         .kakao-icon { font-size: 1.3rem; }
 
-        /* 🌟 구분선 상하 여백 축소 (25px -> 18px) */
         .divider { display: flex; align-items: center; text-align: center; color: #999; font-size: 0.85rem; font-weight: 700; margin: 18px 0; }
         .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #eee; }
         .divider::before { margin-right: 15px; }
         .divider::after { margin-left: 15px; }
 
-        /* 🌟 하단 링크 간격 축소 (20px -> 15px) */
         .extra-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; font-size: 0.85rem; font-weight: 700; color: #888; }
         .extra-links a { color: #888; text-decoration: none; cursor: pointer; }
         .extra-links a:hover { color: #333; text-decoration: underline; }
 
-        /* 🌟 모바일 전용 초밀착 셋팅 (폭 480px 이하일 때 더 좁힘) */
+        /* 🌟 추가된 비밀번호 찾기 모달(팝업) 스타일 */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(2px); }
+        .modal-overlay.active { display: flex; animation: fadeIn 0.2s; }
+        .modal-box { background: #fff; width: 90%; max-width: 400px; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: #999; border: none; background: none; font-weight: 900; }
+        .modal-title { font-size: 1.25rem; font-weight: 900; color: #333; margin-bottom: 20px; text-align: center; }
+        .modal-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 10px; font-size: 1rem; outline: none; }
+        .modal-input:focus { border-color: var(--primary-blue); }
+        .btn-modal { width: 100%; padding: 13px; background: var(--primary-blue); color: #fff; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: 900; cursor: pointer; margin-top: 10px; transition: 0.2s; }
+        .btn-modal:hover { background: #3a82b8; }
+        .pw-result { display: none; margin-top: 15px; padding: 15px; border-radius: 10px; text-align: center; font-weight: 800; word-break: break-all; line-height: 1.5; }
+
         @media (max-width: 480px) {
             .auth-box { border-radius: 15px; }
             .form-container { padding: 20px 15px; }
@@ -123,11 +126,25 @@
                 </form>
 
                 <div class="extra-links">
-                    <a onclick="alert('비밀번호 찾기 화면이 열립니다.')">비밀번호 찾기</a>
+                    <a onclick="openFindPwModal()">비밀번호 찾기</a>
                     <span>|</span>
                     <a href="join.html">이메일로 회원가입</a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="findPwModal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeFindPwModal()">×</button>
+            <div class="modal-title">🔐 비밀번호 찾기</div>
+            <form id="findPwForm">
+                <input type="text" id="fpName" class="modal-input" placeholder="가입하신 이름" required>
+                <input type="email" id="fpEmail" class="modal-input" placeholder="가입하신 이메일" required>
+                <input type="tel" id="fpPhone" class="modal-input" placeholder="휴대폰 번호 (예: 010-1234-5678)" required>
+                <button type="submit" class="btn-modal">비밀번호 확인</button>
+            </form>
+            <div id="pwResultBox" class="pw-result"></div>
         </div>
     </div>
 
@@ -143,7 +160,7 @@
             }
         }
 
-        // 이메일 로그인 요청 연동
+        // 로그인
         document.getElementById('loginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const email = document.getElementById('loginEmail').value;
@@ -158,12 +175,58 @@
             .then(data => {
                 if (data.success) {
                     alert(data.message);
-                    location.href = 'index.html'; // 메인화면으로 진입!
+                    location.href = 'index.html'; 
                 } else {
                     alert(data.message);
                 }
             })
             .catch(err => alert('로그인 처리 중 서버 통신 에러가 발생했습니다.'));
+        });
+
+        // 🌟 비밀번호 찾기 관련 스크립트 추가
+        function openFindPwModal() {
+            document.getElementById('findPwModal').classList.add('active');
+            document.getElementById('pwResultBox').style.display = 'none';
+            document.getElementById('findPwForm').reset();
+        }
+
+        function closeFindPwModal() {
+            document.getElementById('findPwModal').classList.remove('active');
+        }
+
+        // 모달 바깥 배경 클릭 시 닫기
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('findPwModal')) {
+                closeFindPwModal();
+            }
+        }
+
+        document.getElementById('findPwForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('fpName').value.trim();
+            const email = document.getElementById('fpEmail').value.trim();
+            const phone = document.getElementById('fpPhone').value.trim();
+
+            fetch('/api/find-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, phone })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const resBox = document.getElementById('pwResultBox');
+                resBox.style.display = 'block';
+                if (data.success) {
+                    resBox.style.background = '#e8f5e9';
+                    resBox.style.color = '#2e7d32';
+                    resBox.innerHTML = `회원님의 비밀번호는<br><span style="font-size:1.4rem; color:#d32f2f;">${data.password}</span><br>입니다.`;
+                } else {
+                    resBox.style.background = '#ffebee';
+                    resBox.style.color = '#c62828';
+                    resBox.innerHTML = data.message;
+                }
+            })
+            .catch(err => alert('서버 통신 오류가 발생했습니다.'));
         });
     </script>
 </body>

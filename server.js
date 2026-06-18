@@ -1090,6 +1090,24 @@ app.get('/api/notices/comments/:postId', (req, res) => {
         });
     });
 });
+// ==========================================
+// 🌟 [추가] 비밀번호 찾기 (이름, 이메일, 폰번호로 조회) API
+// ==========================================
+app.post('/api/find-password', (req, res) => {
+    const { name, email, phone } = req.body;
+    
+    // 이메일 가입자 테이블에서 정보 조회
+    db.query('SELECT password FROM farm_email_users WHERE name = ? AND email = ? AND phone = ?', [name, email, phone], (err, results) => {
+        if (err) return res.status(500).json({ success: false, message: 'DB 조회 중 오류가 발생했습니다.' });
+        
+        if (results && results.length > 0) {
+            // 정보가 일치하면 비밀번호를 돌려줍니다.
+            res.json({ success: true, password: results[0].password });
+        } else {
+            res.json({ success: false, message: '입력하신 정보와 일치하는 회원이 없습니다.' });
+        }
+    });
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
