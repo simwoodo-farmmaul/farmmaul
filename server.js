@@ -151,13 +151,28 @@ app.post('/api/login', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [수정] 마을 HUB 거점 신청 API (소유자 계정 연동)
+// ==========================================
 app.post('/api/hub-apply', (req, res) => {
+    // 1. 로그인 확인
+    if (!req.session || !req.session.user) {
+        return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    }
+    
+    const owner_nickname = req.session.user.nickname;
     const { hub_name, hub_type, hub_address, hub_desc, hub_image } = req.body;
-    const createTableQuery = `CREATE TABLE IF NOT EXISTS hub_applications_v2 (id INT AUTO_INCREMENT PRIMARY KEY, hub_name VARCHAR(255) NOT NULL, hub_type VARCHAR(100) NOT NULL, hub_address VARCHAR(500) NOT NULL, hub_desc TEXT, hub_image LONGTEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+    
+    // 2. HUB 테이블 생성 및 소유자(owner_nickname) 칸 안전하게 추가
+    const createTableQuery = `CREATE TABLE IF NOT EXISTS hub_applications_v2 (id INT AUTO_INCREMENT PRIMARY KEY, owner_nickname VARCHAR(100), hub_name VARCHAR(255) NOT NULL, hub_type VARCHAR(100) NOT NULL, hub_address VARCHAR(500) NOT NULL, hub_desc TEXT, hub_image LONGTEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`;
+    
     db.query(createTableQuery, (err) => {
-        const insertQuery = `INSERT INTO hub_applications_v2 (hub_name, hub_type, hub_address, hub_desc, hub_image) VALUES (?, ?, ?, ?, ?)`;
-        db.query(insertQuery, [hub_name, hub_type, hub_address, hub_desc, hub_image], (err, result) => {
-            res.json({ success: true, message: '성공적으로 접수되었습니다!' });
+        db.query(`ALTER TABLE hub_applications_v2 ADD COLUMN owner_nickname VARCHAR(100)`, () => {
+            const insertQuery = `INSERT INTO hub_applications_v2 (owner_nickname, hub_name, hub_type, hub_address, hub_desc, hub_image) VALUES (?, ?, ?, ?, ?, ?)`;
+            db.query(insertQuery, [owner_nickname, hub_name, hub_type, hub_address, hub_desc, hub_image], (err, result) => {
+                if (err) return res.status(500).json({ success: false });
+                res.json({ success: true, message: '성공적으로 접수되었습니다!' });
+            });
         });
     });
 });
@@ -171,6 +186,20 @@ app.get('/api/hubs', (req, res) => {
 app.get('/api/hubs/:id', (req, res) => {
     db.query(`SELECT * FROM hub_applications_v2 WHERE id = ?`, [req.params.id], (err, result) => {
         res.json({ success: true, data: result[0] });
+    });
+});
+
+// ==========================================
+// 🌟 [추가] 내 마을 HUB 아이디 찾기 API (마이페이지용)
+// ==========================================
+app.get('/api/my-hub', (req, res) => {
+    if (!req.session || !req.session.user) return res.json({ success: false });
+    const nickname = req.session.user.nickname;
+    
+    // 내가 만든 HUB 중 가장 최근 것을 가져옵니다.
+    db.query(`SELECT id FROM hub_applications_v2 WHERE owner_nickname = ? ORDER BY created_at DESC LIMIT 1`, [nickname], (err, results) => {
+        if(err || results.length === 0) return res.json({ success: false });
+        res.json({ success: true, hubId: results[0].id });
     });
 });
 

@@ -167,10 +167,18 @@
 
     <script>
         let hubImages = []; 
-
-        // 🌟 지도 기능을 위한 변수 세팅
         let applyMapInstance = null;
         let applyMapMarker = null;
+
+        // 🌟 페이지 로드 시 로그인 검사
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/user').then(res=>res.json()).then(data => {
+                if(!data.loggedIn) {
+                    alert("마을 HUB 거점 신청은 팜마을 회원만 가능합니다! 로그인 페이지로 이동합니다. 🏠");
+                    location.href = 'login.html';
+                }
+            });
+        });
 
         function execDaumPostcode() {
             new daum.Postcode({
@@ -184,13 +192,11 @@
                     document.getElementById('hub_address_main').value = fullAddress;
                     document.getElementById('hub_address_detail').focus();
 
-                    // 🌟 주소를 검색하면 지도도 함께 그려주기
                     drawApplyMap(fullAddress);
                 }
             }).open();
         }
 
-        // 🌟 지도를 실시간으로 그리는 마법의 기능
         function drawApplyMap(address) {
             const mapContainer = document.getElementById('apply_map');
             mapContainer.style.display = 'block';
@@ -205,21 +211,18 @@
             }
 
             const geocoder = new kakao.maps.services.Geocoder();
-            
-            // 괄호 제거 후 깔끔하게 검색
             let cleanAddress = address.replace(/\[.*?\]\s*/g, '');
 
             geocoder.addressSearch(cleanAddress, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                    if (applyMapMarker) applyMapMarker.setMap(null); // 기존 핀 걷어내기
+                    if (applyMapMarker) applyMapMarker.setMap(null); 
                     
                     applyMapMarker = new kakao.maps.Marker({ 
                         map: applyMapInstance, 
                         position: coords 
                     });
-                    
-                    applyMapInstance.setCenter(coords); // 부드럽게 중앙으로 이동
+                    applyMapInstance.setCenter(coords); 
                 }
             });
         }
@@ -315,10 +318,10 @@
             .then(res => res.json())
             .then(result => {
                 if(result.success) {
-                    alert('성공적으로 마을 HUB 홈페이지가 생성되었습니다! 🎉');
-                    location.href = 'index.html';
+                    alert('성공적으로 마을 HUB 거점 신청이 접수되었습니다! 🎉');
+                    location.href = 'mypage.html'; // 🌟 접수 후 마이페이지로 이동!
                 } else {
-                    alert('신청 중 오류가 발생했습니다.');
+                    alert('신청 중 오류가 발생했습니다: ' + (result.message || ''));
                 }
             })
             .catch(err => alert('서버와 연결할 수 없습니다.'));
