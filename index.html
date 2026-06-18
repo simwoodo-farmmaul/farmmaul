@@ -46,7 +46,7 @@
         .notice-text:hover { text-decoration: underline; }
 
         header { background-color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.05); position: sticky; top: 0; z-index: 100; }
-        .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: relative; } /* position 속성 추가 */
+        .header-container { max-width: 1200px; margin: 0 auto; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; position: relative; }
         
         .auth-zone-flex { display: flex; gap: 8px; align-items: center; }
         .btn-login { border: 1px solid var(--primary-blue); color: var(--primary-blue) !important; background-color: #fff; padding: 4px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 700; transition: 0.2s; }
@@ -87,64 +87,18 @@
         .product-info .price { font-size: 1.2rem; font-weight: bold; color: var(--primary-orange); }
         .product-info .producer { font-size: 0.9rem; color: var(--text-light); margin-top: 5px; }
 
-.producer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-.producer-card { 
-    background: #fff; 
-    border-radius: 16px; 
-    overflow: hidden; /* 사진이 카드 밖으로 나가지 않게 잘라줌 */
-    border: 1px solid #eaeaea; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.04); 
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; 
-    cursor: pointer; 
-    display: flex; 
-    flex-direction: column;
-}
-.producer-card:hover { 
-    transform: translateY(-6px); 
-    box-shadow: 0 12px 30px rgba(135,179,46,0.15); 
-    border-color: var(--primary-green); 
-}
-.producer-img-box {
-    width: 100%;
-    height: 180px;
-    overflow: hidden; /* 사진 확대 시 틀 유지 */
-}
-.producer-img { 
-    width: 100%; 
-    height: 100%; 
-    object-fit: cover; 
-    transition: transform 0.3s ease; /* 부드러운 확대 애니메이션 */
-}
-.producer-card:hover .producer-img {
-    transform: scale(1.05); /* 마우스 올렸을 때 사진 살짝 확대 */
-}
-.producer-info-wrap {
-    padding: 20px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-.producer-name { font-size: 1.2rem; font-weight: 900; color: #222; margin-bottom: 6px; }
-.producer-desc { font-size: 0.95rem; color: #666; margin-bottom: 12px; }
-.producer-rating { font-size: 0.85rem; font-weight: 800; color: var(--primary-orange); display: inline-block; background: #fff8eb; padding: 4px 12px; border-radius: 20px; margin-bottom: 15px; }
-.btn-follow { 
-    background: #f8f9fa; 
-    color: #555; 
-    border: 1px solid #ddd; 
-    padding: 10px; 
-    border-radius: 8px; 
-    font-weight: 800; 
-    font-size: 0.95rem;
-    cursor: pointer; 
-    transition: all 0.2s; 
-    width: 100%; /* 버튼을 카드 가로 크기에 딱 맞춤 */
-}
-.producer-card:hover .btn-follow { 
-    background: var(--primary-green); 
-    color: white; 
-    border-color: var(--primary-green);
-}
+        .producer-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+        .producer-card { background: #fff; border-radius: 16px; overflow: hidden; border: 1px solid #eaeaea; box-shadow: 0 4px 15px rgba(0,0,0,0.04); transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; cursor: pointer; display: flex; flex-direction: column; }
+        .producer-card:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(135,179,46,0.15); border-color: var(--primary-green); }
+        .producer-img-box { width: 100%; height: 180px; overflow: hidden; }
+        .producer-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+        .producer-card:hover .producer-img { transform: scale(1.05); }
+        .producer-info-wrap { padding: 20px; text-align: center; display: flex; flex-direction: column; flex: 1; }
+        .producer-name { font-size: 1.2rem; font-weight: 900; color: #222; margin-bottom: 6px; }
+        .producer-desc { font-size: 0.95rem; color: #666; margin-bottom: 12px; }
+        .producer-rating { font-size: 0.85rem; font-weight: 800; color: var(--primary-orange); display: inline-block; background: #fff8eb; padding: 4px 12px; border-radius: 20px; margin-bottom: 15px; }
+        .btn-follow { background: #f8f9fa; color: #555; border: 1px solid #ddd; padding: 10px; border-radius: 8px; font-weight: 800; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; width: 100%; }
+        .producer-card:hover .btn-follow { background: var(--primary-green); color: white; border-color: var(--primary-green); }
 
         .hub-search-ui { background: #fff; border-radius: 15px; border: 1px solid #eaeaea; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .region-selects { display: flex; gap: 10px; padding: 20px; background: #f8f9fa; border-bottom: 1px solid #eee; }
@@ -167,8 +121,6 @@
         .hub-item-info { font-size: 0.95rem; color: #555; font-weight: 600; display: flex; align-items: flex-start; gap: 5px; }
         .hub-item-info span { color: #ff5e62; font-size: 0.9rem; margin-top: 1px; }
 
-        /* 1. 상단 메뉴 4개 (생산용품관, 약초, 비료, 사료) */
-        /* 1. 상단 메뉴 4개 (생산용품관, 약초, 비료, 사료) - 높이 110px 고정 */
         .extra-menu-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }      
         .extra-menu-box { height: 110px; border-radius: 15px; padding: 15px; text-align: center; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; word-break: keep-all; box-sizing: border-box; }
         .extra-menu-box:nth-child(1) { background: linear-gradient(135deg, #e3f2fd, #bbdefb); }
@@ -179,14 +131,12 @@
         .extra-menu-box .icon { font-size: 2.3rem; margin-bottom: 5px; filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.1)); }
         .extra-menu-box .title { font-size: 1.15rem; font-weight: 900; color: var(--text-dark); margin: 0; }
 
-        /* 2. 중앙 긴 배너 3개 (사라졌던 코드 완벽 복구 및 높이 110px 고정) */
         .event-banner-inner { display: flex; gap: 15px; width: 100%; box-sizing: border-box; margin-top: 15px; }
         .dimiga-box { height: 110px; cursor: pointer; flex: 1; background: linear-gradient(to right, #6b9122, #87B32E); border-radius: 15px; padding: 15px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05); text-align: center; gap: 8px; transition: transform 0.2s; box-sizing: border-box; }
         .dimiga-box:hover { transform: translateY(-3px); }
         .dimiga-box .d-title { color: #ffffff; font-size: 1.25rem; font-weight: 900; letter-spacing: -0.5px; word-break: keep-all; margin: 0; }
         .dimiga-box .d-sub { color: #ffffff; font-size: 1rem; font-weight: 700; letter-spacing: -0.5px; opacity: 0.9; word-break: keep-all; margin: 0; }
 
-        /* 3. 하단 메뉴 4개 (잘키우는법, 질문있어요, 잔디밭, 알림판) - 높이 110px 고정 */
         .sub-menus { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 15px; } 
         .sub-menu-banner { height: 110px; color: white; padding: 15px; border-radius: 15px; text-align: center; font-size: 1.25rem; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 8px; word-break: keep-all; box-sizing: border-box; }
         .sub-menu-banner:hover { transform: translateY(-3px); }
@@ -240,13 +190,20 @@
 
         @media (max-width: 768px) {
             .top-notice-bar { font-size: 0.75rem; padding: 8px 10px; }
+            .header-container { padding: 10px 5px !important; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; }
+            .logo-text { font-size: 1.5rem !important; gap: 2px !important; letter-spacing: -1.5px !important; }
+            .logo-leaf { font-size: 1.3rem !important; }
+            .logo-icon { height: 2.0rem !important; }
             
-            .header-container { padding: 12px 15px; display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%; }
-            .logo-text { font-size: 1.7rem; }
-            .logo-leaf { font-size: 1.3rem; }
-            
-            .auth-zone-flex { gap: 6px; flex: 1; justify-content: flex-end; }
+            .auth-zone-flex { gap: 6px !important; flex: 1; justify-content: flex-end; }
             .btn-login, .btn-register-trigger { padding: 5px 10px; font-size: 0.85rem; }
+            
+            #auth-zone { gap: 4px !important; }
+            #auth-zone span { font-size: 12px !important; margin-right: 3px !important; letter-spacing: -0.5px; }
+            #auth-zone a[href="/auth/logout"] { padding: 5px 8px !important; font-size: 12px !important; }
+
+            .header-search-bar { display: none !important; }
+
             .hero { padding: 15px 20px 50px; }
             .main-categories { flex-wrap: wrap; gap: 10px; margin: -40px auto 30px; }
             .category-box { width: calc(50% - 5px); height: 100px; }
@@ -266,27 +223,17 @@
             .hub-display-area { flex-direction: column; padding: 15px; }
             .hub-map-img-box { height: 250px; }
 
-        /* 🌟 모바일 반응형 처리 규칙 변경 */
-        @media (max-width: 768px) {
-            /* ... (다른 모바일 설정들) ... */
-            
-            /* 1. 상단 메뉴: 모바일에서 1줄에 2개씩 */
             .extra-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .extra-menu-box { padding: 15px 10px; border-radius: 12px; }
             .extra-menu-box .icon { font-size: 2rem; margin-bottom: 5px; }
             .extra-menu-box .title { font-size: 1.05rem; }
 
-            /* 2. 중앙 배너: 모바일에서 세로로 1줄에 1개씩 꽉 차게 */
             .event-banner-inner { flex-direction: column; gap: 12px; margin-top: 25px; }
 
-            /* 3. 하단 메뉴: 모바일에서 1줄에 2개씩 (총 4개) 꽉 차게 */
             .sub-menus { grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 25px; }
             .sub-menu-banner { padding: 15px 5px; border-radius: 12px; }
             .sub-menu-banner div { font-size: 1.05rem; font-weight: 900; letter-spacing: -0.5px; }
-            .sub-menu-banner span.desc { display: none; /* 모바일에서는 칸이 좁으므로 설명글 숨김 */ }
-            
-            /* ... (다른 모바일 설정들) ... */
-        }
+            .sub-menu-banner span.desc { display: none; }
             
             .cta-section h2 { font-size: 1.6rem; }
             .cta-buttons { flex-direction: column; gap: 10px; }
@@ -303,96 +250,89 @@
             
             .floating-menu { bottom: 85px; right: 20px; } 
             .float-btn { width: 50px; height: 50px; }
+
+            .top-mypage-btn { display: none !important; }
+            .pc-admin-btn { display: none !important; }
         }
 
-        /* 🌟 모바일 헤더(상단바) 초밀착 및 좌측 정렬 특별 패치 🌟 */
-        @media (max-width: 768px) {
-            /* 1. 화면 양끝 빈 공간(여백)을 줄여서 전체를 좌측으로 당김 */
-            .header-container { padding: 10px 5px !important; }
-            
-            /* 2. 로고 아이콘 크기를 줄이고, '팜마을' 글씨와 바짝 붙임 */
-            .logo-text { font-size: 1.5rem !important; gap: 2px !important; letter-spacing: -1.5px !important; }
-            .logo-icon { height: 2.0rem !important; }
-            
-        /* 3. 환영인사 글씨를 살짝 줄여 로그아웃 버튼을 좌측으로 당김 */
-        #auth-zone { gap: 4px !important; }
-        #auth-zone span { font-size: 12px !important; margin-right: 3px !important; letter-spacing: -0.5px; }
-        #auth-zone a[href="/auth/logout"] { padding: 5px 8px !important; font-size: 12px !important; }
-    }
-
-    /* 👇 새로 추가된 부분 시작 */
-    /* 헤더 내부 검색창 스타일 (PC용) */
-    .header-search-bar {
-        width: 280px;
-        height: 36px;
-        position: absolute; /* 정중앙 강제 고정 닻 역할 */
-        left: 50%;
-        transform: translateX(-50%);
-        box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
-        border: 1px solid #eaeaea;
-        border-radius: 20px;
-        overflow: hidden;
-        display: flex;
-        background: #fff;
-    }
-
-    .header-search-bar input {
-        flex: 1;
-        border: none;
-        outline: none;
-        padding: 0 15px;
-        font-size: 0.9rem;
-    }
-    
-    .header-search-bar button {
-        width: 40px;
-        border: none;
-        background: var(--primary-orange);
-        color: #fff;
-        cursor: pointer;
-    }
-
-    /* 모바일 화면에서 상단 검색창 숨기기 */
-    @media (max-width: 768px) {
         .header-search-bar {
-            display: none !important;
+            width: 280px;
+            height: 36px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #eaeaea;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            background: #fff;
         }
-    }
-    /* 👆 새로 추가된 부분 끝 */
-</style>
+
+        .header-search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 0 15px;
+            font-size: 0.9rem;
+        }
+        
+        .header-search-bar button {
+            width: 40px;
+            border: none;
+            background: var(--primary-orange);
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-   <div class="top-notice-bar">
+    <div class="top-notice-bar">
         <div class="notice-inner">
             <div>
                 <span class="notice-badge">알림</span>
-                <span class="notice-text" onclick="location.href='notice.html'">팜마을 평택 비전동 제2허브 정식 오픈 안내 🎉</span>
+                <span class="notice-text" id="mainTopNoticeText" onclick="location.href='notice.html'">공지사항을 불러오는 중입니다... ⏳</span>
             </div>
         </div>
     </div>
 
-<header>
-       <div class="header-container">
-        
-        <a href="index.html" class="logo-text">
-            <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
-        </a>
-        
-        <!-- 👇 검색창을 auth-zone 구역 밖으로 분리했습니다 -->
-        <div class="search-bar header-search-bar">
-            <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
-            <button onclick="executeSearch()">🔍</button>
-        </div>
-        <!-- 👆 분리 완료 -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch('/api/notices')
+            .then(res => res.json())
+            .then(result => {
+                if (result.success && result.data.length > 0) {
+                    const topNotice = result.data[0];
+                    const noticeEl = document.getElementById('mainTopNoticeText');
+                    if (noticeEl) {
+                        noticeEl.innerText = (topNotice.is_pinned ? "📌 " : "") + topNotice.title;
+                    }
+                } else {
+                    document.getElementById('mainTopNoticeText').innerText = "팜마을에 오신 것을 환영합니다! 🌱";
+                }
+            })
+            .catch(err => console.log('알림판 연동 에러:', err));
+        });
+    </script>
 
-        <div class="auth-zone-flex" id="auth-zone">
-            <a href="login.html" class="btn-login">로그인</a>  
-            <a href="join.html" class="btn-register-trigger">회원가입</a>
-        </div>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo-text">
+                <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
+            </a>
+            
+            <div class="search-bar header-search-bar">
+                <input type="text" id="mainSearchInput" placeholder="어떤 상품을 찾으시나요?" onkeyup="if(event.key==='Enter'){executeSearch()}">
+                <button onclick="executeSearch()">🔍</button>
+            </div>
 
-    </div>
-</header>
+            <div class="auth-zone-flex" id="auth-zone">
+                <a href="login.html" class="btn-login">로그인</a>  
+                <a href="join.html" class="btn-register-trigger">회원가입</a>
+            </div>
+        </div>
+    </header>
 
     <section class="hero">
         <div class="hero-title">우리동네 신선한 먹거리</div>
@@ -401,11 +341,8 @@
 
     <script>
         function executeSearch() {
-            // 입력창에 적힌 글자를 가져옵니다.
             const searchInput = document.getElementById('mainSearchInput');
-            const keyword = searchInput.value.trim(); // 앞뒤 불필요한 공백 제거
-            
-            // 주소 뒤에 '?keyword=입력한글자'를 붙여서 결과 페이지로 이동시킵니다.
+            const keyword = searchInput.value.trim(); 
             location.href = 'search_result.html?keyword=' + encodeURIComponent(keyword);
         }
     </script>
@@ -417,20 +354,19 @@
         <div class="category-box box-fish" onclick="location.href='search_result.html?keyword=어류'"><span class="icon">🐟</span><span class="title">어류</span></div>
     </div>
 
-        <section class="common-section">
+    <section class="common-section">
         <h2 class="section-title">
             <span>최신상품</span>
             <a href="register.html" style="font-size: 0.85rem; background: var(--primary-orange); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none;">+ 상품등록</a>
         </h2>
         <div class="product-grid" id="mainProductContainer">
-            <!-- 진짜 서버(DB)에서 상품 목록을 불러와 이곳에 자동으로 채웁니다. -->
             <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888; font-weight: 800;">
                 서버에서 동네 상품 정보를 불러오는 중입니다... 🌱
             </div>
         </div>    
     </section>
 
-<section class="common-section">
+    <section class="common-section">
         <h2 class="section-title">
             <span>생산자 이야기</span>
             <a href="producer_apply.html" style="font-size: 0.85rem; background: var(--primary-green); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-decoration: none;">+ 생산자 등록</a>
@@ -449,12 +385,11 @@
             const container = document.getElementById('mainProducerGridContainer');
             if(!container) return;
             
-            // 🌟 진짜 서버 DB에서 명단을 꺼내옵니다
             fetch('/api/producers')
             .then(response => response.json())
             .then(result => {
                 if(result.success && result.data.length > 0) {
-                    container.innerHTML = ''; // 로딩 문구 청소
+                    container.innerHTML = ''; 
                     
                     result.data.forEach(producer => {
                         const profileImg = producer.profile_image || 'https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop';
@@ -481,6 +416,7 @@
             .catch(error => console.error('메인 생산자 리스트 불러오기 실패:', error));
         });
     </script>    
+
     <section class="common-section">
         <h2 class="section-title">우리 동네 마을 HUB 위치</h2>
         <p class="section-subtitle">내가 사는 곳을 기준으로, 내 주변의 가까운 HUB 위치를 확인하세요.</p>
@@ -499,7 +435,8 @@
                 <button class="btn-search-hub" onclick="updateHubFilter()">검색하기</button>
                 <button class="btn-hub-apply" onclick="location.href='hub_apply.html'">허브등록신청</button>
             </div>
-        </div>            <div class="hub-display-area">
+        </div>            
+            <div class="hub-display-area">
                 <div class="hub-map-img-box">
                     <iframe id="mainMapIframe" src="about:blank" allowfullscreen="" loading="lazy"></iframe>
                 </div>
@@ -510,7 +447,7 @@
         </div>
     </section>
 
-<section class="common-section" style="display: flex; flex-direction: column; gap: 15px;">
+    <section class="common-section" style="display: flex; flex-direction: column; gap: 15px;">
         
        <div class="extra-menu-grid">
             <div class="extra-menu-box" onclick="location.href='shop.html'"><span class="icon">🛠️</span><span class="title">생산용품관</span></div>
@@ -594,9 +531,8 @@
         </div>
     </section>
 
-<footer class="company-info">
+    <footer class="company-info">
         <div class="footer-container">
-            <!-- 모든 메뉴와 버튼을 한 줄로 나열 -->
             <div class="footer-logo-zone" style="display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 15px;">
                 <a href="index.html" class="logo-text footer-logo-text" style="margin-right: 10px;">
                     <img src="farmmaul-logo.webp" alt="팜마을" class="logo-icon">팜마을
@@ -609,11 +545,9 @@
                     <a href="policy.html" style="margin-right: 15px;">고객센터</a>
                 </div>
                 
-                <!-- 오시는 길 버튼 -->
                 <div onclick="toggleMap()" style="font-weight: 800; cursor: pointer; display: inline-block; padding: 6px 14px; background: #e8f5e9; color: #2e7d32; border-radius: 8px; border: 1px solid #c8e6c9; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">📍 오시는 길 (클릭하여 지도 보기) ⬇️</div>
             </div>
 
-            <!-- 숨겨진 카카오 지도 영역 -->
             <div id="map-wrapper" style="display: none; width: 100%; max-width: 400px; margin-bottom: 20px; border-radius: 10px; overflow: hidden; border: 1px solid #ddd;">
                 <iframe 
                     src="https://maps.google.com/maps?q=경기도 안산시 상록구 사사안골길 106&t=&z=16&ie=UTF8&iwloc=&output=embed" 
@@ -625,7 +559,6 @@
                 </iframe>
             </div>
             
-            <!-- 회사 정보 -->
             <div class="footer-details">
                 <span><strong>디미가 주식회사</strong></span>
                 <span><strong>대표자:</strong> 이호선</span>
@@ -638,36 +571,28 @@
                 <span><strong>사업장 주소:</strong> 경기도 안산시 상록구 사사안골길 106(사사동)</span>
             </div>
             
-            <!-- 원상복구된 하단 고객센터 연락처 -->
             <div class="footer-details">
                 <span><strong>고객센터:</strong> 031-419-1151 / 010-3768-2491</span>
                 <span><strong>홈페이지관리:</strong> 010-3967-0919</span>               
                 <span><strong>이메일:</strong> greenpic@naver.com</span>
             </div>
             
-            <!-- 카피라이트 -->
             <div class="footer-copyright" style="margin-top: 20px;">
                 Copyright © 디미가 주식회사 All rights reserved.
             </div>
         </div>
     </footer>
 
-    <!-- 어르신을 위한 글자 확대 스타일 추가 -->
     <style>
-        /* 글자 확대 버튼 디자인 */
         .floating-menu .float-zoom { background: var(--primary-blue); }
         .floating-menu .float-zoom .icon { font-size: 1.4rem; margin-bottom: 2px; }
         .floating-menu .float-zoom .text { font-size: 0.75rem; font-weight: 800; }
-        
-        /* 돋보기 모드 (글자 크기를 15% 확대) */
         html.large-font { font-size: 115%; }
     </style>
 
-<!-- 글자 확대/축소 작동 스크립트 -->
     <script>
         function toggleZoom() {
             const htmlTag = document.documentElement; 
-            // 모바일 하단바의 큰글씨 텍스트와 연결되도록 ID 변경
             const zoomBtnText = document.getElementById('zoomTextMobile'); 
             
             if (htmlTag.classList.contains('large-font')) {
@@ -690,7 +615,6 @@
         <a href="chat.html" class="nav-item">
             <span class="icon">💬</span><span class="text">채팅</span>
         </a>
-        <!-- ★ 추가된 큰글씨 버튼 (채팅과 내정보 사이) ★ -->
         <a href="#" class="nav-item" onclick="toggleZoom(); return false;">
             <span class="icon">🔍</span><span class="text" id="zoomTextMobile">큰글씨</span>
         </a>
@@ -699,27 +623,24 @@
         </a>
     </div>
 
-<script>
-        // 공공데이터 법정동 API 주소
+    <script>
         const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
-        let allHubs = []; // 서버에서 불러온 허브 목록을 저장할 공간
+        let allHubs = [];
 
         document.addEventListener("DOMContentLoaded", function() {
-            // 1. 전국 시/도 데이터 API로 불러오기
             fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
                 .then(response => response.json())
                 .then(data => {
                     const sidoSelect = document.getElementById('sidoSelect');
                     data.regcodes.forEach(function(item) {
                         let option = document.createElement('option');
-                        option.value = item.name; // 값: "경기도"
-                        option.text = item.name;  // 보이는 글자: "경기도"
-                        option.dataset.code = item.code.substring(0, 2); // 숨겨진 행정코드: "41"
+                        option.value = item.name; 
+                        option.text = item.name;  
+                        option.dataset.code = item.code.substring(0, 2); 
                         sidoSelect.add(option);
                     });
                 });
 
-            // 2. 팜마을 허브 리스트 가져오기
             fetch('/api/hubs')
                 .then(response => response.json())
                 .then(result => {
@@ -731,13 +652,11 @@
                 .catch(error => console.error('허브 리스트 불러오기 실패:', error));
         });
 
-        // 🌟 3. 시/도를 선택했을 때 -> 시/군/구 API 불러오기
         function changeSido() {
             const sidoSelect = document.getElementById('sidoSelect');
             const sigunguSelect = document.getElementById('sigunguSelect');
             const dongSelect = document.getElementById('dongSelect');
             
-            // 하위 메뉴 초기화
             sigunguSelect.options.length = 1;
             dongSelect.options.length = 1;
 
@@ -746,22 +665,19 @@
                 return;
             }
 
-            // 선택된 시/도의 고유 코드 추출 (예: 경기도 = 41)
             const sidoCode = sidoSelect.options[sidoSelect.selectedIndex].dataset.code;
 
-            // 시/군/구 API 호출
             fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
                 .then(response => response.json())
                 .then(data => {
                     data.regcodes.forEach(function(item) {
                         let nameArray = item.name.split(" ");
                         if (nameArray.length > 1) { 
-                            // "경기도 수원시 권선구" 처럼 나오는 결과에서 시/도 이름 떼어내기
                             let sigunguName = nameArray.slice(1).join(" ");
                             let option = document.createElement('option');
                             option.value = sigunguName;
                             option.text = sigunguName;
-                            option.dataset.code = item.code.substring(0, 5); // 시군구 고유코드
+                            option.dataset.code = item.code.substring(0, 5);
                             sigunguSelect.add(option);
                         }
                     });
@@ -769,12 +685,10 @@
             updateHubFilter();
         }
 
-        // 🌟 4. 시/군/구를 선택했을 때 -> 읍/면/동 API 불러오기
         function changeSigungu() {
             const sigunguSelect = document.getElementById('sigunguSelect');
             const dongSelect = document.getElementById('dongSelect');
             
-            // 동 메뉴 초기화
             dongSelect.options.length = 1;
 
             if (sigunguSelect.selectedIndex === 0) {
@@ -782,17 +696,15 @@
                 return;
             }
 
-            // 선택된 시/군/구의 고유 코드 추출
             const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex].dataset.code;
 
-            // 읍/면/동 API 호출 (is_ignore_zero=true 속성으로 껍데기 지역 제거)
             fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
                 .then(response => response.json())
                 .then(data => {
                     data.regcodes.forEach(function(item) {
                         let nameArray = item.name.split(" ");
                         if (nameArray.length > 2) {
-                            let dongName = nameArray[nameArray.length - 1]; // 배열 마지막의 동 이름만 추출
+                            let dongName = nameArray[nameArray.length - 1];
                             let option = document.createElement('option');
                             option.value = dongName;
                             option.text = dongName;
@@ -803,7 +715,6 @@
             updateHubFilter();
         }
 
-        // 🌟 5. 실제 허브 지도 및 리스트 출력
         function updateHubFilter() {
             const sido = document.getElementById('sidoSelect').value;
             const sigungu = document.getElementById('sigunguSelect').value;
@@ -816,9 +727,7 @@
                 let match = true;
                 if (sido && !hub.hub_address.includes(sido)) match = false;
                 
-                // 시/군/구 값이 존재할 때, 주소 비교 (예: "수원시 권선구" 포함 여부 확인)
                 if (sigungu) {
-                    // 띄어쓰기로 분리된 복합 구(수원시 권선구)를 안전하게 검색하기 위해 분리하여 확인
                     const sigunguParts = sigungu.split(" ");
                     sigunguParts.forEach(part => {
                         if (!hub.hub_address.includes(part)) match = false;
@@ -861,21 +770,6 @@
             }
         }
     </script>    
-    
-    <!-- 🌟 모바일 화면 전용: 상단 '내정보' 숨김 처리 -->
-    <style>
-        @media (max-width: 768px) {
-            .top-mypage-btn { display: none !important; }
-        }
-    </style>
-
-    <!-- 🌟 모바일 화면 전용: 상단 '내정보' 및 푸터 '관리자' 숨김 처리 -->
-    <style>
-        @media (max-width: 768px) {
-            .top-mypage-btn { display: none !important; }
-            .pc-admin-btn { display: none !important; }
-        }
-    </style>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -884,11 +778,9 @@
                 .then(data => {
                     const authZone = document.getElementById('auth-zone');
                     if (data.loggedIn) {
-                        // 관리자 명단 확인
                         const adminEmails = ['greenpic@naver.com', 'simwoodo@naver.com'];
                         const isAdmin = adminEmails.includes(data.user.email) && data.user.kakaoId === null;
 
-                        // 🌟 상단 메뉴: 관리자 버튼 제거, 내정보 버튼에 top-mypage-btn 클래스 추가
                         authZone.innerHTML = `
                             <span style="color: #333; font-weight: bold; margin-right: 8px; font-size:13px; white-space: nowrap;">
                                 👤 ${data.user.nickname}님 환영합니다
@@ -897,9 +789,7 @@
                             <a href="/auth/logout" style="padding: 5px 10px; background-color: #ff4d4d; color: white; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight:700; white-space: nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">로그아웃</a>
                         `;
 
-                        // 🌟 관리자일 경우 메뉴 추가
                         if (isAdmin) {
-                            // 1. 모바일: 하단 고정 내비게이션 바에 아이콘 추가
                             const mobileNav = document.querySelector('.mobile-bottom-nav');
                             if (mobileNav) {
                                 const adminNav = document.createElement('a');
@@ -912,7 +802,6 @@
                                 navItems.forEach(item => item.style.width = (100 / navItems.length) + '%');
                             }
 
-                            // 2. PC: 화면 맨 아래쪽 푸터 링크 영역에 '관리자페이지' 텍스트 추가
                             const footerLinks = document.querySelector('.footer-links');
                             if (footerLinks) {
                                 const pcAdminBtn = document.createElement('a');
@@ -940,7 +829,6 @@
 
         installBtn.addEventListener('click', async () => {
             if (deferredPrompt) {
-                // 💻📱 [PC/모바일 공통] : 브라우저가 허용하면 진짜 어플 설치 창을 띄웁니다!
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
@@ -948,12 +836,10 @@
                 }
                 deferredPrompt = null;
             } else {
-                // 이미 설치가 되었거나, 애플 기기(아이폰/맥) 등 지원하지 않는 환경일 때의 안내
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 if (isMobile) {
                     alert('아이폰(사파리) 사용자는 화면 하단의 [공유 버튼 ⬆️]을 누르신 후 [홈 화면에 추가 ➕]를 선택해 주시면 앱처럼 사용하실 수 있습니다! 🌱');
                 } else {
-                    // ★ PC 접속자에게 띄우는 친절한 강제 안내창 ★
                     alert('💻 자동 설치 창을 띄울 수 없습니다.\n\n[원인]\n이미 PC에 팜마을이 설치되어 숨어있거나, 예전에 설치 후 바탕화면 아이콘만 지우셨기 때문입니다.\n\n[해결 방법]\n1. 인터넷 주소창 오른쪽 끝에 있는 [모니터 모양 아이콘(앱 설치)]을 직접 클릭해 주세요!\n2. 아이콘이 없다면 창 오른쪽 위 [점 3개(⋮)] 메뉴 -> [저장 및 공유] -> [팜마을 설치]를 눌러주시면 바로 해결됩니다. 🌱');
                 }
             }
@@ -975,18 +861,16 @@
 </script>
 
 <script>
-    // 🌟 페이지가 켜질 때 DB 금고에서 진짜 상품 목록을 원격으로 가져와 화면에 그립니다.
     document.addEventListener("DOMContentLoaded", function() {
         fetch('/api/products')
         .then(response => response.json())
         .then(result => {
             if(result.success) {
                 const container = document.getElementById('mainProductContainer');
-                container.innerHTML = ''; // 기존의 가짜 샘플 카드들을 무조건 깨끗하게 청소합니다!
+                container.innerHTML = ''; 
                 
                 if (result.data.length > 0) {
             result.data.forEach(product => {
-                    // 🌟 금고(DB)에 진짜 저장된 상품 사진을 불러오고, 없을 때만 기본 토마토 이미지를 사용합니다.
                     const imgUrl = product.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
                     
                     const itemHtml = `
@@ -1002,7 +886,6 @@
                         container.insertAdjacentHTML('beforeend', itemHtml);
                     });
                 } else {
-                    // 금고(DB)에 상품이 하나도 없을 경우 표시되는 안내 문구입니다.
                     container.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #888; font-weight: 800; background: #fff; border-radius: 15px; border: 1px dashed #ccc;">아직 우리 동네에 등록된 상품이 없습니다. 팜마을 첫 상품을 등록해 보세요! 🌱</div>';
                 }
             }
@@ -1011,7 +894,6 @@
    });
 </script>
 
-<!-- 카카오 지도 API 및 클릭 이벤트 스크립트 시작 -->
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
 <script>
     var map; 
@@ -1020,15 +902,12 @@
     function toggleMap() {
         var wrapper = document.getElementById('map-wrapper');
         
-        // 지도가 열려있으면 숨기기
         if (wrapper.style.display === 'block') {
             wrapper.style.display = 'none';
         } 
-        // 지도가 숨겨져 있으면 열기
         else {
             wrapper.style.display = 'block';
             
-            // 지도를 처음 열 때 딱 한 번만 불러오기
             if (!isMapLoaded) {
                 var mapContainer = document.getElementById('kakao-map'); 
                 var mapOption = {
@@ -1037,7 +916,6 @@
                 };
                 map = new kakao.maps.Map(mapContainer, mapOption); 
                 
-                // 안산시 디미가 주소로 마커 꽂기
                 var geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch('경기도 안산시 상록구 사사안골길 106', function(result, status) {
                     if (status === kakao.maps.services.Status.OK) {
@@ -1048,14 +926,10 @@
                 });
                 isMapLoaded = true;
             } else {
-                // 두 번째 열 때부터는 화면 크기에 맞게 재조정
                 map.relayout();
             }
         }
     }
 </script>
-<!-- 카카오 지도 API 스크립트 끝 -->
-<!-- 카카오 지도 API 스크립트 끝 -->
-
 </body>
 </html>

@@ -1201,6 +1201,56 @@ app.get('/api/producer/stories', (req, res) => {
         res.json({ success: true, data: results });
     });
 });
+// ==========================================
+// 🌟 [추가] 메인페이지 알림판(공지사항) 연동 API
+// ==========================================
+
+// 1. 알림판 테이블 생성 (상단 고정 기능 is_pinned 추가)
+db.query(`CREATE TABLE IF NOT EXISTS farm_notices (id INT AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255), content TEXT, is_pinned BOOLEAN DEFAULT FALSE, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {});
+
+// 2. 알림 등록 API
+app.post('/api/notices', (req, res) => {
+    const { title, content, is_pinned } = req.body;
+    
+    // 상단 고정(체크)을 선택했다면, 기존 메인에 떠있던 고정을 모두 해제하고 이번 것만 메인에 띄웁니다.
+    if (is_pinned) {
+        db.query(`UPDATE farm_notices SET is_pinned = FALSE`, () => {
+            db.query(`INSERT INTO farm_notices (title, content, is_pinned) VALUES (?, ?, ?)`, [title, content, true], (err) => {
+                if(err) return res.json({ success: false });
+                res.json({ success: true, message: '상단 고정 알림이 등록되어 메인페이지에 반영되었습니다.' });
+            });
+        });
+    } else {
+        db.query(`INSERT INTO farm_notices (title, content, is_pinned) VALUES (?, ?, ?)`, [title, content, false], (err) => {
+            if(err) return res.json({ success: false });
+            res.json({ success: true, message: '일반 알림이 성공적으로 등록되었습니다.' });
+        });
+    }
+});
+
+// 3. 알림 불러오기 (상단 고정된 것이 무조건 1순위, 그다음은 최근 등록순)
+app.get('/api/notices', (req, res) => {
+    db.query(`SELECT * FROM farm_notices ORDER BY is_pinned DESC, created_at DESC`, (err, results) => {
+        if(err) return res.json({ success: false, data: [] });
+        res.json({ success: true, data: results });
+    });
+});
+
+// 4. 알림 리스트에서 체크박스 클릭 시 고정 상태 휙휙 바꾸기
+app.put('/api/notices/:id/pin', (req, res) => {
+    const { is_pinned } = req.body;
+    if (is_pinned) {
+        db.query(`UPDATE farm_notices SET is_pinned = FALSE`, () => {
+            db.query(`UPDATE farm_notices SET is_pinned = TRUE WHERE id = ?`, [req.params.id], () => {
+                res.json({ success: true });
+            });
+        });
+    } else {
+        db.query(`UPDATE farm_notices SET is_pinned = FALSE WHERE id = ?`, [req.params.id], () => {
+            res.json({ success: true });
+        });
+    }
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));

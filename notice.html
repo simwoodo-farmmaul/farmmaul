@@ -14,7 +14,6 @@
         .center-title { flex: 1; text-align: center; font-size: 1.3rem; font-weight: 900; color: #333; white-space: nowrap; }
         .btn-home { flex: 1; text-align: right; font-weight: bold; color: #666; font-size: 1rem; }
 
-        /* 🌟 가로 크기 1000px로 확장 유지 */
         .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; }
 
         .notice-banner { background: linear-gradient(135deg, #87B32E, #6b9122); border-radius: 15px; padding: 30px; text-align: center; color: white; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(135, 179, 46, 0.3); }
@@ -27,8 +26,12 @@
         .btn-write:hover { background: #d84315; }
 
         .write-box { display: none; background: #fff; padding: 25px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        .write-box input, .write-box textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; outline: none; }
+        .write-box input[type="text"], .write-box textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 15px; font-size: 1rem; outline: none; }
         .write-box textarea { height: 150px; resize: none; }
+        
+        /* 🌟 새로 추가된 체크박스 라벨 스타일 */
+        .pin-label { display: block; margin-bottom: 15px; font-weight: 900; cursor: pointer; color: #E69138; font-size: 1.05rem; }
+        
         .btn-submit { background: #87B32E; color: white; border: none; width: 100%; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1rem; cursor: pointer; }
 
         .notice-item { background: #fff; border-radius: 12px; padding: 25px; border: 1px solid #eee; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column; }
@@ -39,11 +42,11 @@
         
         .toggle-btn { background: #f8f9fa; border: 1px solid #ddd; border-radius: 8px; padding: 8px; text-align: center; color: #555; font-weight: bold; cursor: pointer; margin-top: 10px; }
 
-        /* 🌟 추가된 수정/삭제 버튼 및 댓글창 스타일 */
-        .author-actions { margin-top: 15px; text-align: right; border-top: 1px solid #eee; padding-top: 15px; }
+        .author-actions { margin-top: 15px; border-top: 1px solid #eee; padding-top: 15px; display: flex; justify-content: space-between; align-items: center; }
         .btn-action { padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; margin-left: 5px; font-size: 0.9rem; }
         .btn-edit { background: #4B9AD2; color: white; }
         .btn-delete { background: #ff4d4d; color: white; }
+        .pin-switch { font-weight: 900; color: #E69138; cursor: pointer; }
 
         .notice-comments-wrap { margin-top: 20px; background: #f9fbf9; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; display: none; }
         .notice-comments-wrap.expanded { display: block; }
@@ -97,6 +100,11 @@
             <h4 style="margin-bottom: 15px; color: #333;">새로운 공지사항 작성</h4>
             <input type="text" id="nTitle" placeholder="공지 제목을 입력해주세요" required>
             <textarea id="nContent" placeholder="공지 내용을 자세히 적어주세요." required></textarea>
+            
+            <label class="pin-label">
+                <input type="checkbox" id="nPinned" style="width:auto; margin-right:5px;"> 📌 이 공지를 메인화면 상단 알림으로 고정하기
+            </label>
+
             <button class="btn-submit" onclick="submitNotice()">공지 등록하기</button>
         </div>
 
@@ -105,7 +113,6 @@
         </div>
     </div>
 
-    <!-- 🌟 수정 팝업창 -->
     <div id="editNoticeModal" class="modal-overlay">
         <div class="modal-box">
             <h3 style="margin-bottom: 15px; color:#333;">✏️ 공지사항 수정하기</h3>
@@ -141,15 +148,18 @@
             form.style.display = form.style.display === 'block' ? 'none' : 'block';
         }
 
+        // 🌟 작성 시 체크박스 상태값도 서버로 보냄
         function submitNotice() {
             const title = document.getElementById('nTitle').value;
             const content = document.getElementById('nContent').value;
+            const is_pinned = document.getElementById('nPinned').checked;
+            
             if(!title) { alert('제목을 입력해주세요.'); return; }
 
             fetch('/api/notices', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ title, content })
+                body: JSON.stringify({ title, content, is_pinned })
             })
             .then(res => res.json())
             .then(result => {
@@ -157,6 +167,7 @@
                 if(result.success) {
                     document.getElementById('nTitle').value = '';
                     document.getElementById('nContent').value = '';
+                    document.getElementById('nPinned').checked = false;
                     document.getElementById('writeForm').style.display = 'none';
                     loadNotices(); 
                 }
@@ -187,26 +198,33 @@
                         toggleBtn = `<div class="toggle-btn" onclick="toggleContent(${item.id}, this)">상세 내용 보기 🔽</div>`;
                     }
 
-                    // 관리자일 경우에만 수정/삭제 버튼 추가
+                    // 🌟 관리자일 경우 고정 체크박스 및 액션 버튼 추가
                     let actionHtml = '';
                     if(isAdminGlobal) {
+                        const pinChecked = item.is_pinned ? 'checked' : '';
                         actionHtml = `
                             <div class="author-actions">
-                                <button class="btn-action btn-edit" onclick="openEditNoticeModal(${item.id})">✏️ 수정</button>
-                                <button class="btn-action btn-delete" onclick="deleteNotice(${item.id})">🗑️ 삭제</button>
+                                <label class="pin-switch">
+                                    <input type="checkbox" onchange="togglePin(${item.id}, this.checked)" ${pinChecked}> 📌 메인화면 고정
+                                </label>
+                                <div>
+                                    <button class="btn-action btn-edit" onclick="openEditNoticeModal(${item.id})">✏️ 수정</button>
+                                    <button class="btn-action btn-delete" onclick="deleteNotice(${item.id})">🗑️ 삭제</button>
+                                </div>
                             </div>
                         `;
                     }
 
+                    const pinBadge = item.is_pinned ? `<span style="color:#E69138; margin-right:5px;">📌</span>` : `📢`;
+                    
                     const html = `
-                        <div class="notice-item">
-                            <div class="notice-title">📢 ${item.title}</div>
+                        <div class="notice-item" style="${item.is_pinned ? 'border: 2px solid #E69138;' : ''}">
+                            <div class="notice-title">${pinBadge} ${item.title}</div>
                             <div class="notice-meta">📅 ${date}</div>
                             ${toggleBtn}
                             ${contentHtml}
                             ${actionHtml}
 
-                            <!-- 🌟 댓글창 영역 (기본은 숨김, 상세 내용 보기 클릭 시 펼쳐짐) -->
                             <div id="commentsWrap_${item.id}" class="notice-comments-wrap">
                                 <div style="font-weight: 800; margin-bottom: 15px; font-size: 0.95rem; color: #87B32E;">💬 공지사항 댓글</div>
                                 <div id="noticeCommentsList_${item.id}"></div>
@@ -223,7 +241,21 @@
             });
         }
 
-        // 내용과 댓글창을 함께 펼쳐보기 기능
+        // 🌟 고정 체크박스 상태 변경 서버 전송 함수
+        function togglePin(id, is_pinned) {
+            fetch(`/api/notices/${id}/pin`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_pinned: is_pinned })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    loadNotices(); // 메인화면과 리스트 정렬을 위해 다시 로드
+                }
+            });
+        }
+
         function toggleContent(id, btn) {
             const contentDiv = document.getElementById(`content_${id}`);
             const commentsWrap = document.getElementById(`commentsWrap_${id}`);
@@ -283,7 +315,6 @@
             }
         }
 
-        // 🌟 이웃 댓글 불러오기
         function loadNoticeComments(postId) {
             fetch(`/api/notices/comments/${postId}`)
             .then(res => res.json())
@@ -306,7 +337,6 @@
             });
         }
 
-        // 🌟 이웃 댓글 등록하기
         function submitNoticeComment(postId) {
             const inputField = document.getElementById(`noticeCommentInput_${postId}`);
             const content = inputField.value.trim();
