@@ -117,9 +117,12 @@
 <body>
     <div class="header">
         <div class="header-inner">
-            <a href="index.html" class="btn-icon">←</a>
-            <div class="title">브랜드 홈페이지</div>
-            <div style="width: 24px;"></div>
+            <a href="javascript:history.back()" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-family: 'Jua', sans-serif; font-size: 1.4rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <span style="color: #666; -webkit-text-fill-color: #666; font-size: 1.2rem; font-family: 'Pretendard', sans-serif; margin-right: 2px; font-weight: 900;">←</span>
+                <img src="farmmaul-logo.webp" alt="팜마을" style="height: 1.6rem; margin-bottom: 2px;">팜마을
+            </a>
+            <div class="title" id="headerFarmName" style="max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">농장 로딩중...</div>
+            <div style="width: 80px;"></div>
         </div>
     </div>
 
@@ -246,6 +249,9 @@
 
                     document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
                     document.getElementById('storyProducerShort').innerText = producer.farm_short;
+                    
+                    // 🌟 상단 헤더의 제목을 현재 접속한 농장 이름으로 자동 변경!
+                    document.getElementById('headerFarmName').innerText = producer.farm_name;
                     
                     const descEl = document.getElementById('storyProducerDesc');
                     if(descEl) descEl.innerText = producer.farm_desc || '등록된 소개글이 없습니다.';
