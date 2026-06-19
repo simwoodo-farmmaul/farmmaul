@@ -7,7 +7,7 @@
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -58,7 +58,9 @@
         .gallery-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 15px; background: #eee; cursor: pointer; transition: 0.2s; }
         .gallery-img:hover { transform: scale(1.02); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
 
-        .google-map-area { width: 100%; height: 450px; background: #eee; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        /* 🌟 모바일 대응을 위해 강제 높이 설정 */
+        .google-map-area { width: 100%; height: 450px; min-height: 300px; background: #eee; border-radius: 20px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        
         .map-action-card { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border: 1px solid #90caf9; border-radius: 20px; padding: 30px; text-align: center; }
         .map-action-title { font-weight: 900; color: #0d47a1; font-size: 1.3rem; margin-bottom: 10px; }
         .nav-btn-group { display: flex; gap: 15px; margin-top: 25px; }
@@ -224,7 +226,7 @@
                     // 🌟 주소가 비어있어도 에러나지 않게 안전장치 추가
                     const cleanAddress = (hub.hub_address || "경기도 평택시 지산동").replace(/\[.*?\]\s*/g, '');
                     
-                    // 🌟 카카오 지도 생성 및 마커 찍기
+                    // 🌟 카카오 지도 렌더링 시작
                     const mapContainer = document.getElementById('kakao-map-container');
                     const mapOption = { 
                         center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 중심좌표
@@ -243,7 +245,11 @@
                             });
                             infowindow.open(map, marker);
                             
-                            map.setCenter(coords); // 지도 중심 이동
+                            // 🌟 모바일 깨짐 완벽 방지: 0.1초 뒤에 지도를 꽉 채워서 그리기
+                            setTimeout(() => {
+                                map.relayout();
+                                map.setCenter(coords); 
+                            }, 100);
                         } else {
                             mapContainer.innerHTML = '<div style="padding:40px; text-align:center; color:#888; font-weight:800;">지도를 불러올 수 없는 주소입니다.</div>';
                         }
