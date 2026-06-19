@@ -51,7 +51,6 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* 🌟 농장 소개 및 일정 추가 영역 */
         .intro-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
         .intro-box { font-size: 1.1rem; line-height: 1.8; color: #444; white-space: pre-wrap; background: #fdfdfd; padding: 35px; border-radius: 15px; border: 1px solid #f0f0f0; }
         
@@ -77,8 +76,25 @@
         .product-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: #222; }
         .product-price { font-size: 1.25rem; font-weight: 900; color: var(--primary-orange); }
 
-        .btn-write-float { position: fixed; bottom: 30px; right: calc(50% - 570px); width: 65px; height: 65px; background: var(--primary-green); color: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 20px rgba(135,179,46,0.4); font-size: 1.8rem; cursor: pointer; z-index: 1000; transition: 0.2s; }
-        .btn-write-float:hover { transform: scale(1.1); background: #719626; }
+        /* 🌟 농장일기 전용 예쁜 디자인 스타일 */
+        .diary-write-zone { display: none; text-align: right; margin-bottom: 25px; }
+        .btn-write-diary { background: var(--primary-blue); color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 900; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(75,154,210,0.3); transition: 0.2s; }
+        .btn-write-diary:hover { transform: translateY(-2px); background: #3a82b8; box-shadow: 0 6px 20px rgba(75,154,210,0.4); }
+        
+        .diary-form-box { background: #fff; border: 2px dashed var(--primary-green); border-radius: 15px; padding: 30px; margin-bottom: 30px; display: none; animation: fadeIn 0.3s; }
+        .diary-form-box.active { display: block; }
+        .diary-textarea { width: 100%; height: 150px; border: 1px solid #ddd; border-radius: 12px; padding: 20px; font-size: 1.05rem; line-height: 1.6; resize: vertical; margin-bottom: 15px; outline: none; background: #fafafa; transition: 0.2s; }
+        .diary-textarea:focus { border-color: var(--primary-green); background: #fff; box-shadow: 0 0 0 3px rgba(135,179,46,0.1); }
+        .btn-submit-diary { background: var(--primary-green); color: #fff; border: none; padding: 14px 30px; border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 1.05rem; transition: 0.2s; }
+        .btn-submit-diary:hover { background: #719626; }
+
+        .diary-timeline { display: flex; flex-direction: column; gap: 20px; position: relative; }
+        .diary-card { background: #fff; border-left: 6px solid var(--primary-green); border-radius: 15px; padding: 25px 30px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-top: 1px solid #eee; border-right: 1px solid #eee; border-bottom: 1px solid #eee; transition: 0.3s; }
+        .diary-card:hover { transform: translateX(5px); box-shadow: 0 8px 25px rgba(135,179,46,0.15); border-color: var(--primary-green); }
+        .diary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #eee; }
+        .diary-date { font-size: 1.15rem; font-weight: 900; color: var(--primary-orange); display: flex; align-items: center; gap: 8px; }
+        .diary-author { font-size: 0.95rem; color: #555; font-weight: 800; background: #f1f3f5; padding: 6px 14px; border-radius: 20px; }
+        .diary-content-text { font-size: 1.1rem; color: #333; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; }
 
         @media (max-width: 1024px) {
             .product-grid { grid-template-columns: repeat(2, 1fr); }
@@ -93,7 +109,8 @@
             .profile-wrap { margin-top: -60px; padding: 0 15px 20px; }
             .producer-name { font-size: 1.6rem; }
             .tab-content { padding: 25px 15px; }
-            .btn-write-float { right: 20px; bottom: 20px; }
+            .diary-card { padding: 20px; border-left-width: 4px; }
+            .diary-date { font-size: 1.05rem; }
         }
     </style>
 </head>
@@ -124,7 +141,7 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-val" id="postCount">0</span>
-                    <span class="stat-label">농장 소식</span>
+                    <span class="stat-label">농장 일기</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-val" id="productCount">0</span>
@@ -136,10 +153,9 @@
         <div class="tabs">
             <div class="tab-btn active" onclick="switchTab('intro')">농장 소개</div>
             <div class="tab-btn" onclick="switchTab('products')">판매 상품</div>
-            <div class="tab-btn" onclick="switchTab('diary')">농장 소식</div>
+            <div class="tab-btn" onclick="switchTab('diary')">농장 일기</div>
         </div>
 
-        <!-- 🌟 확장된 소개 탭 (일정/공지 포함) -->
         <div id="tab-intro" class="tab-content active">
             <div class="cert-badges">
                 <span class="cert-badge">🌱 팜마을 인증 농가</span>
@@ -179,15 +195,30 @@
         </div>
 
         <div id="tab-diary" class="tab-content">
-            <div id="storyBlogContainer">
-                <div style="text-align:center; padding:50px; color:#999; font-weight: 700; font-size: 1.1rem;">아직 들려준 농장 소식이 없습니다.<br>오른쪽 아래 버튼을 눌러 첫 소식을 남겨보세요!</div>
+            
+            <div id="diaryOwnerZone" class="diary-write-zone">
+                <button class="btn-write-diary" onclick="toggleDiaryForm()">📝 오늘 농장일기 쓰기</button>
             </div>
+
+            <div id="diaryFormBox" class="diary-form-box">
+                <h3 style="margin-bottom: 15px; color: #2e7d32; font-weight: 900;">🌱 오늘의 농장 기록</h3>
+                <textarea id="diaryContentInput" class="diary-textarea" placeholder="오늘 밭에 어떤 씨앗을 뿌리셨나요? 수확한 작물이나 날씨, 소소한 일상 등 이웃들에게 들려주고 싶은 농장 이야기를 자유롭게 적어주세요!"></textarea>
+                <div style="text-align: right;">
+                    <button class="btn-submit-diary" onclick="submitDiary()">일기장 등록하기</button>
+                </div>
+            </div>
+
+            <div id="diaryTimelineContainer" class="diary-timeline">
+                <div style="text-align:center; padding:60px; color:#999; font-weight: 700; font-size: 1.1rem; background: #fff; border-radius: 15px; border: 1px dashed #ddd;">아직 작성된 농장 일기가 없습니다.<br>농장주님이 첫 일기를 들려주시길 기다려주세요! 🌱</div>
+            </div>
+            
         </div>
     </div>
 
-    <div class="btn-write-float" onclick="location.href='story_write.html'">✏️</div>
-
     <script>
+        let currentProducerId = null;
+        let currentProducerOwner = null;
+
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -197,19 +228,21 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             const urlParams = new URLSearchParams(window.location.search);
-            const producerId = urlParams.get('id');
+            currentProducerId = urlParams.get('id');
 
-            if (!producerId) {
+            if (!currentProducerId) {
                 alert("올바르지 않은 접근입니다.");
                 location.href = "index.html";
                 return;
             }
 
-            fetch(`/api/producers/${producerId}`)
+            // 1. 해당 생산자(농장) 정보 불러오기
+            fetch(`/api/producers/${currentProducerId}`)
             .then(response => response.json())
             .then(result => {
                 if(result.success && result.data) {
                     const producer = result.data;
+                    currentProducerOwner = producer.owner_nickname; // 주인의 닉네임 기억해두기
 
                     document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
                     document.getElementById('storyProducerShort').innerText = producer.farm_short;
@@ -226,6 +259,14 @@
                         if(cImg) { cImg.src = producer.cover_image; cImg.style.display = 'block'; }
                     }
 
+                    // 2. 접속한 사람이 주인인지 확인 (맞으면 글쓰기 버튼 오픈)
+                    fetch('/api/user').then(r=>r.json()).then(userData => {
+                        if(userData.loggedIn && userData.user.nickname === currentProducerOwner) {
+                            document.getElementById('diaryOwnerZone').style.display = 'block';
+                        }
+                    });
+
+                    // 3. 상품 목록 불러오기 로직
                     fetch('/api/products')
                     .then(res => res.json())
                     .then(pResult => {
@@ -256,13 +297,74 @@
                         }
                     });
 
+                    // 4. 농장 일기 목록 불러오기 로직
+                    loadDiaryList();
+
                 } else {
                     alert("해당 생산자를 찾을 수 없습니다.");
                     location.href = "index.html";
                 }
             })
-            .catch(error => console.error('생산자 데이터 조회 실패:', error));
+            .catch(error => console.error('데이터 조회 실패:', error));
         });
+
+        // 🌟 글쓰기 상자 열고 닫기 마법사
+        function toggleDiaryForm() {
+            document.getElementById('diaryFormBox').classList.toggle('active');
+        }
+
+        // 🌟 작성한 일기를 서버에 저장하는 기능
+        function submitDiary() {
+            const content = document.getElementById('diaryContentInput').value.trim();
+            if(!content) { alert('일기 내용을 입력해주세요!'); return; }
+            
+            fetch('/api/producers/diary', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ producer_id: currentProducerId, content: content })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert(data.message);
+                if(data.success) {
+                    document.getElementById('diaryContentInput').value = ''; // 쓴 글 지우기
+                    toggleDiaryForm(); // 상자 닫기
+                    loadDiaryList(); // 일기장 새로고침
+                }
+            });
+        }
+
+        // 🌟 서버에서 일기장 가져와서 예쁘게 그리기
+        function loadDiaryList() {
+            fetch(`/api/producers/${currentProducerId}/diary`)
+            .then(res => res.json())
+            .then(result => {
+                const container = document.getElementById('diaryTimelineContainer');
+                if(result.success && result.data.length > 0) {
+                    document.getElementById('postCount').innerText = result.data.length;
+                    container.innerHTML = '';
+                    
+                    result.data.forEach(diary => {
+                        const dDate = new Date(diary.created_at);
+                        const dateStr = `${dDate.getFullYear()}년 ${dDate.getMonth()+1}월 ${dDate.getDate()}일`;
+                        
+                        const html = `
+                            <div class="diary-card">
+                                <div class="diary-header">
+                                    <div class="diary-date">📅 ${dateStr}</div>
+                                    <div class="diary-author">🧑‍🌾 ${diary.nickname}</div>
+                                </div>
+                                <div class="diary-content-text">${diary.content}</div>
+                            </div>
+                        `;
+                        container.insertAdjacentHTML('beforeend', html);
+                    });
+                } else {
+                    document.getElementById('postCount').innerText = '0';
+                    container.innerHTML = '<div style="text-align:center; padding:60px; color:#999; font-weight: 700; font-size: 1.1rem; background: #fff; border-radius: 15px; border: 1px dashed #ddd;">아직 작성된 농장 일기가 없습니다.<br>농장주님이 첫 일기를 들려주시길 기다려주세요! 🌱</div>';
+                }
+            });
+        }
     </script>
 </body>
 </html>

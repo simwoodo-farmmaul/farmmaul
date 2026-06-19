@@ -1000,4 +1000,43 @@ app.put('/api/admin/hubs/:id/approve', (req, res) => {
     });
 });
 
+// ==========================================
+// 🌟 [추가] 생산자 개별 홈페이지 - 농장 일기 관리 API
+// ==========================================
+
+// 1. 농장 일기 쓰기 (저장)
+app.post('/api/producers/diary', (req, res) => {
+    if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+    
+    const nickname = req.session.user.nickname;
+    const { producer_id, content } = req.body;
+    
+    // 일기장 전용 금고(테이블)가 없으면 자동 생성
+    const createTableQuery = `
+        CREATE TABLE IF NOT EXISTS farm_diary (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            producer_id INT,
+            nickname VARCHAR(100),
+            content TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    `;
+    db.query(createTableQuery, () => {
+        db.query(`INSERT INTO farm_diary (producer_id, nickname, content) VALUES (?, ?, ?)`, [producer_id, nickname, content], (err) => {
+            if(err) return res.status(500).json({ success: false, message: '일기 등록 오류' });
+            res.json({ success: true, message: '오늘의 농장 일기가 성공적으로 등록되었습니다! 📝' });
+        });
+    });
+});
+
+// 2. 해당 농장의 일기 목록 불러오기
+app.get('/api/producers/:id/diary', (req, res) => {
+    db.query(`CREATE TABLE IF NOT EXISTS farm_diary (id INT AUTO_INCREMENT PRIMARY KEY, producer_id INT, nickname VARCHAR(100), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
+        db.query(`SELECT * FROM farm_diary WHERE producer_id = ? ORDER BY created_at DESC`, [req.params.id], (err, results) => {
+            if(err) return res.json({ success: false, data: [] });
+            res.json({ success: true, data: results });
+        });
+    });
+});
+
 app.listen(3000, () => console.log(`🚀 팜마을 서버가 3000번 방에서 달리고 있습니다!`));
