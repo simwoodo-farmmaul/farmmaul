@@ -691,7 +691,10 @@
             document.getElementById('modal-hub-date').innerText = date;
             document.getElementById('modal-hub-desc').innerText = hub.hub_desc || "등록된 매장 소개 설명글이 없습니다.";
             document.getElementById('modal-hub-img').src = hub.hub_image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=400&auto=format&fit=crop";
-            document.getElementById('modal-approve-btn').onclick = function() { alert(`[${hub.hub_name}] 거점을 최종 승인 완료했습니다.`); };
+            document.getElementById('modal-approve-btn').onclick = function() { 
+    approveHub(hub.id, hub.hub_name); 
+    closeModal('dynamicHubModal'); 
+};
             
             document.getElementById('dynamicHubModal').classList.add('active');
 
@@ -740,11 +743,37 @@
                     if(globalHubList.length === 0) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:30px; color:#888;">아직 접수된 마을 HUB 신청 내역이 없습니다.</td></tr>'; return; }
                     globalHubList.forEach((hub, index) => {
                         const date = new Date(hub.created_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
-                        const row = `<tr><td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td><td>${hub.hub_type}</td><td style="font-size:0.85rem; color:#555;">${hub.hub_address}</td><td style="font-size:0.85rem;">${date}</td><td><span class="badge bg-blue">신청완료</span></td><td class="action-btns"><button class="btn-sm profile" onclick="openHubDetail(${index})">보기 및 지도확인</button><button class="btn-sm approve" onclick="alert('${hub.hub_name} 거점을 최종 승인했습니다!')">승인</button></td></tr>`;
+                        
+                        // 🌟 상태값에 따라 뱃지와 버튼을 다르게 표시
+                        const statusStr = hub.status || '신청완료';
+                        let badgeHtml = '';
+                        let btnHtml = '';
+                        
+                        if(statusStr === '승인완료') {
+                            badgeHtml = '<span class="badge" style="background:#e8f5e9; color:#2e7d32; border:1px solid #c8e6c9;">승인완료</span>';
+                            btnHtml = `<button class="btn-sm" style="color:#aaa; border-color:#eee; cursor:not-allowed;" disabled>승인됨</button>`;
+                        } else {
+                            badgeHtml = '<span class="badge bg-blue">신청완료</span>';
+                            btnHtml = `<button class="btn-sm approve" onclick="approveHub(${hub.id}, '${hub.hub_name}')">승인</button>`;
+                        }
+
+                        const row = `<tr><td style="color:var(--master-blue); font-weight:800;">${hub.hub_name}</td><td>${hub.hub_type}</td><td style="font-size:0.85rem; color:#555;">${hub.hub_address}</td><td style="font-size:0.85rem;">${date}</td><td>${badgeHtml}</td><td class="action-btns"><button class="btn-sm profile" onclick="openHubDetail(${index})">보기 및 지도확인</button>${btnHtml}</td></tr>`;
                         tbody.insertAdjacentHTML('beforeend', row);
                     });
                 }
             });
+        }
+
+        // 🌟 진짜 서버와 통신하는 승인 함수 추가
+        function approveHub(id, name) {
+            if(confirm(`[${name}] 거점을 최종 승인하시겠습니까?`)) {
+                fetch(`/api/admin/hubs/${id}/approve`, { method: 'PUT' })
+                .then(res => res.json())
+                .then(data => {
+                    alert(data.message);
+                    if(data.success) loadHubList(); // 완료 후 표 새로고침
+                });
+            }
         }
 
         function statusChange() { alert('주문 상태가 변경되었습니다. 구매자에게 알림 메시지를 발송합니다! 📩'); }

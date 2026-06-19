@@ -1251,6 +1251,20 @@ app.put('/api/notices/:id/pin', (req, res) => {
         });
     }
 });
+// ==========================================
+// 🌟 [추가] 마을 HUB 관리자 승인 API
+// ==========================================
+
+// 1. 기존 테이블에 상태(status) 컬럼이 없다면 안전하게 추가합니다.
+db.query(`ALTER TABLE hub_applications_v2 ADD COLUMN status VARCHAR(20) DEFAULT '신청완료'`, () => {});
+
+// 2. 관리자가 승인 버튼을 누르면 상태를 '승인완료'로 변경합니다.
+app.put('/api/admin/hubs/:id/approve', (req, res) => {
+    db.query(`UPDATE hub_applications_v2 SET status = '승인완료' WHERE id = ?`, [req.params.id], (err) => {
+        if (err) return res.json({ success: false, message: 'DB 오류가 발생했습니다.' });
+        res.json({ success: true, message: '마을 HUB가 성공적으로 승인되었습니다!' });
+    });
+});
 
 // 🌟 서버 엔진 실행 코드는 무조건 파일 맨 마지막에 있어야 합니다!
 app.listen(PORT, () => console.log(`🚀 팜마을 서버가 ${PORT}번 방에서 달리고 있습니다!`));
