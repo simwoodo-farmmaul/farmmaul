@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>팜마을 - 마을 HUB 거점 신청</title>
     <link rel="icon" type="image/webp" href="farmmaul.webp">
-    <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <!-- 🌟 카카오 지도 API 및 우편번호 API 장착 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
-    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
+    <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -111,7 +109,6 @@
                     <input type="text" id="hub_address_main" class="form-input" placeholder="기본 주소가 여기에 자동 입력됩니다" style="margin-bottom: 10px;" readonly required>
                     <input type="text" id="hub_address_detail" class="form-input" placeholder="나머지 상세 주소를 입력해주세요 (예: 101동 202호)" required>
                     
-                    <!-- 🌟 카카오 지도 컨테이너 🌟 -->
                     <div id="apply_map" style="width: 100%; height: 250px; border-radius: 10px; margin-top: 15px; border: 2px solid #ddd; display: none;"></div>
                 </div>
                 
@@ -123,10 +120,6 @@
 
             <div class="form-section">
                 <div class="form-title">📸 매장 사진 등록 (갤러리용)</div>
-                <div style="margin-bottom: 15px; font-size: 0.9rem; color: #666; line-height: 1.5;">
-                    매장 외부 간판 사진을 대표 사진으로 올리고, 추가로 매장 내부나 메뉴 사진을 여러 장 올려주세요.
-                </div>
-                
                 <div class="photo-grid">
                     <div>
                         <span class="form-label" style="color: var(--primary-orange);">🌟 대표 간판 사진 (필수)</span>
@@ -137,7 +130,7 @@
                         </label>
                     </div>
                     <div>
-                        <span class="form-label" style="color: var(--primary-blue);">➕ 추가 사진 (메뉴/내부 등 여러 장)</span>
+                        <span class="form-label" style="color: var(--primary-blue);">➕ 추가 사진 (여러 장)</span>
                         <label class="upload-box" for="f_sub">
                             <span style="font-size:1.5rem; margin-bottom:5px;">🖼️</span>
                             <span style="font-weight:700; font-size:0.85rem;">여러 장 한 번에 선택</span>
@@ -145,7 +138,6 @@
                         </label>
                     </div>
                 </div>
-                
                 <div id="gallery_preview_area" class="gallery-preview"></div>
             </div>
 
@@ -172,7 +164,6 @@
         let applyMapInstance = null;
         let applyMapMarker = null;
 
-        // 🌟 페이지 로드 시 로그인 검사
         document.addEventListener("DOMContentLoaded", function() {
             fetch('/api/user').then(res=>res.json()).then(data => {
                 if(!data.loggedIn) {
@@ -182,25 +173,44 @@
             });
         });
 
+        // 🌟 주소창이 안 닫히는 현상 원천 차단 (에러 방어 로직)
         function execDaumPostcode() {
             new daum.Postcode({
                 oncomplete: function(data) {
-                    let fullAddress = data.address;
-                    let extraName = data.bname || ''; 
-                    if (extraName && !fullAddress.includes(extraName)) {
-                        fullAddress += ` (${extraName})`;
-                    }
-                    document.getElementById('hub_zipcode').value = data.zonecode;
-                    document.getElementById('hub_address_main').value = fullAddress;
-                    document.getElementById('hub_address_detail').focus();
+                    try {
+                        let fullAddress = data.address;
+                        let extraName = data.bname || ''; 
+                        if (extraName && !fullAddress.includes(extraName)) {
+                            fullAddress += ` (${extraName})`;
+                        }
+                        
+                        // 값 꽂아넣기
+                        document.getElementById('hub_zipcode').value = data.zonecode;
+                        document.getElementById('hub_address_main').value = fullAddress;
+                        document.getElementById('hub_address_detail').focus();
 
-                    drawApplyMap(fullAddress);
+                        // 🌟 지도를 그리는 도중 에러가 나도 우편번호 창은 100% 닫히도록 타이머 분리
+                        setTimeout(() => {
+                            try {
+                                drawApplyMap(fullAddress);
+                            } catch (e) {
+                                console.warn("지도 렌더링을 건너뜁니다 (에러방어):", e);
+                            }
+                        }, 100);
+                    } catch (err) {
+                        console.error("주소 파싱 에러:", err);
+                    }
                 }
             }).open();
         }
 
-        // 🌟 카카오 지도 실시간 그리기 기능
+        // 🌟 안전한 지도 그리기
         function drawApplyMap(address) {
+            if (typeof kakao === 'undefined' || !kakao.maps || !kakao.maps.services) {
+                console.warn("카카오 지도 API가 아직 로드되지 않았습니다.");
+                return;
+            }
+
             const mapContainer = document.getElementById('apply_map');
             mapContainer.style.display = 'block';
 
@@ -209,8 +219,6 @@
                     center: new kakao.maps.LatLng(33.450701, 126.570667),
                     level: 3
                 });
-            } else {
-                applyMapInstance.relayout();
             }
 
             const geocoder = new kakao.maps.services.Geocoder();
@@ -225,17 +233,19 @@
                         map: applyMapInstance, 
                         position: coords 
                     });
-                    applyMapInstance.setCenter(coords); 
+                    
+                    // 모바일 화면 깨짐 방지: 0.1초 뒤에 레이아웃 계산 후 핀 꽂기
+                    setTimeout(() => {
+                        applyMapInstance.relayout();
+                        applyMapInstance.setCenter(coords); 
+                    }, 100);
                 }
             });
         }
 
         function processImage(input, startIndex) {
             if (!input.files || input.files.length === 0) return;
-            
-            if (startIndex === 0) {
-                if(hubImages.length === 0) hubImages.push("");
-            }
+            if (startIndex === 0 && hubImages.length === 0) hubImages.push("");
 
             Array.from(input.files).forEach(file => {
                 const reader = new FileReader();
@@ -247,7 +257,6 @@
                         const MAX_WIDTH = 640;
                         let width = img.width; let height = img.height;
                         if (width > MAX_WIDTH) { height = height * (MAX_WIDTH / width); width = MAX_WIDTH; }
-                        
                         canvas.width = width; canvas.height = height;
                         const ctx = canvas.getContext('2d');
                         ctx.fillStyle = "#ffffff";
@@ -255,12 +264,8 @@
                         ctx.drawImage(img, 0, 0, width, height);
                         
                         const base64 = canvas.toDataURL('image/jpeg', 0.5);
-                        
-                        if (startIndex === 0) {
-                            hubImages[0] = base64; 
-                        } else {
-                            hubImages.push(base64); 
-                        }
+                        if (startIndex === 0) hubImages[0] = base64; 
+                        else hubImages.push(base64); 
                         renderGallery();
                     }
                 }
@@ -286,11 +291,8 @@
         }
 
         function removeImage(index) {
-            if(index === 0) {
-                hubImages[0] = ""; 
-            } else {
-                hubImages.splice(index, 1); 
-            }
+            if(index === 0) hubImages[0] = ""; 
+            else hubImages.splice(index, 1); 
             renderGallery();
         }
 
@@ -321,13 +323,13 @@
             .then(res => res.json())
             .then(result => {
                 if(result.success) {
-                    alert('성공적으로 마을 HUB 거점 신청이 접수되었습니다! 🎉');
+                    alert('성공적으로 마을 HUB 신청이 완료되었습니다! 관리자 승인 후 등록됩니다. 🎉');
                     location.href = 'mypage.html'; 
                 } else {
                     alert('신청 중 오류가 발생했습니다: ' + (result.message || ''));
                 }
             })
-            .catch(err => alert('서버와 연결할 수 없습니다.'));
+            .catch(err => alert('서버 통신 오류가 발생했습니다.'));
         });
     </script>
 </body>
