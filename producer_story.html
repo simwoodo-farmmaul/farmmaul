@@ -121,8 +121,11 @@
                 <span style="color: #666; -webkit-text-fill-color: #666; font-size: 1.2rem; font-family: 'Pretendard', sans-serif; margin-right: 2px; font-weight: 900;">←</span>
                 <img src="farmmaul-logo.webp" alt="팜마을" style="height: 1.6rem; margin-bottom: 2px;">팜마을
             </a>
-            <div class="title" id="headerFarmName" style="max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">농장 로딩중...</div>
-            <div style="width: 80px;"></div>
+            <!-- 🌟 농장 이름 폰트 크기를 더 크게(1.5rem) 키웠습니다! -->
+            <div class="title" id="headerFarmName" style="max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.5rem; font-weight: 900;">농장 로딩중...</div>
+            
+            <!-- 🌟 우측 상단 마이페이지 관리 버튼 추가! -->
+            <a href="mypage.html" style="font-size: 0.9rem; font-weight: 800; color: white; background: var(--primary-blue); padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">마이페이지</a>
         </div>
     </div>
 
@@ -134,8 +137,9 @@
         
         <div class="profile-wrap">
             <img id="storyProfileImg" src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop" class="profile-img">
-            <h1 class="producer-name" id="storyProducerName">농장 이름 로딩중...</h1>
-            <p class="producer-short" id="storyProducerShort">한 줄 소개를 불러오고 있습니다.</p>
+            <!-- 🌟 중복되는 이름을 지우고 간격을 맞추기 위해 투명한 공간을 넣었습니다 -->
+            <div style="height: 20px;"></div>
+            <p class="producer-short" id="storyProducerShort" style="font-size: 1.2rem; color: #444;">한 줄 소개를 불러오고 있습니다.</p>
             
             <div class="stats-box">
                 <div class="stat-item">
@@ -247,11 +251,11 @@
                     const producer = result.data;
                     currentProducerOwner = producer.owner_nickname; // 주인의 닉네임 기억해두기
 
-                    document.getElementById('storyProducerName').innerText = producer.farm_name + " 🧑‍🌾";
+                    // 🌟 아래쪽 이름은 지웠으므로 한 줄 소개만 넣어줍니다.
                     document.getElementById('storyProducerShort').innerText = producer.farm_short;
                     
-                    // 🌟 상단 헤더의 제목을 현재 접속한 농장 이름으로 자동 변경!
-                    document.getElementById('headerFarmName').innerText = producer.farm_name;
+                    // 🌟 상단 헤더에 농장 이름과 귀여운 이모티콘을 함께 띄워줍니다!
+                    document.getElementById('headerFarmName').innerText = producer.farm_name + " 🧑‍🌾";
                     
                     const descEl = document.getElementById('storyProducerDesc');
                     if(descEl) descEl.innerText = producer.farm_desc || '등록된 소개글이 없습니다.';
