@@ -7,8 +7,7 @@
     <link rel="icon" type="image/webp" href="farmmaul.webp">
     <link rel="apple-touch-icon" href="farmmaul.webp">
     
-    <!-- 🌟 카카오 지도 API 장착 -->
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=2a91463a2d8c44e5580734f1d49af685&libraries=services"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
@@ -104,7 +103,6 @@
 
         <div class="map-container">
             <div class="map-overlay-info">선택된 동네 주변 실시간 HUB 지도</div>
-            <!-- 🌟 카카오 지도 컨테이너 🌟 -->
             <div id="kakao-search-map" style="width: 100%; height: 100%;"></div>
         </div>
 
@@ -136,16 +134,19 @@
         const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
         let allHubs = []; 
         
-        // 🌟 카카오 지도를 제어하기 위한 변수
         let searchMapInstance = null;
         let searchMapMarker = null;
 
         document.addEventListener("DOMContentLoaded", async function() {
-            // 🌟 0. 카카오 지도 기본 세팅 (페이지 로딩 시 바로 그림)
             const mapContainer = document.getElementById('kakao-search-map');
             searchMapInstance = new kakao.maps.Map(mapContainer, {
-                center: new kakao.maps.LatLng(33.450701, 126.570667), // 임시 위치
-                level: 5 // 넓게 보기 위해 5레벨로 설정
+                center: new kakao.maps.LatLng(33.450701, 126.570667), 
+                level: 5 
+            });
+
+            // 🌟 모바일 화면 깨짐 방지
+            window.addEventListener('resize', () => {
+                if(searchMapInstance) searchMapInstance.relayout();
             });
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -284,12 +285,15 @@
             const sigungu = document.getElementById('sigunguSelect').value;
             const dong = document.getElementById('dongSelect').value;
 
+            // 🌟 전체 검색일 때도 승인 완료된 허브만 노출! 🌟
+            const approvedHubs = allHubs.filter(hub => hub.status === '승인완료');
+
             if(!sido && !sigungu && !dong) {
-                renderHubs(allHubs);
+                renderHubs(approvedHubs);
                 return;
             }
 
-            const filtered = allHubs.filter(hub => {
+            const filtered = approvedHubs.filter(hub => {
                 let match = true;
                 if(sido && !hub.hub_address.includes(sido)) match = false;
                 
@@ -317,14 +321,14 @@
             const dong = document.getElementById('dongSelect').value || '';
 
             if(dataList.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">선택하신 동네와 일치하는 마을 HUB 거점이 없습니다.</div>';
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">선택하신 동네와 일치하는 승인된 마을 HUB 거점이 없습니다.</div>';
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기 평택시 지산동';
-                updateSearchMap(fallbackAddress); // 🌟 결과가 없으면 동네 중심으로 지도 이동
+                updateSearchMap(fallbackAddress); 
                 return;
             }
 
             const firstHubAddr = dataList[0].hub_address.replace(/\[.*?\]\s*/g, '');
-            updateSearchMap(firstHubAddr); // 🌟 첫 번째 결과물 중심으로 지도 이동
+            updateSearchMap(firstHubAddr); 
 
             dataList.forEach(hub => {
                 let imgUrl = "https://images.unsplash.com/photo-1554118811-1e0d58224f24?q=80&w=200&auto=format&fit=crop";
@@ -362,7 +366,7 @@
             });
         }
 
-        // 🌟 카카오 지도 검색 및 마커 갱신 함수
+        // 🌟 카카오 지도 검색 및 마커 갱신 (모바일 화면 레이아웃 보호)
         function updateSearchMap(address) {
             if (!searchMapInstance) return;
             
@@ -371,14 +375,17 @@
                 if (status === kakao.maps.services.Status.OK) {
                     const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                     
-                    if (searchMapMarker) searchMapMarker.setMap(null); // 기존 마커 지우기
+                    if (searchMapMarker) searchMapMarker.setMap(null); 
                     
                     searchMapMarker = new kakao.maps.Marker({ 
                         map: searchMapInstance, 
                         position: coords 
                     });
                     
-                    searchMapInstance.setCenter(coords); // 부드럽게 화면 이동
+                    setTimeout(() => {
+                        searchMapInstance.relayout();
+                        searchMapInstance.setCenter(coords); 
+                    }, 100);
                 }
             });
         }
