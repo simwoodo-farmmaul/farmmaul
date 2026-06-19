@@ -113,7 +113,7 @@
         .btn-hub-apply:hover { background: #719626; }
         
         .hub-display-area { display: flex; gap: 20px; padding: 25px; background: #fff; }
-        .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; height: 320px; }
+        .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; height: 320px; width: 100%; }
         
         .hub-list { flex: 1; display: flex; flex-direction: column; gap: 15px; justify-content: center; }
         .hub-list-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; }
@@ -218,7 +218,7 @@
             
             .hub-display-area { flex-direction: column; padding: 15px; }
             
-            /* 🌟 모바일에서 지도가 꽉 차도록 강제 수정 🌟 */
+            /* 🌟 모바일에서 지도가 꽉 차도록 강제 수정 */
             .hub-map-img-box { height: 280px !important; width: 100%; display: block; min-height: 250px; }
             #mainKakaoMap { width: 100%; height: 100%; min-height: 250px; }
 
@@ -824,6 +824,9 @@
             container.innerHTML = ''; 
 
             const filteredHubs = allHubs.filter(hub => {
+                // 🌟 승인 완료된 허브만 메인 화면에 보이게 필터링! 🌟
+                if (hub.status !== '승인완료') return false;
+
                 let match = true;
                 if (sido && !hub.hub_address.includes(sido)) match = false;
                 
@@ -839,7 +842,7 @@
             });
 
             if(filteredHubs.length === 0) {
-                container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">선택하신 지역에 아직 승인된 우리동네 HUB 거점이 없습니다.</div>';
+                container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">선택하신 지역에 승인된 우리동네 HUB 거점이 없습니다.</div>';
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기도 평택시 지산동';
                 updateMainMap(fallbackAddress); // 🌟 카카오맵으로 위치 이동
                 return;
