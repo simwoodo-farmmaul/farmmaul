@@ -317,7 +317,11 @@
                     });
                 }
                 
-                if(dong && !hub.hub_address.includes(dong)) match = false;
+                if (dong) {
+                    // "지산동", "비전1동" 등에서 '동/읍/면'과 숫자를 떼어내고 '지산', '비전'만 추출
+                    const shortDong = dong.replace(/[0-9동읍면]/g, '');
+                    if (!hub.hub_address.includes(dong) && !hub.hub_address.includes(shortDong)) match = false;
+                }
                 return match;
             });
 
