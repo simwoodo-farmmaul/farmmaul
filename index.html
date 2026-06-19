@@ -820,15 +820,28 @@
             const sigungu = document.getElementById('sigunguSelect').value;
             const dong = document.getElementById('dongSelect').value;
 
+            // 🌟 전국 시/도 이름을 단축 주소와 매칭시키는 똑똑한 사전
+            const sidoMap = {
+                "서울특별시": "서울", "부산광역시": "부산", "대구광역시": "대구", "인천광역시": "인천",
+                "광주광역시": "광주", "대전광역시": "대전", "울산광역시": "울산", "세종특별자치시": "세종",
+                "경기도": "경기", "강원특별자치도": "강원", "충청북도": "충북", "충청남도": "충남",
+                "전북특별자치도": "전북", "전라북도": "전북", "전라남도": "전남", "경상북도": "경북",
+                "경상남도": "경남", "제주특별자치도": "제주"
+            };
+
             const container = document.getElementById('mainHubListContainer');
             container.innerHTML = ''; 
 
             const filteredHubs = allHubs.filter(hub => {
-                // 🌟 승인 완료된 허브만 메인 화면에 보이게 필터링! 🌟
+                // 🌟 승인 완료된 허브만 메인 화면에 보이게 필터링!
                 if (hub.status !== '승인완료') return false;
 
                 let match = true;
-                if (sido && !hub.hub_address.includes(sido)) match = false;
+                if (sido) {
+                    // 원래 이름("경기도")과 줄임말("경기") 둘 다 검사하여 누락 방지!
+                    const shortSido = sidoMap[sido] || sido.substring(0, 2);
+                    if (!hub.hub_address.includes(sido) && !hub.hub_address.includes(shortSido)) match = false;
+                }
                 
                 if (sigungu) {
                     const sigunguParts = sigungu.split(" ");
@@ -844,7 +857,7 @@
             if(filteredHubs.length === 0) {
                 container.innerHTML = '<div style="text-align:center; color:#999; font-size:0.9rem; padding:20px;">선택하신 지역에 승인된 우리동네 HUB 거점이 없습니다.</div>';
                 const fallbackAddress = `${sido} ${sigungu} ${dong}`.trim() || '경기도 평택시 지산동';
-                updateMainMap(fallbackAddress); // 🌟 카카오맵으로 위치 이동
+                updateMainMap(fallbackAddress); 
                 return;
             }
 
