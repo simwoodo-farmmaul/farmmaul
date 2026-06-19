@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="팜마을">
 
+    <!-- 🌟 카카오 지도 API 장착 (메인페이지) -->
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
 
     <style>
@@ -113,7 +114,7 @@
         .btn-hub-apply:hover { background: #719626; }
         
         .hub-display-area { display: flex; gap: 20px; padding: 25px; background: #fff; }
-        .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; height: 320px; }
+        .hub-map-img-box { flex: 1.5; position: relative; border-radius: 15px; overflow: hidden; background: #ebdcc9; height: 320px; width: 100%; }
         
         .hub-list { flex: 1; display: flex; flex-direction: column; gap: 15px; justify-content: center; }
         .hub-list-item { background: #fff; border: 1px solid #eaeaea; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); transition: 0.2s; cursor: pointer; }
@@ -217,7 +218,9 @@
             .hub-btn-group button { flex: 1; padding: 12px; font-size: 0.95rem; }
             
             .hub-display-area { flex-direction: column; padding: 15px; }
-            .hub-map-img-box { height: 250px; }
+            /* 🌟 모바일에서 지도가 꽉 차도록 수정 🌟 */
+            .hub-map-img-box { height: 250px; width: 100%; display: block; }
+            #mainKakaoMap { width: 100%; height: 100%; }
 
             .extra-menu-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
             .extra-menu-box { padding: 15px 10px; border-radius: 12px; }
@@ -612,21 +615,28 @@
         </a>
     </div>
 
+    <!-- 🌟 메인 카카오 맵 및 내 동네 자동 검색 스크립트 🌟 -->
     <script>
         const KOREA_API_URL = "https://grpc-proxy-server-mkvo6j4wsq-du.a.run.app/v1/regcodes";
         let allHubs = [];
         let mainKakaoMapInstance = null;
         let mainKakaoMapMarker = null;
 
-        document.addEventListener("DOMContentLoaded", function() {
-            // 메인 카카오 맵 초기화
+        document.addEventListener("DOMContentLoaded", async function() {
+            // 카카오 맵 초기화
             const mainMapContainer = document.getElementById('mainKakaoMap');
             mainKakaoMapInstance = new kakao.maps.Map(mainMapContainer, {
-                center: new kakao.maps.LatLng(33.450701, 126.570667), // 초기 임시 좌표
+                center: new kakao.maps.LatLng(37.08278, 127.0543), // 평택시 지산동 근처 임시 좌표
                 level: 5
             });
 
-            fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
+            // 🌟 모바일 등에서 화면 크기 변경 시 지도가 깨지지 않게 방지
+            window.addEventListener('resize', () => {
+                if(mainKakaoMapInstance) mainKakaoMapInstance.relayout();
+            });
+
+            // 1. 전국 시/도 데이터 가져오기
+            await fetch(`${KOREA_API_URL}?regcode_pattern=*00000000`)
                 .then(response => response.json())
                 .then(data => {
                     const sidoSelect = document.getElementById('sidoSelect');
@@ -639,17 +649,110 @@
                     });
                 });
 
-            fetch('/api/hubs')
+            // 2. 허브 리스트 가져오기
+            await fetch('/api/hubs')
                 .then(response => response.json())
                 .then(result => {
                     if(result.success) {
                         allHubs = result.data;
-                        updateHubFilter(); 
                     }
                 })
                 .catch(error => console.error('허브 리스트 불러오기 실패:', error));
+
+            // 3. 내 동네 기본 세팅 (로그인 시 내 주소, 비로그인 시 평택시 지산동)
+            fetch('/api/mypage')
+                .then(res => res.json())
+                .then(async userRes => {
+                    let defaultSido = "경기도";
+                    let defaultSigungu = "평택시";
+                    let defaultDong = "지산동";
+
+                    if (userRes.success && userRes.data && userRes.data.address) {
+                        const parts = userRes.data.address.replace(/\[.*?\]\s*/g, '').split(' ');
+                        if(parts.length >= 3) {
+                            defaultSido = parts[0];
+                            defaultSigungu = parts[1];
+                            defaultDong = parts[2];
+                        }
+                    }
+
+                    // 내 동네 자동 적용 함수 호출
+                    await executeAutoSet(defaultSido, defaultSigungu, defaultDong);
+                    updateHubFilter(); // 지도와 리스트 그리기
+                })
+                .catch(async () => {
+                    // 비로그인 상태일 때 기본값 처리
+                    await executeAutoSet("경기도", "평택시", "지산동");
+                    updateHubFilter();
+                });
         });
 
+        // 🌟 내 동네(셀렉트 박스) 자동 맞춤 마법사 함수
+        async function executeAutoSet(pSido, pSigungu, pDong) {
+            const sidoSelect = document.getElementById('sidoSelect');
+            const sigunguSelect = document.getElementById('sigunguSelect');
+            const dongSelect = document.getElementById('dongSelect');
+
+            for(let i=0; i<sidoSelect.options.length; i++) {
+                if(sidoSelect.options[i].value.includes(pSido)) {
+                    sidoSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            
+            const sidoCode = sidoSelect.options[sidoSelect.selectedIndex]?.dataset.code;
+            if(!sidoCode) return;
+
+            await fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
+                .then(res => res.json())
+                .then(data => {
+                    data.regcodes.forEach(item => {
+                        let nameArray = item.name.split(" ");
+                        if (nameArray.length > 1) { 
+                            let sigunguName = nameArray.slice(1).join(" ");
+                            let option = document.createElement('option');
+                            option.value = sigunguName;
+                            option.text = sigunguName;
+                            option.dataset.code = item.code.substring(0, 5);
+                            sigunguSelect.add(option);
+                        }
+                    });
+                });
+
+            for(let i=0; i<sigunguSelect.options.length; i++) {
+                if(sigunguSelect.options[i].value.includes(pSigungu)) {
+                    sigunguSelect.selectedIndex = i;
+                    break;
+                }
+            }
+
+            const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex]?.dataset.code;
+            if(!sigunguCode) return;
+
+            await fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
+                .then(res => res.json())
+                .then(data => {
+                    data.regcodes.forEach(item => {
+                        let nameArray = item.name.split(" ");
+                        if (nameArray.length > 2) {
+                            let dongName = nameArray[nameArray.length - 1];
+                            let option = document.createElement('option');
+                            option.value = dongName;
+                            option.text = dongName;
+                            dongSelect.add(option);
+                        }
+                    });
+                });
+
+            for(let i=0; i<dongSelect.options.length; i++) {
+                if(dongSelect.options[i].value.includes(pDong)) {
+                    dongSelect.selectedIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // 사용자가 수동으로 시/도를 바꿀 때
         function changeSido() {
             const sidoSelect = document.getElementById('sidoSelect');
             const sigunguSelect = document.getElementById('sigunguSelect');
@@ -764,6 +867,10 @@
         // 🌟 지도를 부드럽게 이동시키고 핀을 꽂는 함수
         function updateMainMap(address) {
             if(!mainKakaoMapInstance) return;
+            
+            // 🌟 모바일 화면에서 지도가 깨지지 않도록 레이아웃 재계산 🌟
+            mainKakaoMapInstance.relayout(); 
+
             const geocoder = new kakao.maps.services.Geocoder();
             geocoder.addressSearch(address, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
@@ -899,6 +1006,7 @@
    });
 </script>
 
+<!-- 🌟 하단 오시는길 카카오 맵 스크립트 🌟 -->
 <script>
     var footerMap; 
     var isFooterMapLoaded = false;
