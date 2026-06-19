@@ -761,7 +761,7 @@
             dongSelect.options.length = 1;
 
             if (sidoSelect.selectedIndex === 0) {
-                updateHubFilter();
+                if(typeof updateHubFilter === "function") updateHubFilter();
                 return;
             }
 
@@ -770,19 +770,71 @@
             fetch(`${KOREA_API_URL}?regcode_pattern=${sidoCode}*00000`)
                 .then(response => response.json())
                 .then(data => {
+                    // 🌟 1. 데이터를 배열에 임시로 담기
+                    let regions = [];
                     data.regcodes.forEach(function(item) {
                         let nameArray = item.name.split(" ");
                         if (nameArray.length > 1) { 
                             let sigunguName = nameArray.slice(1).join(" ");
-                            let option = document.createElement('option');
-                            option.value = sigunguName;
-                            option.text = sigunguName;
-                            option.dataset.code = item.code.substring(0, 5);
-                            sigunguSelect.add(option);
+                            regions.push({ name: sigunguName, code: item.code.substring(0, 5) });
                         }
                     });
+
+                    // 🌟 2. 임시로 담은 배열을 무조건 '가나다순'으로 정렬하기!
+                    regions.sort((a, b) => a.name.localeCompare(b.name));
+
+                    // 🌟 3. 정렬된 순서대로 화면(셀렉트 박스)에 꽂아넣기
+                    regions.forEach(function(region) {
+                        let option = document.createElement('option');
+                        option.value = region.name;
+                        option.text = region.name;
+                        option.dataset.code = region.code;
+                        sigunguSelect.add(option);
+                    });
                 });
-            updateHubFilter();
+                
+            if(typeof updateHubFilter === "function") updateHubFilter();
+        }
+
+        function changeSigungu() {
+            const sigunguSelect = document.getElementById('sigunguSelect');
+            const dongSelect = document.getElementById('dongSelect');
+            
+            dongSelect.options.length = 1;
+
+            if (sigunguSelect.selectedIndex === 0) {
+                if(typeof updateHubFilter === "function") updateHubFilter();
+                return;
+            }
+
+            const sigunguCode = sigunguSelect.options[sigunguSelect.selectedIndex].dataset.code;
+
+            fetch(`${KOREA_API_URL}?regcode_pattern=${sigunguCode}*&is_ignore_zero=true`)
+                .then(response => response.json())
+                .then(data => {
+                    // 🌟 1. 읍/면/동 데이터 임시 배열에 담기
+                    let dongs = [];
+                    data.regcodes.forEach(function(item) {
+                        let nameArray = item.name.split(" ");
+                        if (nameArray.length > 2) {
+                            let dongName = nameArray[nameArray.length - 1];
+                            dongs.push({ name: dongName });
+                        }
+                    });
+
+                    // 🌟 2. 읍/면/동도 무조건 '가나다순'으로 정렬!
+                    dongs.sort((a, b) => a.name.localeCompare(b.name));
+
+                    // 🌟 3. 정렬된 순서대로 화면에 꽂아넣기
+                    dongs.forEach(function(dong) {
+                        let option = document.createElement('option');
+                        option.value = dong.name;
+                        option.text = dong.name;
+                        dongSelect.add(option);
+                    });
+                });
+                
+            if(typeof updateHubFilter === "function") updateHubFilter();
         }
 
         function changeSigungu() {
