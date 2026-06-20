@@ -289,6 +289,7 @@
         let detailMapInstance = null;
         let detailMapMarker = null;
 
+        // 🌟 지도를 그리고, 만약 'B동 402호'때문에 에러나면 똑똑하게 자르는 마법 함수
         function renderKakaoMap(address, title) {
             const container = document.getElementById('detailMapContainer');
             
@@ -301,28 +302,47 @@
 
             const geocoder = new kakao.maps.services.Geocoder();
             
-            // 🌟 [중요] 주소에서 괄호 등 지도를 방해하는 찌꺼기 글자 제거
-            const cleanAddress = address.replace(/\[.*?\]\s*/g, '').split(',')[0].trim();
+            // 괄호, 우편번호 등 지저분한 특수기호 먼저 청소
+            let cleanAddress = address.replace(/\[.*?\]\s*/g, '').split(',')[0].trim();
             
             geocoder.addressSearch(cleanAddress, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
-                    const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                    
-                    if (detailMapMarker) detailMapMarker.setMap(null);
-                    
-                    detailMapMarker = new kakao.maps.Marker({
-                        map: detailMapInstance,
-                        position: coords
-                    });
-                    
-                    setTimeout(() => {
-                        detailMapInstance.relayout();
-                        detailMapInstance.setCenter(coords);
-                    }, 100);
+                    setMarker(result[0].y, result[0].x);
                 } else {
-                    container.innerHTML = '<div style="padding:40px; text-align:center; color:#888; font-weight:800;">지도를 불러올 수 없는 주소입니다.</div>';
+                    // 🌟 'B동 402호' 같은 상세주소 때문에 카카오가 길을 잃었을 경우!
+                    // 띄어쓰기를 기준으로 앞의 3~4덩어리(경기 평택시 지산1로 10)까지만 잘라서 다시 검색합니다.
+                    let parts = cleanAddress.split(' ');
+                    if(parts.length >= 3) {
+                        let shortAddress = parts[0] + ' ' + parts[1] + ' ' + parts[2];
+                        if(parts.length > 3 && (parts[3].endsWith('로') || parts[3].endsWith('길') || !isNaN(parts[3]))) {
+                            shortAddress += ' ' + parts[3];
+                        }
+                        
+                        geocoder.addressSearch(shortAddress, function(res2, stat2) {
+                            if (stat2 === kakao.maps.services.Status.OK) {
+                                setMarker(res2[0].y, res2[0].x);
+                            } else {
+                                container.innerHTML = '<div style="padding:40px; text-align:center; color:#888; font-weight:800;">지도를 표시하기 어려운 주소 형식입니다.<br><span style="font-size:0.9rem;">(' + address + ')</span></div>';
+                            }
+                        });
+                    } else {
+                        container.innerHTML = '<div style="padding:40px; text-align:center; color:#888; font-weight:800;">지도를 표시하기 어려운 주소 형식입니다.<br><span style="font-size:0.9rem;">(' + address + ')</span></div>';
+                    }
                 }
             });
+
+            function setMarker(lat, lng) {
+                const coords = new kakao.maps.LatLng(lat, lng);
+                if (detailMapMarker) detailMapMarker.setMap(null);
+                detailMapMarker = new kakao.maps.Marker({
+                    map: detailMapInstance,
+                    position: coords
+                });
+                setTimeout(() => {
+                    detailMapInstance.relayout();
+                    detailMapInstance.setCenter(coords);
+                }, 100);
+            }
         }
 
         function updateMap() {
@@ -388,8 +408,6 @@
                     if (result.success) {
                         const p = result.data;
                         
-                        console.log("🔍 서버에서 가져온 상품 데이터 확인:", p); // 디버깅용 안전장치
-
                         const btnArea = document.getElementById('ownerActionBtns');
                         if (btnArea && (result.isAdmin || (result.currentUser && p.owner_nickname === result.currentUser))) {
                             btnArea.style.display = 'flex';
@@ -399,15 +417,41 @@
                         document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
                         document.querySelector('.farm-name').innerText = p.farm_name || '팜마을 생산자';
                         
-                        // 🌟 수정: 상품 등록 시 저장되는 다양한 주소 이름표를 모두 확인합니다!
-                        if (p.pickup_address && p.pickup_address.trim() !== '') {
-                            currentFarmAddress = p.pickup_address;
-                        } else if (p.farm_address && p.farm_address.trim() !== '') {
-                            currentFarmAddress = p.farm_address;
-                        } else if (p.address && p.address.trim() !== '') {
-                            currentFarmAddress = p.address;
-                        } else {
-                            currentFarmAddress = ''; // 주소 없음
+                        // 🌟 마법의 주소 찾기: 어떤 이름표를 달고 있든 주소 형태를 띄면 무조건 찾아냅니다!
+                        let foundAddr = p.pickup_address || p.farm_address || p.address || p.location || '';
+                        
+                        // 만약 정해진 이름표 중에 주소가 없다면, 데이터 전체를 뒤져서 찾아냅니다.
+                        if (!foundAddr || foundAddr.trim() === '') {
+                            for (let key in p) {
+                                if (typeof p[key] === 'string' && 
+                                   (p[key].includes('시 ') || p[key].includes('도 ')) && 
+                                   (p[key].includes('동') || p[key].includes('로') || p[key].includes('길'))) {
+                                    
+                                    if (p[key].length > 8 && p[key].length < 100) {
+                                        foundAddr = p[key]; 
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        currentFarmAddress = foundAddr;
+
+                        // 🌟 최후의 보루: 그래도 못 찾았다면, 이 상품을 올린 '생산자 농장'의 주소를 서버에서 끌어옵니다!
+                        if (!currentFarmAddress || currentFarmAddress.trim() === '') {
+                            fetch('/api/producers')
+                            .then(r => r.json())
+                            .then(prodRes => {
+                                if(prodRes.success) {
+                                    const matchedProducer = prodRes.data.find(prod => prod.owner_nickname === p.owner_nickname || prod.farm_name === p.farm_name);
+                                    if (matchedProducer && matchedProducer.address) {
+                                        currentFarmAddress = matchedProducer.address;
+                                        // 주소를 뒤늦게 찾았으니 맵을 강제로 한 번 더 업데이트 시켜줍니다.
+                                        const option = document.querySelector('input[name="d_option"]:checked').value;
+                                        if(option === '방문수거') updateMap();
+                                    }
+                                }
+                            });
                         }
 
                         const aiTarget = document.getElementById('aiGreetingTarget');
