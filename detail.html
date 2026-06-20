@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>팜마을 - 구매자 상품 상세페이지</title>
     
-    <!-- 🌟 카카오 지도 API 스크립트 추가 -->
     <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=5bb380850abcd5daff17634299b790de&libraries=services"></script>
 
     <style>
@@ -286,9 +285,7 @@
             win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
         }
 
-        // 🌟 수정: 가짜 기본 주소를 삭제하고 빈 칸으로 비워두어 에러를 방지합니다.
         let currentFarmAddress = ''; 
-
         let detailMapInstance = null;
         let detailMapMarker = null;
 
@@ -304,7 +301,10 @@
 
             const geocoder = new kakao.maps.services.Geocoder();
             
-            geocoder.addressSearch(address, function(result, status) {
+            // 🌟 [중요] 주소에서 괄호 등 지도를 방해하는 찌꺼기 글자 제거
+            const cleanAddress = address.replace(/\[.*?\]\s*/g, '').split(',')[0].trim();
+            
+            geocoder.addressSearch(cleanAddress, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
                     
@@ -336,8 +336,7 @@
                 mapArea.style.display = 'block';
                 mapTitle.innerHTML = '📍 방문 장소 확인';
                 
-                // 🌟 수정: 진짜 주소가 있을 때만 지도를 띄우고, 없으면 없다고 알려주기
-                if (currentFarmAddress) {
+                if (currentFarmAddress && currentFarmAddress.trim() !== '') {
                     mapAddr.innerText = currentFarmAddress;
                     renderKakaoMap(currentFarmAddress, '방문 장소');
                 } else {
@@ -389,6 +388,8 @@
                     if (result.success) {
                         const p = result.data;
                         
+                        console.log("🔍 서버에서 가져온 상품 데이터 확인:", p); // 디버깅용 안전장치
+
                         const btnArea = document.getElementById('ownerActionBtns');
                         if (btnArea && (result.isAdmin || (result.currentUser && p.owner_nickname === result.currentUser))) {
                             btnArea.style.display = 'flex';
@@ -398,10 +399,12 @@
                         document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
                         document.querySelector('.farm-name').innerText = p.farm_name || '팜마을 생산자';
                         
-                        // 🌟 수정: DB에서 주소를 가져올 때 정확하게 매칭시킵니다.
-                        if(p.farm_address) {
+                        // 🌟 수정: 상품 등록 시 저장되는 다양한 주소 이름표를 모두 확인합니다!
+                        if (p.pickup_address && p.pickup_address.trim() !== '') {
+                            currentFarmAddress = p.pickup_address;
+                        } else if (p.farm_address && p.farm_address.trim() !== '') {
                             currentFarmAddress = p.farm_address;
-                        } else if(p.address) {
+                        } else if (p.address && p.address.trim() !== '') {
                             currentFarmAddress = p.address;
                         } else {
                             currentFarmAddress = ''; // 주소 없음
