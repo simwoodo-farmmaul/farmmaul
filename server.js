@@ -245,12 +245,13 @@ app.delete('/api/mypage', (req, res) => {
 });
 
 // ==========================================
-// 🌟 팜마을 상품 (Products) API
+// 🌟 팜마을 상품 (Products) API - 🌟 주소 저장 기능 추가!
 // ==========================================
 app.post('/api/products', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요한 서비스입니다.' });
     const ownerNickname = req.session.user.nickname;
-    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData } = req.body;
+    // 🌟 farm_address 변수 추가
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData, farm_address } = req.body; 
     
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS farm_products (
@@ -270,11 +271,11 @@ app.post('/api/products', (req, res) => {
             tags VARCHAR(255),
             content_data LONGTEXT,
             faqs LONGTEXT,
+            farm_address VARCHAR(500),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     `;
     db.query(createTableQuery, () => {
-        // 컬럼 안전 추가 로직 (생략 방지)
         db.query(`ALTER TABLE farm_products ADD COLUMN owner_nickname VARCHAR(100)`, () => {});
         db.query(`ALTER TABLE farm_products ADD COLUMN delivery VARCHAR(255) DEFAULT '방문수거'`, () => {});
         db.query(`ALTER TABLE farm_products ADD COLUMN tags VARCHAR(255)`, () => {});
@@ -282,9 +283,12 @@ app.post('/api/products', (req, res) => {
         db.query(`ALTER TABLE farm_products ADD COLUMN p_size VARCHAR(50)`, () => {});
         db.query(`ALTER TABLE farm_products ADD COLUMN certs VARCHAR(255)`, () => {});
         db.query(`ALTER TABLE farm_products ADD COLUMN faqs LONGTEXT`, () => {});
+        // 🌟 DB 테이블에 주소 저장할 칸 강제 확보
+        db.query(`ALTER TABLE farm_products ADD COLUMN farm_address VARCHAR(500)`, () => {}); 
         
-        const insertQuery = `INSERT INTO farm_products (owner_nickname, farm_name, category, title, org_price, sale_price, p_date, p_grade, p_size, certs, image, delivery, tags, content_data, faqs) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        db.query(insertQuery, [ownerNickname, farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]'], (insertErr, result) => {
+        // 🌟 INSERT 구문에 주소 파라미터 추가
+        const insertQuery = `INSERT INTO farm_products (owner_nickname, farm_name, category, title, org_price, sale_price, p_date, p_grade, p_size, certs, image, delivery, tags, content_data, faqs, farm_address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        db.query(insertQuery, [ownerNickname, farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]', farm_address || ''], (insertErr, result) => {
             if (insertErr) return res.status(500).json({ success: false, message: 'DB 저장 중 오류가 발생했습니다.' });
             res.json({ success: true, message: '상품 등록 완료!' });
         });
@@ -315,14 +319,16 @@ app.put('/api/products/:id', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     const nickname = req.session.user.nickname;
     const isAdmin = checkIsAdmin(req.session.user);
-    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData } = req.body;
+    // 🌟 farm_address 변수 추가
+    const { farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize, certs, image, delivery, tags, contentData, faqsData, farm_address } = req.body;
     
     db.query(`SELECT owner_nickname FROM farm_products WHERE id = ?`, [req.params.id], (err, rows) => {
         if (!rows || rows.length === 0) return res.status(404).json({ success: false, message: '상품을 찾을 수 없습니다.' });
         if (rows[0].owner_nickname !== nickname && !isAdmin) return res.status(403).json({ success: false, message: '본인이 등록한 상품만 수정할 수 있습니다.' });
 
-        const updateQuery = `UPDATE farm_products SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, p_size=?, certs=?, image=?, delivery=?, tags=?, content_data=?, faqs=? WHERE id=?`;
-        db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]', req.params.id], (err, result) => {
+        // 🌟 UPDATE 구문에 주소 파라미터 추가
+        const updateQuery = `UPDATE farm_products SET farm_name=?, category=?, title=?, org_price=?, sale_price=?, p_date=?, p_grade=?, p_size=?, certs=?, image=?, delivery=?, tags=?, content_data=?, faqs=?, farm_address=? WHERE id=?`;
+        db.query(updateQuery, [farmName, category, title, orgPrice, salePrice, pDate, pGrade, pSize || '', certs || '', image, delivery || '방문수거', tags || '', contentData || '[]', faqsData || '[]', farm_address || '', req.params.id], (err, result) => {
             if (err) return res.status(500).json({ success: false, message: '수정 중 오류가 발생했습니다.' });
             res.json({ success: true, message: '상품이 성공적으로 수정되었습니다!' });
         });
@@ -833,7 +839,7 @@ app.delete('/api/admin/members/:type/:id', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [통합/완성] 알림판(Notice) 통합 API (메인 고정 연동)
+// 🌟 알림판(Notice) 통합 API (메인 고정 연동)
 // ==========================================
 app.get('/api/notices', (req, res) => {
     const createTableQuery = `
@@ -949,7 +955,7 @@ app.get('/api/notices/comments/:postId', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [통합/완성] 마을 HUB 거점 관리 통합 API
+// 🌟 마을 HUB 거점 관리 통합 API
 // ==========================================
 app.post('/api/hub-apply', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
@@ -1001,17 +1007,14 @@ app.put('/api/admin/hubs/:id/approve', (req, res) => {
 });
 
 // ==========================================
-// 🌟 [추가] 생산자 개별 홈페이지 - 농장 일기 관리 API
+// 🌟 생산자 개별 홈페이지 - 농장 일기 관리 API
 // ==========================================
-
-// 1. 농장 일기 쓰기 (저장)
 app.post('/api/producers/diary', (req, res) => {
     if (!req.session || !req.session.user) return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
     
     const nickname = req.session.user.nickname;
     const { producer_id, content } = req.body;
     
-    // 일기장 전용 금고(테이블)가 없으면 자동 생성
     const createTableQuery = `
         CREATE TABLE IF NOT EXISTS farm_diary (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -1029,7 +1032,6 @@ app.post('/api/producers/diary', (req, res) => {
     });
 });
 
-// 2. 해당 농장의 일기 목록 불러오기
 app.get('/api/producers/:id/diary', (req, res) => {
     db.query(`CREATE TABLE IF NOT EXISTS farm_diary (id INT AUTO_INCREMENT PRIMARY KEY, producer_id INT, nickname VARCHAR(100), content TEXT, created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)`, () => {
         db.query(`SELECT * FROM farm_diary WHERE producer_id = ? ORDER BY created_at DESC`, [req.params.id], (err, results) => {
