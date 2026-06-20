@@ -22,7 +22,6 @@
 
         .header { background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         
-        /* 🌟 수정: 너비를 1200px에서 1000px로 축소 */
         .header-inner { max-width: 1000px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
         .container { max-width: 1000px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); display: flex; flex-direction: column;}
 
@@ -30,7 +29,6 @@
         .cover-img { width: 100%; height: 350px; object-fit: cover; background: #e0e0e0; display: block; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6)); }
 
-        /* 🌟 수정: 메뉴 스크롤바 숨김 처리 및 둥근 박스 형태로 예쁘게 디자인 */
         .tabs { display: flex; padding: 20px; gap: 12px; border-bottom: 1px solid #eee; position: sticky; top: 62px; background: #fff; z-index: 99; overflow-x: auto; white-space: nowrap; -ms-overflow-style: none; scrollbar-width: none; }
         .tabs::-webkit-scrollbar { display: none; }
         .tab-btn { flex: 1; text-align: center; padding: 14px 10px; font-weight: 800; cursor: pointer; color: #666; background: #f4f7f6; border-radius: 12px; font-size: 1.05rem; transition: 0.2s; min-width: 120px; border: 1px solid #eaeaea; }
@@ -41,7 +39,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .intro-grid { display: grid; gap: 30px; }
+        .intro-grid { display: grid; gap: 30px; margin-bottom: 50px; }
         .intro-box { font-size: 1.1rem; line-height: 1.8; color: #444; white-space: pre-wrap; background: #fdfdfd; padding: 35px; border-radius: 15px; border: 1px solid #f0f0f0; }
         
         .schedule-box { background: #fff8eb; border: 1px solid #ffe0b2; border-radius: 15px; padding: 25px; }
@@ -55,7 +53,8 @@
         .product-add-banner h3 { color: #e65100; font-size: 1.2rem; margin-bottom: 8px; font-weight: 900; }
         .product-add-banner p { color: #f57c00; font-size: 1rem; font-weight: 700; }
 
-        .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        /* 🌟 수정: 상품 3줄(3칸) 배열 적용 */
+        .product-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .product-card { border: 1px solid #eaeaea; border-radius: 15px; overflow: hidden; transition: 0.2s; cursor: pointer; background: #fff; }
         .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); border-color: var(--primary-green); }
         .product-img { width: 100%; height: 200px; object-fit: cover; background: #eee; }
@@ -63,7 +62,6 @@
         .product-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: #222; }
         .product-price { font-size: 1.25rem; font-weight: 900; color: var(--primary-orange); }
 
-        /* 농장일기 전용 예쁜 디자인 스타일 */
         .diary-write-zone { display: none; text-align: right; margin-bottom: 25px; }
         .btn-write-diary { background: var(--primary-blue); color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 900; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(75,154,210,0.3); transition: 0.2s; }
         .btn-write-diary:hover { transform: translateY(-2px); background: #3a82b8; box-shadow: 0 6px 20px rgba(75,154,210,0.4); }
@@ -129,12 +127,18 @@
         </div>
 
         <div id="tab-intro" class="tab-content active">
-            <!-- 🌟 뱃지 요소 삭제 완료 -->
-            
             <h3 style="margin-bottom: 20px; font-weight: 900; font-size: 1.3rem;">우리 농장을 소개합니다</h3>
             <div class="intro-grid" id="introGridBox">
                 <div id="storyProducerDesc" class="intro-box">
-                    생산자님이 작성하신 상세 소개글이 이곳에 예쁘게 표시됩니다. 어떻게 작물을 기르시는지, 어떤 마음으로 농장을 운영하시는지 이웃들에게 알려주세요!
+                    생산자님이 작성하신 상세 소개글이 이곳에 표시됩니다.
+                </div>
+            </div>
+
+            <!-- 🌟 수정: 첫 화면(농장소개 탭) 아래에 판매상품 리스트 함께 노출 -->
+            <div style="margin-top: 40px; padding-top: 40px; border-top: 2px dashed #eee;">
+                <h3 style="margin-bottom: 20px; font-weight: 900; font-size: 1.3rem; color: var(--primary-orange);">🛒 우리 농장 판매 상품</h3>
+                <div class="product-grid" id="storyProductContainerIntro">
+                    <div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: #888; font-weight: 700;">상품 정보를 불러오고 있습니다...</div>
                 </div>
             </div>
         </div>
@@ -145,7 +149,7 @@
                 <p>수확한 작물을 등록하면 메인 화면 최신 상품에도 함께 보여집니다!</p>
             </div>
 
-            <div class="product-grid" id="storyProductContainer">
+            <div class="product-grid" id="storyProductContainerTab">
                 <div style="grid-column: 1 / -1; text-align:center; padding: 40px; color: #888; font-weight: 700;">상품 정보를 불러오고 있습니다...</div>
             </div>
         </div>
@@ -260,13 +264,14 @@
                     .then(pResult => {
                         if(pResult.success) {
                             const myProducts = pResult.data.filter(p => p.owner_nickname === producer.owner_nickname);
-                            const pContainer = document.getElementById('storyProductContainer');
+                            const pContainerIntro = document.getElementById('storyProductContainerIntro');
+                            const pContainerTab = document.getElementById('storyProductContainerTab');
                             
                             if(myProducts.length > 0) {
-                                pContainer.innerHTML = ''; 
+                                let productHtml = ''; 
                                 myProducts.forEach(p => {
                                     const imgUrl = p.image || 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?q=80&w=400&auto=format&fit=crop';
-                                    const itemHtml = `
+                                    productHtml += `
                                         <div class="product-card" onclick="location.href='detail.html?id=${p.id}'">
                                             <img src="${imgUrl}" class="product-img">
                                             <div class="product-info">
@@ -275,10 +280,14 @@
                                             </div>
                                         </div>
                                     `;
-                                    pContainer.insertAdjacentHTML('beforeend', itemHtml);
                                 });
+                                // 🌟 수정: 생성된 상품 리스트를 '농장소개' 탭과 '판매상품' 탭 두 곳 모두에 뿌려줍니다!
+                                pContainerIntro.innerHTML = productHtml;
+                                pContainerTab.innerHTML = productHtml;
                             } else {
-                                pContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding: 50px; color: #888; font-weight: 700; font-size: 1.05rem;">등록된 판매 상품이 없습니다.<br>상단의 상품 등록 배너를 통해 첫 상품을 올려보세요! 🌱</div>';
+                                const emptyHtml = '<div style="grid-column: 1 / -1; text-align:center; padding: 50px; color: #888; font-weight: 700; font-size: 1.05rem;">등록된 판매 상품이 없습니다.<br>상단의 상품 등록 배너를 통해 첫 상품을 올려보세요! 🌱</div>';
+                                pContainerIntro.innerHTML = emptyHtml;
+                                pContainerTab.innerHTML = emptyHtml;
                             }
                         }
                     });
