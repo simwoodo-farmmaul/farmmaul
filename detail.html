@@ -13,17 +13,22 @@
         
         /* 공통 헤더 */
         .header { border-bottom: 1px solid #eee; position: sticky; top: 0; background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); z-index: 100; }
-        .header-inner { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
+        
+        /* 🌟 수정: 너비를 1200px에서 1000px로 축소 */
+        .header-inner { max-width: 1000px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; }
         .header .btn { font-size: 1.2rem; text-decoration: none; color: #333; font-weight: 900; cursor: pointer; }
         .header .title { font-weight: 900; font-size: 1.3rem; color: var(--primary-green); }
 
         /* 반응형 레이아웃 뼈대 */
-        .top-section { max-width: 1200px; margin: 0 auto; display: flex; gap: 60px; padding: 50px 20px; align-items: flex-start; }
+        /* 🌟 수정: 너비를 1200px에서 1000px로 축소 */
+        .top-section { max-width: 1000px; margin: 0 auto; display: flex; gap: 60px; padding: 50px 20px; align-items: flex-start; }
         .img-area { width: 500px; flex-shrink: 0; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 100px; }
         
         /* 우측 정보 영역 레이아웃 재설계 */
         .info-area { flex: 1; display: flex; flex-direction: column; width: 100%; gap: 25px; }
-        .bottom-section { max-width: 1200px; margin: 0 auto; padding: 0 20px 80px; border-top: 1px solid #eee; padding-top: 40px; }
+        
+        /* 🌟 수정: 너비를 1200px에서 1000px로 축소 */
+        .bottom-section { max-width: 1000px; margin: 0 auto; padding: 0 20px 80px; border-top: 1px solid #eee; padding-top: 40px; }
 
         /* 사진 및 영상 */
         .main-image { width: 100%; aspect-ratio: 1/1; background: #eee; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
@@ -32,7 +37,7 @@
         
         /* 구역 1: 타이틀 영역 */
         .product-header-section { border-bottom: 2px solid #222; padding-bottom: 20px; position: relative; }
-        .farm-badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 6px; font-size: 1rem; font-weight: 800; margin-bottom: 12px; }
+        .farm-badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 6px 12px; border-radius: 6px; font-size: 1rem; font-weight: 800; }
         .prod-title { font-size: 2.2rem; font-weight: 900; color: #222; line-height: 1.35; margin: 0 0 15px; word-break: keep-all; }
         
         .certs { display: flex; gap: 6px; margin-bottom: 15px; flex-wrap: wrap; }
@@ -141,7 +146,11 @@
 
     <div class="header">
         <div class="header-inner">
-            <a href="#" class="btn" onclick="history.back()">←</a>
+            <!-- 🌟 수정: 상단 좌측 버튼 팜마을 메인홈페이지 연결 -->
+            <a href="index.html" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-family: 'Jua', sans-serif; font-size: 1.4rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <span style="color: #666; -webkit-text-fill-color: #666; font-size: 1.2rem; font-family: 'Pretendard', sans-serif; margin-right: 2px; font-weight: 900;">←</span>
+                <img src="farmmaul-logo.webp" alt="팜마을" style="height: 1.6rem; margin-bottom: 2px;" onerror="this.style.display='none'">팜마을
+            </a>
             <div class="title">팜마을 상품안내</div>
             <a href="#" class="btn" onclick="alert('상품이 공유되었습니다.')">🔗</a>
         </div>
@@ -160,7 +169,12 @@
         <div class="info-area">
             
             <div class="product-header-section">
-                <div class="farm-badge">🧑‍🌾 <span class="farm-name">지산동 영진농원</span></div>
+                <!-- 🌟 수정: 농장보기 버튼 추가 및 레이아웃 정리 -->
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                    <div class="farm-badge" style="margin-bottom: 0;">🧑‍🌾 <span class="farm-name">지산동 영진농원</span></div>
+                    <button onclick="goToFarm()" style="background: var(--primary-green); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: 800; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;">🏡 농장보기</button>
+                </div>
+                
                 <div id="ownerActionBtns" class="owner-btns" style="display: none;">
                     <button onclick="editProduct()" style="color: #4B9AD2; border-color: #4B9AD2;">수정</button>
                     <button onclick="deleteProduct()" style="color: #ff5e62; border-color: #ff5e62;">삭제</button>
@@ -280,16 +294,27 @@
     </div>
 
     <script>
+        // 🌟 수정: 농장 ID를 전역 변수로 저장
+        let currentProducerId = null; 
+
         function toggleAIChat() {
             const win = document.getElementById('aiChatWindow');
             win.style.display = win.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        // 🌟 수정: 농장보기 버튼 클릭 시 이동하는 함수
+        function goToFarm() {
+            if (currentProducerId) {
+                location.href = 'producer_story.html?id=' + currentProducerId;
+            } else {
+                alert('생산자페이지가 없습니다. 🌱\n(생산자가 아직 브랜드 홈페이지를 등록하지 않았습니다)');
+            }
         }
 
         let currentFarmAddress = ''; 
         let detailMapInstance = null;
         let detailMapMarker = null;
 
-        // 🌟 지도를 그리고, 만약 'B동 402호'때문에 에러나면 똑똑하게 자르는 마법 함수
         function renderKakaoMap(address, title) {
             const container = document.getElementById('detailMapContainer');
             
@@ -302,15 +327,12 @@
 
             const geocoder = new kakao.maps.services.Geocoder();
             
-            // 괄호, 우편번호 등 지저분한 특수기호 먼저 청소
             let cleanAddress = address.replace(/\[.*?\]\s*/g, '').split(',')[0].trim();
             
             geocoder.addressSearch(cleanAddress, function(result, status) {
                 if (status === kakao.maps.services.Status.OK) {
                     setMarker(result[0].y, result[0].x);
                 } else {
-                    // 🌟 'B동 402호' 같은 상세주소 때문에 카카오가 길을 잃었을 경우!
-                    // 띄어쓰기를 기준으로 앞의 3~4덩어리(경기 평택시 지산1로 10)까지만 잘라서 다시 검색합니다.
                     let parts = cleanAddress.split(' ');
                     if(parts.length >= 3) {
                         let shortAddress = parts[0] + ' ' + parts[1] + ' ' + parts[2];
@@ -417,10 +439,8 @@
                         document.querySelector('.sale-price').innerText = Number(p.sale_price).toLocaleString();
                         document.querySelector('.farm-name').innerText = p.farm_name || '팜마을 생산자';
                         
-                        // 🌟 마법의 주소 찾기: 어떤 이름표를 달고 있든 주소 형태를 띄면 무조건 찾아냅니다!
                         let foundAddr = p.pickup_address || p.farm_address || p.address || p.location || '';
                         
-                        // 만약 정해진 이름표 중에 주소가 없다면, 데이터 전체를 뒤져서 찾아냅니다.
                         if (!foundAddr || foundAddr.trim() === '') {
                             for (let key in p) {
                                 if (typeof p[key] === 'string' && 
@@ -437,22 +457,26 @@
                         
                         currentFarmAddress = foundAddr;
 
-                        // 🌟 최후의 보루: 그래도 못 찾았다면, 이 상품을 올린 '생산자 농장'의 주소를 서버에서 끌어옵니다!
-                        if (!currentFarmAddress || currentFarmAddress.trim() === '') {
-                            fetch('/api/producers')
-                            .then(r => r.json())
-                            .then(prodRes => {
-                                if(prodRes.success) {
-                                    const matchedProducer = prodRes.data.find(prod => prod.owner_nickname === p.owner_nickname || prod.farm_name === p.farm_name);
-                                    if (matchedProducer && matchedProducer.address) {
-                                        currentFarmAddress = matchedProducer.address;
-                                        // 주소를 뒤늦게 찾았으니 맵을 강제로 한 번 더 업데이트 시켜줍니다.
-                                        const option = document.querySelector('input[name="d_option"]:checked').value;
-                                        if(option === '방문수거') updateMap();
+                        // 🌟 수정: 무조건 생산자 목록을 불러와 농장(생산자) ID를 매칭합니다.
+                        fetch('/api/producers')
+                        .then(r => r.json())
+                        .then(prodRes => {
+                            if(prodRes.success) {
+                                const matchedProducer = prodRes.data.find(prod => prod.owner_nickname === p.owner_nickname || prod.farm_name === p.farm_name);
+                                if (matchedProducer) {
+                                    currentProducerId = matchedProducer.id; // 농장보기 버튼을 위해 ID 저장
+                                    
+                                    // 만약 주소가 없다면 생산자의 주소를 끌어옵니다
+                                    if (!currentFarmAddress || currentFarmAddress.trim() === '') {
+                                        if (matchedProducer.address) {
+                                            currentFarmAddress = matchedProducer.address;
+                                            const option = document.querySelector('input[name="d_option"]:checked').value;
+                                            if(option === '방문수거') updateMap();
+                                        }
                                     }
                                 }
-                            });
-                        }
+                            }
+                        });
 
                         const aiTarget = document.getElementById('aiGreetingTarget');
                         if(aiTarget) aiTarget.innerText = (p.farm_name || '') + ' ' + p.title;
