@@ -22,36 +22,23 @@
 
         .header { background: rgba(255,255,255,0.95); backdrop-filter: blur(5px); border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
         .header-inner { max-width: 1200px; margin: 0 auto; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-icon { font-size: 1.2rem; cursor: pointer; font-weight: 900; }
-        .title { font-weight: 900; font-size: 1.2rem; color: var(--primary-green); }
 
-        .container { max-width: 1200px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); }
+        .container { max-width: 1200px; margin: 0 auto; background: #fff; min-height: 100vh; box-shadow: 0 0 20px rgba(0,0,0,0.05); display: flex; flex-direction: column;}
 
         .hero-section { position: relative; border-bottom: 1px solid #eee; }
         .cover-img { width: 100%; height: 350px; object-fit: cover; background: #e0e0e0; display: block; }
         .hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.6)); }
-        
-        .profile-wrap { position: relative; padding: 0 20px 35px; margin-top: -80px; z-index: 10; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .profile-img { width: 160px; height: 160px; border-radius: 50%; object-fit: cover; border: 5px solid #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.15); background: #fff; }
-        
-        .producer-name { font-size: 2rem; font-weight: 900; margin: 20px 0 10px; color: #222; }
-        .producer-short { font-size: 1.15rem; color: #555; margin-bottom: 20px; font-weight: 600; }
-        
-        .stats-box { display: flex; justify-content: center; gap: 40px; background: #f8f9fa; padding: 20px 40px; border-radius: 20px; border: 1px solid #eaeaea; }
-        .stat-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .stat-val { font-size: 1.4rem; font-weight: 900; color: var(--primary-orange); }
-        .stat-label { font-size: 0.95rem; color: #777; font-weight: 700; }
 
-        .tabs { display: flex; border-bottom: 1px solid #eee; position: sticky; top: 54px; background: #fff; z-index: 99; }
-        .tab-btn { flex: 1; text-align: center; padding: 18px; font-weight: 800; cursor: pointer; color: #999; font-size: 1.1rem; transition: 0.2s; position: relative; }
+        .tabs { display: flex; border-bottom: 1px solid #eee; position: sticky; top: 62px; background: #fff; z-index: 99; overflow-x: auto; white-space: nowrap; }
+        .tab-btn { flex: 1; text-align: center; padding: 18px 10px; font-weight: 800; cursor: pointer; color: #999; font-size: 1.05rem; transition: 0.2s; position: relative; min-width: 100px; }
         .tab-btn.active { color: var(--primary-green); }
         .tab-btn.active::after { content: ''; position: absolute; bottom: -1px; left: 0; width: 100%; height: 4px; background: var(--primary-green); }
 
-        .tab-content { display: none; padding: 40px 30px; animation: fadeIn 0.3s ease; }
+        .tab-content { display: none; padding: 40px 30px; animation: fadeIn 0.3s ease; flex: 1; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .intro-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .intro-grid { display: grid; gap: 30px; }
         .intro-box { font-size: 1.1rem; line-height: 1.8; color: #444; white-space: pre-wrap; background: #fdfdfd; padding: 35px; border-radius: 15px; border: 1px solid #f0f0f0; }
         
         .schedule-box { background: #fff8eb; border: 1px solid #ffe0b2; border-radius: 15px; padding: 25px; }
@@ -60,7 +47,7 @@
         .schedule-list li { margin-bottom: 12px; font-size: 0.95rem; color: #555; font-weight: 700; line-height: 1.5; padding-left: 15px; position: relative; }
         .schedule-list li::before { content: '•'; position: absolute; left: 0; color: var(--primary-orange); font-weight: 900; }
         
-        .cert-badges { display: flex; gap: 10px; margin-bottom: 25px; }
+        .cert-badges { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap;}
         .cert-badge { background: #e8f5e9; color: #2e7d32; padding: 8px 16px; border-radius: 20px; font-size: 0.95rem; font-weight: 800; border: 1px solid #c8e6c9; }
 
         .product-add-banner { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border: 2px dashed #ffb74d; padding: 25px; border-radius: 15px; text-align: center; margin-bottom: 30px; cursor: pointer; transition: 0.2s; }
@@ -76,7 +63,7 @@
         .product-title { font-size: 1.1rem; font-weight: 800; margin-bottom: 10px; color: #222; }
         .product-price { font-size: 1.25rem; font-weight: 900; color: var(--primary-orange); }
 
-        /* 🌟 농장일기 전용 예쁜 디자인 스타일 */
+        /* 농장일기 전용 예쁜 디자인 스타일 */
         .diary-write-zone { display: none; text-align: right; margin-bottom: 25px; }
         .btn-write-diary { background: var(--primary-blue); color: white; border: none; padding: 12px 25px; border-radius: 30px; font-weight: 900; font-size: 1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(75,154,210,0.3); transition: 0.2s; }
         .btn-write-diary:hover { transform: translateY(-2px); background: #3a82b8; box-shadow: 0 6px 20px rgba(75,154,210,0.4); }
@@ -96,35 +83,33 @@
         .diary-author { font-size: 0.95rem; color: #555; font-weight: 800; background: #f1f3f5; padding: 6px 14px; border-radius: 20px; }
         .diary-content-text { font-size: 1.1rem; color: #333; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; }
 
+        .farm-footer { background: #f8f9fa; padding: 30px; border-top: 1px solid #eee; margin-top: auto; font-size: 0.95rem; color: #555; line-height: 1.8; }
+
         @media (max-width: 1024px) {
             .product-grid { grid-template-columns: repeat(2, 1fr); }
             .cover-img { height: 280px; }
-            .intro-grid { grid-template-columns: 1fr; }
+            .intro-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 768px) {
             .product-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
             .product-img { height: 160px; }
             .cover-img { height: 200px; }
-            .profile-img { width: 120px; height: 120px; }
-            .profile-wrap { margin-top: -60px; padding: 0 15px 20px; }
-            .producer-name { font-size: 1.6rem; }
             .tab-content { padding: 25px 15px; }
             .diary-card { padding: 20px; border-left-width: 4px; }
             .diary-date { font-size: 1.05rem; }
+            .farm-footer { padding: 20px 15px; font-size: 0.85rem; }
         }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-inner">
-            <a href="javascript:history.back()" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-family: 'Jua', sans-serif; font-size: 1.4rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <!-- 🌟 수정: 뒤로가기 대신 index.html 로 정확히 이동하도록 변경 -->
+            <a href="index.html" style="display: inline-flex; align-items: center; gap: 4px; text-decoration: none; font-family: 'Jua', sans-serif; font-size: 1.4rem; background: linear-gradient(135deg, #87B32E 0%, #4a7c1b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
                 <span style="color: #666; -webkit-text-fill-color: #666; font-size: 1.2rem; font-family: 'Pretendard', sans-serif; margin-right: 2px; font-weight: 900;">←</span>
                 <img src="farmmaul-logo.webp" alt="팜마을" style="height: 1.6rem; margin-bottom: 2px;">팜마을
             </a>
-            <!-- 🌟 농장 이름 폰트 크기를 더 크게(1.5rem) 키웠습니다! -->
             <div class="title" id="headerFarmName" style="max-width: 50%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.5rem; font-weight: 900;">농장 로딩중...</div>
-            
-            <!-- 🌟 우측 상단 마이페이지 관리 버튼 추가! -->
             <a href="mypage.html" style="font-size: 0.9rem; font-weight: 800; color: white; background: var(--primary-blue); padding: 7px 14px; border-radius: 8px; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">마이페이지</a>
         </div>
     </div>
@@ -135,32 +120,12 @@
             <div class="hero-overlay"></div>
         </div>
         
-        <div class="profile-wrap">
-            <img id="storyProfileImg" src="https://images.unsplash.com/photo-1605000797499-95a51c5269ae?q=80&w=400&auto=format&fit=crop" class="profile-img">
-            <!-- 🌟 중복되는 이름을 지우고 간격을 맞추기 위해 투명한 공간을 넣었습니다 -->
-            <div style="height: 20px;"></div>
-            <p class="producer-short" id="storyProducerShort" style="font-size: 1.2rem; color: #444;">한 줄 소개를 불러오고 있습니다.</p>
-            
-            <div class="stats-box">
-                <div class="stat-item">
-                    <span class="stat-val">124</span>
-                    <span class="stat-label">단골 이웃</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-val" id="postCount">0</span>
-                    <span class="stat-label">농장 일기</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-val" id="productCount">0</span>
-                    <span class="stat-label">판매 상품</span>
-                </div>
-            </div>
-        </div>
-
+        <!-- 🌟 수정: 메뉴 4개로 세팅 -->
         <div class="tabs">
             <div class="tab-btn active" onclick="switchTab('intro')">농장 소개</div>
             <div class="tab-btn" onclick="switchTab('products')">판매 상품</div>
             <div class="tab-btn" onclick="switchTab('diary')">농장 일기</div>
+            <div class="tab-btn" onclick="switchTab('schedule')">📅 주요 일정 및 공지</div>
         </div>
 
         <div id="tab-intro" class="tab-content active">
@@ -169,23 +134,11 @@
                 <span class="cert-badge">🚚 산지 직배송 보장</span>
             </div>
             
-            <div class="intro-grid">
-                <div>
-                    <h3 style="margin-bottom: 20px; font-weight: 900; font-size: 1.3rem;">우리 농장을 소개합니다</h3>
-                    <div id="storyProducerDesc" class="intro-box">
-                        생산자님이 작성하신 상세 소개글이 이곳에 예쁘게 표시됩니다. 어떻게 작물을 기르시는지, 어떤 마음으로 농장을 운영하시는지 이웃들에게 알려주세요!
-                    </div>
-                </div>
-                
-                <div>
-                    <div class="schedule-box">
-                        <h3>📅 주요 일정 및 공지</h3>
-                        <ul class="schedule-list">
-                            <li>이번 주 금요일: 햇감자 수확 예정! (예약 판매 진행 중)</li>
-                            <li>매주 수요일은 농장 정비일로 방문 수거가 어렵습니다.</li>
-                            <li>다음 달 초 달콤한 찰옥수수가 출하됩니다. 단골 등록 시 알림을 드립니다.</li>
-                        </ul>
-                    </div>
+            <h3 style="margin-bottom: 20px; font-weight: 900; font-size: 1.3rem;">우리 농장을 소개합니다</h3>
+            <div class="intro-grid" id="introGridBox">
+                <!-- 🌟 수정: JS에서 사진이 있으면 좌측에 사진 삽입, 우측에 글 삽입 -->
+                <div id="storyProducerDesc" class="intro-box">
+                    생산자님이 작성하신 상세 소개글이 이곳에 예쁘게 표시됩니다. 어떻게 작물을 기르시는지, 어떤 마음으로 농장을 운영하시는지 이웃들에게 알려주세요!
                 </div>
             </div>
         </div>
@@ -202,7 +155,6 @@
         </div>
 
         <div id="tab-diary" class="tab-content">
-            
             <div id="diaryOwnerZone" class="diary-write-zone">
                 <button class="btn-write-diary" onclick="toggleDiaryForm()">📝 오늘 농장일기 쓰기</button>
             </div>
@@ -218,7 +170,28 @@
             <div id="diaryTimelineContainer" class="diary-timeline">
                 <div style="text-align:center; padding:60px; color:#999; font-weight: 700; font-size: 1.1rem; background: #fff; border-radius: 15px; border: 1px dashed #ddd;">아직 작성된 농장 일기가 없습니다.<br>농장주님이 첫 일기를 들려주시길 기다려주세요! 🌱</div>
             </div>
-            
+        </div>
+
+        <!-- 🌟 수정: 주요 일정 및 공지를 독립된 탭으로 분리 -->
+        <div id="tab-schedule" class="tab-content">
+            <div class="schedule-box">
+                <h3>📅 주요 일정 및 공지</h3>
+                <ul class="schedule-list">
+                    <li>이번 주 금요일: 햇감자 수확 예정! (예약 판매 진행 중)</li>
+                    <li>매주 수요일은 농장 정비일로 방문 수거가 어렵습니다.</li>
+                    <li>다음 달 초 달콤한 찰옥수수가 출하됩니다. 단골 등록 시 알림을 드립니다.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 🌟 수정: 최하단 농장 정보 및 지도보기 푸터 영역 -->
+        <div class="farm-footer" id="farmFooter">
+            <div><strong>농장명:</strong> <span id="footerFarmName">로딩중...</span></div>
+            <div><strong>대표자:</strong> <span id="footerOwnerName">로딩중...</span></div>
+            <div id="footerAddressZone" style="display: none; align-items: center; gap: 10px; margin-top: 5px;">
+                <strong>주소:</strong> <span id="footerAddress">주소 로딩중...</span>
+                <button onclick="openMap()" style="background: var(--primary-green); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 800; cursor: pointer; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">📍 지도보기</button>
+            </div>
         </div>
     </div>
 
@@ -231,6 +204,13 @@
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // 🌟 지도 보기 팝업 띄우는 함수
+        function openMap() {
+            const addr = document.getElementById('footerAddress').innerText;
+            const searchUrl = "https://map.kakao.com/link/search/" + encodeURIComponent(addr);
+            window.open(searchUrl, "_blank");
         }
 
         document.addEventListener("DOMContentLoaded", function() {
@@ -249,24 +229,37 @@
             .then(result => {
                 if(result.success && result.data) {
                     const producer = result.data;
-                    currentProducerOwner = producer.owner_nickname; // 주인의 닉네임 기억해두기
+                    currentProducerOwner = producer.owner_nickname; 
 
-                    // 🌟 아래쪽 이름은 지웠으므로 한 줄 소개만 넣어줍니다.
-                    document.getElementById('storyProducerShort').innerText = producer.farm_short;
-                    
-                    // 🌟 상단 헤더에 농장 이름과 귀여운 이모티콘을 함께 띄워줍니다!
+                    // 상단 헤더
                     document.getElementById('headerFarmName').innerText = producer.farm_name + " 🧑‍🌾";
                     
-                    const descEl = document.getElementById('storyProducerDesc');
-                    if(descEl) descEl.innerText = producer.farm_desc || '등록된 소개글이 없습니다.';
-
-                    if(producer.profile_image) {
-                        const pImg = document.getElementById('storyProfileImg');
-                        if(pImg) { pImg.src = producer.profile_image; pImg.style.display = 'block'; }
+                    // 🌟 최하단 푸터 정보 채워넣기
+                    document.getElementById('footerFarmName').innerText = producer.farm_name;
+                    document.getElementById('footerOwnerName').innerText = producer.owner_nickname || '정보 없음';
+                    if (producer.address) {
+                        document.getElementById('footerAddressZone').style.display = 'flex'; // 주소가 있으면 지도버튼 노출
+                        document.getElementById('footerAddress').innerText = producer.address;
                     }
+
+                    // 커버 이미지
                     if(producer.cover_image) {
                         const cImg = document.getElementById('storyCoverImg');
                         if(cImg) { cImg.src = producer.cover_image; cImg.style.display = 'block'; }
+                    }
+
+                    // 소개글 세팅
+                    const descEl = document.getElementById('storyProducerDesc');
+                    if(descEl) descEl.innerText = producer.farm_desc || '등록된 소개글이 없습니다.';
+
+                    // 🌟 프로필 이미지가 있다면 좌측에 삽입하고 레이아웃 변경 (사진 + 글 형태)
+                    const introGrid = document.getElementById('introGridBox');
+                    if(producer.profile_image) {
+                        introGrid.style.gridTemplateColumns = "1fr 1.5fr"; // 좌측 이미지, 우측 텍스트
+                        const imgHtml = `<div class="intro-photo-box" style="display:flex; align-items:center;"><img src="${producer.profile_image}" style="width: 100%; border-radius: 15px; object-fit: cover; box-shadow: 0 4px 15px rgba(0,0,0,0.05); aspect-ratio: 4/3;"></div>`;
+                        introGrid.insertAdjacentHTML('afterbegin', imgHtml);
+                    } else {
+                        introGrid.style.gridTemplateColumns = "1fr"; // 사진이 없으면 글만 100% 꽉 채우기
                     }
 
                     // 2. 접속한 사람이 주인인지 확인 (맞으면 글쓰기 버튼 오픈)
@@ -282,7 +275,6 @@
                     .then(pResult => {
                         if(pResult.success) {
                             const myProducts = pResult.data.filter(p => p.owner_nickname === producer.owner_nickname);
-                            document.getElementById('productCount').innerText = myProducts.length;
                             
                             const pContainer = document.getElementById('storyProductContainer');
                             
@@ -318,12 +310,12 @@
             .catch(error => console.error('데이터 조회 실패:', error));
         });
 
-        // 🌟 글쓰기 상자 열고 닫기 마법사
+        // 글쓰기 상자 열고 닫기 마법사
         function toggleDiaryForm() {
             document.getElementById('diaryFormBox').classList.toggle('active');
         }
 
-        // 🌟 작성한 일기를 서버에 저장하는 기능
+        // 작성한 일기를 서버에 저장하는 기능
         function submitDiary() {
             const content = document.getElementById('diaryContentInput').value.trim();
             if(!content) { alert('일기 내용을 입력해주세요!'); return; }
@@ -337,21 +329,20 @@
             .then(data => {
                 alert(data.message);
                 if(data.success) {
-                    document.getElementById('diaryContentInput').value = ''; // 쓴 글 지우기
-                    toggleDiaryForm(); // 상자 닫기
-                    loadDiaryList(); // 일기장 새로고침
+                    document.getElementById('diaryContentInput').value = ''; 
+                    toggleDiaryForm(); 
+                    loadDiaryList(); 
                 }
             });
         }
 
-        // 🌟 서버에서 일기장 가져와서 예쁘게 그리기
+        // 서버에서 일기장 가져와서 예쁘게 그리기
         function loadDiaryList() {
             fetch(`/api/producers/${currentProducerId}/diary`)
             .then(res => res.json())
             .then(result => {
                 const container = document.getElementById('diaryTimelineContainer');
                 if(result.success && result.data.length > 0) {
-                    document.getElementById('postCount').innerText = result.data.length;
                     container.innerHTML = '';
                     
                     result.data.forEach(diary => {
@@ -370,7 +361,6 @@
                         container.insertAdjacentHTML('beforeend', html);
                     });
                 } else {
-                    document.getElementById('postCount').innerText = '0';
                     container.innerHTML = '<div style="text-align:center; padding:60px; color:#999; font-weight: 700; font-size: 1.1rem; background: #fff; border-radius: 15px; border: 1px dashed #ddd;">아직 작성된 농장 일기가 없습니다.<br>농장주님이 첫 일기를 들려주시길 기다려주세요! 🌱</div>';
                 }
             });
